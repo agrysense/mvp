@@ -1,0 +1,36 @@
+var document = require("document");
+var log = require("log"); log.setLevel("info");
+var componentModule = require("../component");
+
+var farmhouseid = null;
+var farm = null;
+var name = null;
+var location = null;
+var gps = null;
+var description = null;
+var category = null;
+var length = null;
+var width = null;
+
+var Farmhouse = function(dto) {
+    componentModule.Component.call(this, dto);
+    if (!dto.farmhouseid) {   
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "Farmhouse: dto.farmhouseid cannot be null or empty"
+        };
+    }
+    
+    this.farmhouseid = dto.farmhouseid;
+    this.farm = dto.farm;
+    this.name = dto.name;
+    this.location = dto.location;
+    this.gps = dto.gps;
+    this.description = dto.description;
+    this.category = dto.category;
+    this.length = dto.length;
+    this.width = dto.width;
+}
+
+Farmhouse.prototype = new componentModule.Component({inheritance: true});
+Farmhouse.prototype.constructor = Farmhouse;

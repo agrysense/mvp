@@ -1,0 +1,11 @@
+/*
+ * Additional styling for index.html
+ */
+.iframe-size {
+    width: 100%; 
+    height: calc(100vh - 45px);
+}
+
+/*
+ * End additional styling for index.html
+ */

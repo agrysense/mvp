@@ -1,0 +1,38 @@
+var log = require("log"); log.setLevel("info");
+var farmManager = require("../entities/farms/farmManager");
+
+var params =  request.parameters;
+if (params.body) {
+    params = JSON.parse(params.body);
+}
+
+try {
+    var fm1 = new farmManager.FarmManager();
+    var result = {};
+    var farm = null;
+    try {
+	    farm = fm1.getFarm(params);
+    } catch (exception) {
+    }
+    if (farm != null) {
+        result.farm = farm;
+        //var farmhouses = farm.listFarmhouses(farm);
+        var totalFarmhouses = farm.getTotalFarmhouses(farm);
+        result.totalFarmHouses = totalFarmhouses;
+    } else {
+        result.farm = {};
+        result.totalFarmHouses = 0;
+    }
+    
+    return result;
+}catch(exception) {
+    return exception;
+}
+
+/*switch(params.field) {
+    case "happyness": return farm.happyness.value;
+    case "feed": return farm.feed.value;
+    case "water": return farm.water.value;
+    case "energy": return farm.energy.value;
+}
+*/

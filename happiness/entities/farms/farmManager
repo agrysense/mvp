@@ -1,0 +1,261 @@
+var document = require("document");
+var log = require("log"); log.setLevel("info");
+var farmModule = require("./farm");
+const FARM = "Farm";
+
+var FarmManager = function() {
+};
+
+/**
+ * @method listFarms
+ * @param {String} dto
+ * @return {Object} list all available farms
+ * @throws {Error}
+ */
+FarmManager.prototype.listFarms = function(dto) {
+    var queryParam = {
+        query: 'apsdb.schema="' + FARM + '"',
+        fields:"*",
+        count:true
+    };
+    
+    var resp = document.query(queryParam);
+    if (resp.metadata.status == "failure") {
+        throw resp.metadata;
+    }
+    
+    if (!resp.result.documents){
+        throw {
+            errorCode: "Entity_Not_Found",
+            errorDetail: "FarmManager.listFarms: could not find farms"
+        };
+    }
+    
+    return resp.result.documents;
+};
+
+/**
+ * @method getFarm
+ * @param {String} dto
+ * @return {Object} leightweight instance of Farm
+ * @throws {Error}
+ */
+FarmManager.prototype.getFarm = function(dto) {
+    if (!dto.farmid) {
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "FarmManager.getFarm: farmid cannot be null or empty"
+        };
+    }
+    
+    var queryParam = {
+        query: 'id="'+ dto.farmid + '" and apsdb.schema="' + FARM + '"',
+        fields:"*"
+    };
+    
+    var resp = document.query(queryParam);
+    if (resp.metadata.status == "failure") {
+        throw resp.metadata;
+    }
+    
+    if (!resp.result.documents[0]){
+        throw {
+            errorCode: "Entity_Not_Found",
+            errorDetail: "FarmManager.getFarm: could not find farm with id " + dto.farmid
+        };
+    }
+    
+    var initializationDto = {
+        "key": resp.result.documents[0].key,
+        "farmid": resp.result.documents[0].id,
+        "company": resp.result.documents[0].company,
+        "name": resp.result.documents[0].name,
+        "location": resp.result.documents[0].location,
+        "gps": resp.result.documents[0].gps,
+        "inheritance": false,
+        "controller": true
+    };
+
+    return new farmModule.Farm(initializationDto);
+};
+
+/**
+ * @method updateFarm
+ * @param {String} dto
+ * @return {Object} update a Farm object. If it doesn't exist, create it
+ * @throws {Error}
+ */
+FarmManager.prototype.updateFarm = function(dto) {
+    if (!dto.farmid) {
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "FarmManager.updateFarm: farmid cannot be null or empty"
+        };
+    }
+    
+    var fields = {
+        "id": dto.farmid,
+        "company": dto.company,
+        "name": dto.name,
+        "location": dto.location,
+        "gps": dto.gps,
+        "meta.types": {
+            "id": "string",
+            "company": "string",
+            "name": "string",
+            "location": "string",
+            "gps": "geospatial"
+        },
+        "meta.schema": FARM
+    };
+    
+    if (dto.key != null) {
+        fields.key = dto.key;
+    }
+    
+    var resp = document.save(fields);
+    if (resp.metadata.status == "failure") {
+        throw resp.metadata;
+    }
+    
+    return resp;
+}
+
+/**
+ * @method deleteFarm
+ * @param {String} dto
+ * @return {Object} flag a Farm as deleted
+ * @throws {Error}
+ */
+FarmManager.prototype.deleteFarm = function(dto) {
+    if (!dto.key) {
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "FarmManager.deleteFarm: key cannot be null or empty"
+        };
+    }
+    
+    var resp = document.delete(dto.key);
+    if (resp.metadata.status == "failure") {
+        throw resp.metadata;
+    }
+    
+    return resp;
+}
+
+/*
+var farm1 = {
+    "0" : [
+        { 
+            "id": {"value": "farm001"},
+            "lat" : {"value": "33.854337"}, 
+            "long" :{"value": "35.608358"}, 
+            "location": {"value": "Deir Al Kalaa"},
+            "manager": {"value": "Jamil Helou"},
+            "phone": {"value": "04876345"},
+            "type": {"value": "Poultry"}
+        }
+    ], 
+    "source" : "simulator",
+    "order" : [ "0" ]
+};
+
+farm1[0][0].happyness = {
+    "value": calculateHappyness(farm1[0][0].id.value)
+};
+
+farm1[0][0].bounce = {
+    "value": farm1[0][0].happyness.value < 60 ? "true" : "false"
+};
+
+farm1[0][0].feed = {
+    "value": getFeed()
+};
+
+farm1[0][0].water = {
+    "value": getWater()
+};
+
+farm1[0][0].energy = {
+    "value": getEnergy()
+};
+
+var farm2 = {
+
+    "0": [
+        {
+            "id": {"value": "farm002"},
+            "lat": {"value": "34.098630"}, 
+            "long": {"value":"35.719914"}, 
+            "location": {"value": "Zebdine"},
+            "manager": {"value": "Fahim Majzoub"},
+            "phone": {"value": "06123456"},
+            "type": {"value": "Poultry"}
+         
+        }
+    ], 
+    "source" : "simulator",
+    "order" : [ "0" ]
+};
+
+farm2[0][0].happyness = {
+    "value": calculateHappyness(farm1[0][0].id.value)
+};
+
+farm2[0][0].bounce = {
+    "value": farm1[0][0].happyness.value < 60 ? "true" : "false"
+};
+
+farm2[0][0].feed = {
+    "value": getFeed()
+};
+
+farm2[0][0].water = {
+    "value": getWater()
+};
+
+farm2[0][0].energy = {
+    "value": getEnergy()
+};
+
+
+var farms = {
+    "farm1": farm1,
+    "farm2": farm2
+};
+
+function getFarm(id) {
+    return farms[id][0][0];
+}
+
+function listFarms() {
+    return farms;
+}
+
+*/
+
+function calculateHappyness(farm) {    
+    var happynessIndex = Math.round(Math.random() * 25) + 75;
+    return happynessIndex;
+}
+
+function calculateGlobalHappyness() {
+    var total = 0;
+    for (var farm in farms) {
+        total += calculateHappyness(farm);
+    }
+    
+    return Math.round(total / Object.keys(farms).length);
+}
+
+function getFeed() {
+   return Math.round(Math.random() * 50) + 50;
+}
+
+function getWater() {
+    return Math.round(Math.random() * 50) + 50;
+}
+
+function getEnergy() {
+    return Math.round(Math.random() * 60) + 40;
+}

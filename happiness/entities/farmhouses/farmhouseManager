@@ -1,0 +1,163 @@
+var document = require("document");
+var log = require("log"); log.setLevel("info");
+var farmhouseModule = require("./farmhouse");
+const FARMHOUSE = "FarmHouse";
+
+var FarmhouseManager = function() {
+};
+
+/**
+ * @method listFarmhouses
+ * @param {String} dto
+ * @return {Object} list all available farms
+ * @throws {Error}
+ */
+FarmhouseManager.prototype.listFarmhouses = function(dto) {
+    if (!dto.farmid) {
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "FarmhouseManager.listFarmhouses: farmid cannot be null or empty"
+        };
+    }
+    
+    var queryParam = {
+        query: 'farm="'+ dto.farmid + '" and apsdb.schema="' + FARMHOUSE + '"',
+        fields:"*"
+    };
+    
+    var resp = document.query(queryParam);
+    if (resp.metadata.status == "failure") {
+        throw resp.metadata;
+    }
+    
+    if (!resp.result.documents){
+        throw {
+            errorCode: "Entity_Not_Found",
+            errorDetail: "FarmManager.listFarmhouses: could not find farmhouses"
+        };
+    }
+    
+    return resp.result.documents;
+}
+
+/**
+ * @method getFarmhouse
+ * @param {String} dto
+ * @return {Object} leightweight instance of Farmhouse
+ * @throws {Error}
+ */
+FarmhouseManager.prototype.getFarmhouse = function(dto) {
+    if (!dto.farmhouseid) {
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "FarmhouseManager.getFarmhouse: farmhouseid cannot be null or empty"
+        };
+    }
+    
+    var queryParam = {
+        query: 'id="'+ dto.farmhouseid + '" and farm="'+ dto.farmid + '" and apsdb.schema="' + FARMHOUSE + '"',
+        fields:"*"
+    };
+    
+    var resp = document.query(queryParam);
+    if (resp.metadata.status == "failure") {
+        throw resp.metadata;
+    }
+    
+    if (!resp.result.documents[0]){
+        throw {
+            errorCode: "Entity_Not_Found",
+            errorDetail: "FarmhouseManager.getFarmhouse: could not find farm with id " + dto.farmid
+        };
+    }
+    
+    var initializationDto = {
+        "key": resp.result.documents[0].key,
+        "farmhouseid": resp.result.documents[0].id,
+        "name": resp.result.documents[0].name,
+        "location": resp.result.documents[0].location,
+        "gps": resp.result.documents[0].gps,
+        "farm": resp.result.documents[0].farm,
+        "description": resp.result.documents[0].description,
+        "category": resp.result.documents[0].category,
+        "length": resp.result.documents[0].length,
+        "width": resp.result.documents[0].width,
+        "inheritance": false,
+        "controller": true
+    };
+
+    return new farmhouseModule.Farmhouse(initializationDto);
+}
+
+/**
+ * @method updateFarmhouse
+ * @param {String} dto
+ * @return {Object} update a Farmhouse object. If it doesn't exist, create it
+ * @throws {Error}
+ */
+FarmhouseManager.prototype.updateFarmhouse = function(dto) {
+    if (!dto.farmhouseid) {
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "FarmhouseManager.updateFarmhouse: farmid cannot be null or empty"
+        };
+    }
+    
+    var fields = {
+        "id": dto.farmhouseid,
+        "name": dto.name,
+        "location": dto.location,
+        "gps": dto.gps,
+        "farm": dto.farmid,
+        "description": dto.description,
+        "category": dto.category,
+        "length": dto.length,
+        "width": dto.width,
+        "meta.types": {
+            "id": "string",
+            "name": "string",
+            "location": "string",
+            "gps": "geospatial",
+            "farm": "string",
+            "description": "string",
+            "category": "string",
+            "length": "string",
+            "width": "string",
+        },
+        "meta.schema": FARMHOUSE
+    };
+    
+    if (dto.key != null) {
+        fields.key = dto.key;
+    }
+    
+    var resp = document.save(fields);
+    if (resp.metadata.status == "failure") {
+        throw resp.metadata;
+    }
+    
+    return resp;
+}
+
+/**
+ * @method deleteFarmhouse
+ * @param {String} dto
+ * @return {Object} flag a Farmhouse as deleted
+ * @throws {Error}
+ */
+FarmhouseManager.prototype.deleteFarmhouse = function(dto) {
+    if (!dto.key) {
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "FarmhouseManager.deleteFarmhouse: key cannot be null or empty"
+        };
+    }
+    
+    var resp = document.delete(dto.key);
+    if (resp.metadata.status == "failure") {
+        throw resp.metadata;
+    }
+    
+    return resp;
+}
+

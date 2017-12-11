@@ -1,0 +1,58 @@
+var document = require("document");
+var log = require("log"); log.setLevel("info");
+var componentModule = require("../component");
+var farmhouseManager = require("../farmhouses/farmhouseManager");
+
+var farmid = null;
+var company = null;
+var name = null;
+var location = null;
+var gps = null;
+
+var Farm = function(dto) {
+    componentModule.Component.call(this, dto);
+    if (!dto.farmid) {   
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "Farm: dto.farmid cannot be null or empty"
+        };
+    }
+    this.farmid = dto.farmid;
+    this.company = dto.company;
+    this.name = dto.name;
+    this.location = dto.location;
+    this.gps = dto.gps;
+}
+
+Farm.prototype = new componentModule.Component({inheritance: true});
+Farm.prototype.constructor = Farm;
+
+/**
+ * @method listFarmhouses
+ * @param {String} dto
+ * @return {Object} list all available farmhouses under this farm
+ * @throws {Error}
+ */
+Farm.prototype.listFarmhouses = function(dto) {
+    var fhm = new farmhouseManager.FarmhouseManager();
+    return fhm.listFarmhouses(dto);
+}
+
+/**
+ * @method getTotalFarmhouses
+ * @param {String} dto
+ * @return {Object} count all available farmhouses under this farm
+ * @throws {Error}
+ */
+Farm.prototype.getTotalFarmhouses = function(dto) {
+    return this.listFarmhouses(dto).length;
+}
+
+/**
+ * @method getTotalBirds
+ * @param {String} dto
+ * @return {Object} count all available birds under this farm
+ * @throws {Error}
+ */
+Farm.prototype.getTotalBirds = function(dto) {
+}
