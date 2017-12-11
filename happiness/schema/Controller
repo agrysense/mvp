@@ -1,0 +1,71 @@
+<schema>
+	<aclGroups>
+		<aclGroup name='user'>
+			<read>user</read>
+			<write>user</write>
+			<fields>
+				<field>farmhouse</field>
+				<field>software_version</field>
+				<field>speaker</field>
+				<field>microphone</field>
+				<field>camera</field>
+				<field>ip_address</field>
+				<field>mac_address</field>
+				<field>api_link</field>
+				<field>security_code</field>
+			</fields>
+		</aclGroup>
+		<schemaAcl>
+			<read>nobody</read>
+			<write>nobody</write>
+			<delete>nobody</delete>
+		</schemaAcl>
+	</aclGroups>
+	<fields>
+		<field name='farmhouse' type='numeric'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+		<field name='software_version' type='numeric'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+		<field name='speaker' type='numeric'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+		<field name='microphone' type='numeric'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+		<field name='camera' type='numeric'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+		<field name='ip_address' type='numeric'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+		<field name='mac_address' type='numeric'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+		<field name='api_link' type='numeric'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+		<field name='security_code' type='numeric'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+	</fields>
+</schema>
