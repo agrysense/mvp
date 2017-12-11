@@ -1,0 +1,47 @@
+<schema>
+	<aclGroups>
+		<aclGroup name="user">
+			<read>user</read>
+			<write>user</write>
+			<fields>
+				<field>name</field>
+				<field>headquarters</field>
+				<field>owner</field>
+				<field>contact</field>
+				<field>phone</field>
+			</fields>
+		</aclGroup>
+		<schemaAcl>
+			<read>nobody</read>
+			<write>nobody</write>
+			<delete>nobody</delete>
+		</schemaAcl>
+	</aclGroups>
+	<fields>
+		<field name='name' type='string'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+		<field name='headquarters' type='string'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+		<field name='owner' type='string'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+		<field name='contact' type='string'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+		<field name='phone' type='string'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+	</fields>
+</schema>
