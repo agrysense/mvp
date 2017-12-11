@@ -1,0 +1,47 @@
+<schema>
+	<aclGroups>
+		<aclGroup name='user'>
+			<read>user</read>
+			<write>user</write>
+			<fields>
+				<field>id</field>
+				<field>sensor_type</field>
+				<field>sensor_core</field>
+				<field>controller</field>
+				<field>port</field>
+			</fields>
+		</aclGroup>
+		<schemaAcl>
+			<read>nobody</read>
+			<write>nobody</write>
+			<delete>nobody</delete>
+		</schemaAcl>
+	</aclGroups>
+	<fields>
+		<field name='id' type='string'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+		<field name='sensor_type' type='string'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+		<field name='sensor_core' type='string'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+		<field name='controller' type='string'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+		<field name='port' type='string'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+	</fields>
+</schema>
