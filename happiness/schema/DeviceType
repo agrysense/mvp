@@ -1,0 +1,53 @@
+<schema>
+	<aclGroups>
+		<aclGroup name='user'>
+			<read>user</read>
+			<write>user</write>
+			<fields>
+				<field>name</field>
+				<field>on_off</field>
+				<field>variable</field>
+				<field>average_value</field>
+				<field>max_value</field>
+				<field>min_value</field>
+			</fields>
+		</aclGroup>
+		<schemaAcl>
+			<read>nobody</read>
+			<write>nobody</write>
+			<delete>nobody</delete>
+		</schemaAcl>
+	</aclGroups>
+	<fields>
+		<field name='name' type='string'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+		<field name='on_off' type='string'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+		<field name='variable' type='string'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+		<field name='average_value' type='numeric'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+		<field name='max_value' type='numeric'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+		<field name='min_value' type='numeric'>
+			<validation>
+				<cardinality min='1' max='1'/>
+			</validation>
+		</field>
+	</fields>
+</schema>
