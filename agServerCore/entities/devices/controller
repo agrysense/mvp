@@ -18,17 +18,20 @@ var security_code = null;
  *
  * @class
  * @constructor
+ * @param {Object} [dto] : initialization object. Should be a scriptr.io document that contains controller data
  */
 var Controller = function(dto) {
     componentModule.Component.call(this, dto);
-    if (!dto.controllerid) {   
+    if (!dto.id) {   
         throw {
             errorCode: "Missing_Parameter",
             errorDetail: "Controller: dto.controllerid cannot be null or empty"
         };
     }
-    this.controllerid = dto.controllerid;
-    this.farmhouse = dto.farmhouse;
+    
+    this.key = dto.keyt
+    this.controllerid = dto.id;
+    this.farmhouse = dto.structure;
     this.software_version = dto.software_version;
     this.speaker = dto.speaker;
     this.microphone = dto.microphone;
@@ -53,7 +56,7 @@ Controller.prototype.constructor = Controller;
 Controller.prototype.toJSONObject = function(dto) {    
     var result = {
         "controllerid": this.controllerid,
-        "farmhouse": this.farmhouse,
+        "structure": this.farmhouse,
         "software_version": this.software_version,
         "speaker": this.speaker,
         "microphone": this.microphone,
