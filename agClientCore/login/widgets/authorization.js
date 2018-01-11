@@ -18,7 +18,7 @@
 $.widget( "scriptr.authorization", {
  	
    token:null,
-   loginPage:"/happiness/login/login.html",
+   loginPage:"/agClientCore/login/html/login.html",
    user:null,
   	
    _create: function() {
