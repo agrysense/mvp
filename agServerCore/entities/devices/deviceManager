@@ -24,20 +24,21 @@ var DeviceManager = function() {
  * lists all available controllers
  *
  * @method listControllers
- * @param {String} dto
+ * @param {Object} [dto]
+ * @param {String} [dto.structureId]: the identifier of the structure (e.g. farmhouse) where the controllers are deployed
  * @return {JSONArray<Controller>} 
  * @throws {Error}
  */
 DeviceManager.prototype.listControllers = function(dto) {
-    if (!dto.farmhouseid) {
+    if (!dto.structureId) {
         throw {
             errorCode: "Missing_Parameter",
-            errorDetail: "DeviceManager.listControllers: farmhouseid cannot be null or empty"
+            errorDetail: "DeviceManager.listControllers: structureId cannot be null or empty"
         };
     }
     
     var queryParam = {
-        query: 'farmhouse="'+ dto.farmhouseid + '" and apsdb.schema="' + CONTROLLER + '"',
+        query: 'structure="'+ dto.structureId + '" and apsdb.schema="' + CONTROLLER + '"',
         fields: "*",
         count: true,
         resultsPerPage: (!dto || !dto.resultsPerPage) ? 50 : dto.resultsPerPage,
@@ -57,23 +58,8 @@ DeviceManager.prototype.listControllers = function(dto) {
     }
     
     var result = [];
-    for (var i=0; i < resp.result.documents.length; i++) {
-        var initializationDto = {
-            "key": resp.result.documents[i].key,
-            "controllerid": resp.result.documents[i].id,
-            "farmhouse": resp.result.documents[i].farmhouse,
-            "software_version": resp.result.documents[i].software_version,
-            "speaker": resp.result.documents[i].speaker,
-            "microphone": resp.result.documents[i].microphone,
-            "mac_address": resp.result.documents[i].mac_address,
-            "camera": resp.result.documents[i].camera,
-            "ip_address": resp.result.documents[i].ip_address,
-            "api_link": resp.result.documents[i].api_link,
-            "security_code": resp.result.documents[i].security_code,
-//            "controller": true,
-            "inheritance": false
-        };
-        result.push(new controllerModule.Controller(initializationDto));
+    for (var i=0; i < resp.result.documents.length; i++) {        
+        result.push(new controllerModule.Controller(resp.result.documents[i]));
     }
     return result;
 }
