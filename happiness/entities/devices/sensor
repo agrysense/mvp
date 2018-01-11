@@ -1,0 +1,53 @@
+var document = require("document");
+var log = require("log"); log.setLevel("info");
+var componentModule = require("../component");
+
+var sensorid = null;
+var sensor_core = null;
+var controller = null;
+var sensor_type = null;
+var port = null;
+
+/**
+ * Defines the Sensor object
+ *
+ * @class
+ * @constructor
+ */
+var Sensor = function(dto) {
+    componentModule.Component.call(this, dto);
+    if (!dto.sensorid) {   
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "Sensor: dto.sensorid cannot be null or empty"
+        };
+    }
+    this.sensorid = dto.sensorid;
+    this.sensor_core = dto.sensor_core;
+    this.controller = dto.controller;
+    this.sensor_type = dto.sensor_type;
+    this.port = dto.port;
+}
+
+Sensor.prototype = new componentModule.Component({inheritance: true});
+Sensor.prototype.constructor = Sensor;
+
+/**
+ * return Sensor object as JSONObject
+ * 
+ * @method toJSONObject
+ * @param {String} dto
+ * @return {JSONObject}
+ * @throws {Error}
+ */
+Sensor.prototype.toJSONObject = function(dto) {    
+    var result = {
+        "sensorid": this.sensorid,
+        "sensor_core": this.sensor_core,
+        "controller": this.controller,
+        "sensor_type": this.sensor_type,
+        "port": this.port
+    }
+    
+    return result;
+}

@@ -1,43 +1,49 @@
 var document = require("document");
 var log = require("log"); log.setLevel("info");
 var farmModule = require("./farm");
+var farmhouseManager = require("../farmhouses/farmhouseManager");
 const FARM = "Farm";
 
+/**
+ * Defines the FarmManager helper class
+ *
+ * @class
+ * @constructor
+ */
 var FarmManager = function() {
 };
 
 /**
+ * lists all available farms
+ *
  * @method listFarms
  * @param {String} dto
- * @return {Object} list all available farms
+ * @return {JSONArray<Farm>}
  * @throws {Error}
  */
 FarmManager.prototype.listFarms = function(dto) {
     var queryParam = {
         query: 'apsdb.schema="' + FARM + '"',
-        fields:"*",
-        count:true
-    };
+        fields: "*",
+        count: true,
+        resultsPerPage: (!dto || !dto.resultsPerPage) ? 50 : dto.resultsPerPage,
+        pageNumber: (!dto || !dto.pageNumber) ? 1 : dto.pageNumber
+    }; 
     
     var resp = document.query(queryParam);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
     
-    if (!resp.result.documents){
-        throw {
-            errorCode: "Entity_Not_Found",
-            errorDetail: "FarmManager.listFarms: could not find farms"
-        };
-    }
-    
     return resp.result.documents;
 };
 
 /**
+ * returns an instance of Farm based on the farmid
+ *
  * @method getFarm
  * @param {String} dto
- * @return {Object} leightweight instance of Farm
+ * @return {Farm}
  * @throws {Error}
  */
 FarmManager.prototype.getFarm = function(dto) {
@@ -73,16 +79,19 @@ FarmManager.prototype.getFarm = function(dto) {
         "location": resp.result.documents[0].location,
         "gps": resp.result.documents[0].gps,
         "inheritance": false,
-        "controller": true
+        "controller": true,
+        "farmhouseManager": farmhouseManager
     };
 
     return new farmModule.Farm(initializationDto);
 };
 
 /**
+ * updates a Farm object. If it doesn't exist, this method creates it
+ *
  * @method updateFarm
  * @param {String} dto
- * @return {Object} update a Farm object. If it doesn't exist, create it
+ * @return {Object}
  * @throws {Error}
  */
 FarmManager.prototype.updateFarm = function(dto) {
@@ -122,9 +131,11 @@ FarmManager.prototype.updateFarm = function(dto) {
 }
 
 /**
+ * flag a Farm as deleted
+ *
  * @method deleteFarm
  * @param {String} dto
- * @return {Object} flag a Farm as deleted
+ * @return {Object} 
  * @throws {Error}
  */
 FarmManager.prototype.deleteFarm = function(dto) {

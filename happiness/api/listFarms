@@ -1,8 +1,0 @@
-var farmManager = require("../entities/farms/farmManager");
-var log = require("log"); log.setLevel("info");
-try {
-    var fm1 = new farmManager.FarmManager();
-	return fm1.listFarms();
-}catch(exception) {
-    return exception;
-}

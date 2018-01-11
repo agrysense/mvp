@@ -1,0 +1,56 @@
+var document = require("document");
+var log = require("log"); log.setLevel("info");
+var componentModule = require("../component");
+
+var cameraid = null;
+var controller = null;
+var embedded = null;
+var third_party = null;
+var vendor = null;
+var model = null;
+
+/**
+ * Defines the Camera object
+ *
+ * @class
+ * @constructor
+ */
+var Camera = function(dto) {
+    componentModule.Component.call(this, dto);
+    if (!dto.cameraid) {   
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "Camera: dto.cameraid cannot be null or empty"
+        };
+    }
+    this.cameraid = dto.cameraid;
+    this.controller = dto.controller;
+    this.embedded = dto.embedded;
+    this.third_party = dto.third_party;
+    this.vendor = dto.vendor;
+    this.model = dto.model;
+}
+
+Camera.prototype = new componentModule.Component({inheritance: true});
+Camera.prototype.constructor = Camera;
+
+/**
+ * return Camera object as JSONObject
+ * 
+ * @method toJSONObject
+ * @param {String} dto
+ * @return {JSONObject}
+ * @throws {Error}
+ */
+Camera.prototype.toJSONObject = function(dto) {    
+    var result = {
+        "cameraid": this.cameraid,
+        "controller": this.controller,
+        "embedded": this.embedded,
+        "third_party": this.third_party,
+        "vendor": this.vendor,
+        "model": this.model
+    }
+    
+    return result;
+}

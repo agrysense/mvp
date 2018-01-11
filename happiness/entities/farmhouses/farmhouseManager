@@ -1,28 +1,42 @@
 var document = require("document");
 var log = require("log"); log.setLevel("info");
 var farmhouseModule = require("./farmhouse");
+var deviceManager = require("../devices/deviceManager");
 const FARMHOUSE = "FarmHouse";
 
+
+/**
+ * Defines the FarmManager helper class
+ *
+ * @class
+ * @constructor
+ */
 var FarmhouseManager = function() {
 };
 
 /**
+ * lists all available farms
+ *
  * @method listFarmhouses
  * @param {String} dto
- * @return {Object} list all available farms
+ * @return {JSONArray<Farmhouse>} 
  * @throws {Error}
  */
 FarmhouseManager.prototype.listFarmhouses = function(dto) {
-    if (!dto.farmid) {
+/*    if (!dto.farmid) {
         throw {
             errorCode: "Missing_Parameter",
             errorDetail: "FarmhouseManager.listFarmhouses: farmid cannot be null or empty"
         };
     }
-    
+*/    
     var queryParam = {
-        query: 'farm="'+ dto.farmid + '" and apsdb.schema="' + FARMHOUSE + '"',
-        fields:"*"
+//        query: 'farm="'+ dto.farmid + '" and apsdb.schema="' + FARMHOUSE + '"',
+        query: 'apsdb.schema="' + FARMHOUSE + '"',
+        fields: "*",
+        count: true,
+        resultsPerPage: (!dto || !dto.resultsPerPage) ? 50 : dto.resultsPerPage,
+        pageNumber: (!dto || !dto.pageNumber) ? 1 : dto.pageNumber
     };
     
     var resp = document.query(queryParam);
@@ -37,13 +51,34 @@ FarmhouseManager.prototype.listFarmhouses = function(dto) {
         };
     }
     
-    return resp.result.documents;
+    var result = [];
+    for (var i=0; i < resp.result.documents.length; i++) {
+        var initializationDto = {
+            "key": resp.result.documents[i].key,
+            "farmhouseid": resp.result.documents[i].id,
+            "name": resp.result.documents[i].name,
+            "location": resp.result.documents[i].location,
+            "gps": resp.result.documents[i].gps,
+            "farm": resp.result.documents[i].farm,
+            "description": resp.result.documents[i].description,
+            "category": resp.result.documents[i].category,
+            "length": resp.result.documents[i].length,
+            "width": resp.result.documents[i].width,
+            "inheritance": false,
+            "controller": true
+        };
+
+        result.push(new farmhouseModule.Farmhouse(initializationDto));
+    }
+    return result;
 }
 
 /**
+ * get Farmhouse based on farmhouseid
+ *
  * @method getFarmhouse
  * @param {String} dto
- * @return {Object} leightweight instance of Farmhouse
+ * @return {Farmhouse}
  * @throws {Error}
  */
 FarmhouseManager.prototype.getFarmhouse = function(dto) {
@@ -53,9 +88,15 @@ FarmhouseManager.prototype.getFarmhouse = function(dto) {
             errorDetail: "FarmhouseManager.getFarmhouse: farmhouseid cannot be null or empty"
         };
     }
+    if (!dto.farm) {
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "FarmhouseManager.getFarmhouse: farm cannot be null or empty"
+        };
+    }
     
     var queryParam = {
-        query: 'id="'+ dto.farmhouseid + '" and farm="'+ dto.farmid + '" and apsdb.schema="' + FARMHOUSE + '"',
+        query: 'id="'+ dto.farmhouseid + '" and farm="'+ dto.farm + '" and apsdb.schema="' + FARMHOUSE + '"',
         fields:"*"
     };
     
@@ -67,7 +108,7 @@ FarmhouseManager.prototype.getFarmhouse = function(dto) {
     if (!resp.result.documents[0]){
         throw {
             errorCode: "Entity_Not_Found",
-            errorDetail: "FarmhouseManager.getFarmhouse: could not find farm with id " + dto.farmid
+            errorDetail: "FarmhouseManager.getFarmhouse: could not find farmhouse with id " + dto.farmhouseid
         };
     }
     
@@ -90,9 +131,11 @@ FarmhouseManager.prototype.getFarmhouse = function(dto) {
 }
 
 /**
+ * updates a Farmhouse object. If it doesn't exist, the method creates it
+ *
  * @method updateFarmhouse
  * @param {String} dto
- * @return {Object} update a Farmhouse object. If it doesn't exist, create it
+ * @return {Object}
  * @throws {Error}
  */
 FarmhouseManager.prototype.updateFarmhouse = function(dto) {
@@ -108,7 +151,7 @@ FarmhouseManager.prototype.updateFarmhouse = function(dto) {
         "name": dto.name,
         "location": dto.location,
         "gps": dto.gps,
-        "farm": dto.farmid,
+        "farm": dto.farm,
         "description": dto.description,
         "category": dto.category,
         "length": dto.length,
@@ -140,9 +183,11 @@ FarmhouseManager.prototype.updateFarmhouse = function(dto) {
 }
 
 /**
+ * flags a Farmhouse as deleted
+ *
  * @method deleteFarmhouse
  * @param {String} dto
- * @return {Object} flag a Farmhouse as deleted
+ * @return {Object}
  * @throws {Error}
  */
 FarmhouseManager.prototype.deleteFarmhouse = function(dto) {

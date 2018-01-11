@@ -1,0 +1,116 @@
+var document = require("document");
+var log = require("log"); log.setLevel("info");
+var componentModule = require("../component");
+
+var controllerid = null;
+var farmhouse = null;
+var software_version = null;
+var speaker = null;
+var microphone = null;
+var mac_address = null;
+var camera = null;
+var ip_address = null;
+var api_link = null;
+var security_code = null;
+
+/**
+ * Defines the Controller object
+ *
+ * @class
+ * @constructor
+ */
+var Controller = function(dto) {
+    componentModule.Component.call(this, dto);
+    if (!dto.controllerid) {   
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "Controller: dto.controllerid cannot be null or empty"
+        };
+    }
+    this.controllerid = dto.controllerid;
+    this.farmhouse = dto.farmhouse;
+    this.software_version = dto.software_version;
+    this.speaker = dto.speaker;
+    this.microphone = dto.microphone;
+    this.mac_address = dto.mac_address;
+    this.camera = dto.camera;
+    this.ip_address = dto.ip_address;
+    this.api_link = dto.api_link;
+    this.security_code = dto.security_code;
+}
+
+Controller.prototype = new componentModule.Component({inheritance: true});
+Controller.prototype.constructor = Controller;
+
+/**
+ * return Controller object as JSONObject
+ * 
+ * @method toJSONObject
+ * @param {String} dto
+ * @return {JSONObject}
+ * @throws {Error}
+ */
+Controller.prototype.toJSONObject = function(dto) {    
+    var result = {
+        "controllerid": this.controllerid,
+        "farmhouse": this.farmhouse,
+        "software_version": this.software_version,
+        "speaker": this.speaker,
+        "microphone": this.microphone,
+        "mac_address": this.mac_address,
+        "camera": this.camera,
+        "ip_address": this.ip_address,
+        "api_link": this.api_link,
+        "security_code": this.security_code
+    }
+    
+    return result;
+}
+
+/**
+ * lists all available cameras under this farm
+ * 
+ * @method listCameras
+ * @param {String} dto
+ * @return {JSONArray<Camera>}
+ * @throws {Error}
+ */
+Controller.prototype.listCameras = function(deviceManager, dto) {
+    var controllerid = (!dto || !dto.controllerid) ? this.controllerid : dto.controllerid;
+    var updatedDto = {
+      "controllerid": controllerid
+    };
+    return deviceManager.listCameras(updatedDto);
+}
+
+/**
+ * lists all available sensors under this farm
+ * 
+ * @method listSensors
+ * @param {String} dto
+ * @return {JSONArray<Sensor>}
+ * @throws {Error}
+ */
+Controller.prototype.listSensors = function(deviceManager, dto) {
+    var controllerid = (!dto || !dto.controllerid) ? this.controllerid : dto.controllerid;
+    var updatedDto = {
+      "controllerid": controllerid
+    };
+    return deviceManager.listSensors(updatedDto);
+}
+
+/**
+ * lists all available sensor_cores under this farm
+ * 
+ * @method listSensorCores
+ * @param {String} dto
+ * @return {JSONArray<SensorCore>}
+ * @throws {Error}
+ */
+Controller.prototype.listSensorCores = function(deviceManager, dto) {
+    var controllerid = (!dto || !dto.controllerid) ? this.controllerid : dto.controllerid;
+    var updatedDto = {
+      "controllerid": controllerid
+    };
+    return deviceManager.listSensorCores(updatedDto);
+}

@@ -1,0 +1,25 @@
+var deviceController = require("../../applications/deviceController");
+var log = require("log"); log.setLevel("info");
+
+var params = request.parameters;
+if (params.body) {
+    params = JSON.parse(params.body);
+}
+
+var customParams = JSON.parse(JSON.stringify(params));
+
+try {
+    var deviceCtrl = new deviceController.DeviceController();
+	return deviceCtrl.updateCamera(params);
+} catch(exception) {
+    return exception;
+}
+
+/*
+var cameraid = null;
+var controller = null;
+var embedded = null;
+var third_party = null;
+var vendor = null;
+var model = null;
+*/

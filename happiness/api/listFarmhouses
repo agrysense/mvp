@@ -1,8 +1,0 @@
-var farmhouseManager = require("../entities/farms/farmhouseManager");
-var log = require("log"); log.setLevel("info");
-try {
-    var fhm1 = new farmhouseManager.FarmhouseManager();
-	return fhm1.listFarmhouses();
-}catch(exception) {
-    return exception;
-}

@@ -1,0 +1,24 @@
+var deviceController = require("../../applications/deviceController");
+var log = require("log"); log.setLevel("info");
+
+var params = request.parameters;
+if (params.body) {
+    params = JSON.parse(params.body);
+}
+
+var customParams = JSON.parse(JSON.stringify(params));
+
+try {
+    var deviceCtrl = new deviceController.DeviceController();
+	return deviceCtrl.updateSensor(params);
+} catch(exception) {
+    return exception;
+}
+
+/*
+var sensorid = null;
+var sensor_core = null;
+var controller = null;
+var sensor_type = null;
+var port = null;
+*/

@@ -16,13 +16,13 @@ function Component(dto) {
     }
     
     if (!dto.inheritance){
-        if (!dto.controller) {
+/*        if (!dto.controller) {
              throw {
                 errorCode: "Missing_Parameter",
                 errorDetail: this.constructor.name + ": dto cannot be null or empty"
             };
         }    
-    
+*/    
         this.setPropertiesFromDocument(dto);    
     }  
 }
