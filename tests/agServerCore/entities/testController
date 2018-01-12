@@ -1,0 +1,40 @@
+var jasmine = require("/tests/modules/jasmine/boot");
+var deviceManagerModule = require("/agServerCore/entities/devices/deviceManager");
+var controllerModule = require("/agServerCore/entities/devices/controller");
+var init = require("./init");
+
+var deviceManager = new deviceManagerModule.DeviceManager();
+var controller = null; // controller instance under testing
+
+jasmine.describe("Testing the Controller class", function() {
+   
+    jasmine.beforeAll(function(){
+
+        var controllerKey = init.createController();
+        var data = init.getDocument(controllerKey);
+        try {
+            controller = new controllerModule.Controller(data, deviceManager);
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }
+    }); 
+
+    jasmine.beforeEach(function() {
+
+    });
+
+    jasmine.it("controller.listCameras() returns an array of Camera instances", function() {
+
+        try {
+            
+            var list = controller.listCameras();
+            jasmine.expect(list).not.toBeNull(null);
+            jasmine.expect(list.length).toBe(1);
+            jasmine.expect(list[0].constructor.name).toBe("Camera");
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }
+    });
+});
+
+jasmine.execute();

@@ -1,0 +1,130 @@
+/**
+ * This file contains functions only relying on scriptr.io's API to create devices in the storage   
+ */
+
+var document = require("document");
+
+const CONTROLLER_KEY_PREFIX = "TEST_CONTROLLER_";
+const CONTROLLER_NAME_PREFIX = "TEST_CONTROLLER_";
+const CAMERA_KEY_PREFIX = "TEST_CAMERA_";
+const CAMERA_NAME_PREFIX = "TEST_CAMERA_";
+const SENSOR_KEY_PREFIX = "TEST_SENSOR_";
+const SENSOR_NAME_PREFIX = "TEST_SENSOR_";
+
+function createController() {
+
+    var uid = guid();
+    var data = {
+
+        "key": CONTROLLER_KEY_PREFIX + uid,
+        "server_address": ip(),
+        "mac_address": mac(),
+        "api_link": "test",
+        "software_version": "1.0.0",
+        "camera": "true",
+        "microphone": "true",
+        "ip_address": ip(),
+        "structure": "a",
+        "security_code": "123456",
+        "speaker": "TRUE",
+        "name": CONTROLLER_NAME_PREFIX + uid,
+        "meta.schema": "Controller"
+    };
+
+    var resp = document.save(data);    
+    if (resp.metadata.status == "failure") {
+        throw(JSON.stringify(resp.metadata));
+    }
+
+    createCamera(data.key);
+    createSensor(data.key);
+    return data.key;
+}
+
+function getDocument(key) {
+
+    var resp = document.get(key);    
+    if (resp.metadata.status == "failure") {
+        throw(JSON.stringify(resp.metadata));
+    }
+
+    return resp.result;
+}
+
+function createCamera(controllerid) {
+
+    var uid = guid();
+    var data = {
+
+        "key": CAMERA_KEY_PREFIX + uid,
+        "name": CAMERA_NAME_PREFIX + uid,
+        "embedded": "true",
+        "controller": controllerid,
+        "third_party": "???",
+        "vendor": "Digital",
+        "model": "ZX-1234",
+        "meta.schema": "Camera"
+    };
+
+    var resp = document.save(data);    
+    if (resp.metadata.status == "failure") {
+        throw(JSON.stringify(resp.metadata));
+    }
+
+    return data.key;
+}
+
+function createSensor(controllerid) {
+
+    var types = ["CO2", "Ammonia", "Temperature", "Humidity", "Light"];
+    var uid = guid();
+    var data = {
+
+        "key": SENSOR_KEY_PREFIX + uid,
+        "sensor_type": types[Math.round(Math.random() * (types.length - 1))],
+        "sensor_core": "",
+        "controller": controllerid,
+        "port": Math.round(Math.random() * 1000) + 100,
+        "meta.schema": "Sensor"
+    };
+
+    var resp = document.save(data);    
+    if (resp.metadata.status == "failure") {
+        throw(JSON.stringify(resp.metadata));
+    }
+
+    return data.key;
+}
+
+function guid() {
+
+    var choice = "abcdefghijklmnopqrstuvwxyz0123456789";
+    var uid = "";
+    for (var i = 0; i < 15; i++) {
+        uid += choice[Math.round(Math.random() * (choice.length -1))];
+    }
+
+    return uid;
+}
+
+function ip() {
+
+    var a = Math.round(Math.random() * 245) + 10;
+    var b = Math.round(Math.random() * 245) + 10;
+    var c = Math.round(Math.random() * 245) + 10;
+    var d = Math.round(Math.random() * 245) + 10;
+    return a + "." + b + "." + c + "." + d;
+}
+
+function mac() {
+
+    var mc = "";
+    var alpha = "ABCDEF";
+    for (var i = 1; i <=8; i++) {
+
+        mc += alpha[Math.round(Math.random() * (alpha.length -1))] +  Math.round(Math.random() * 8);
+        mc += i != 8 ? ":" : "";
+    }
+
+    return mc;
+}
