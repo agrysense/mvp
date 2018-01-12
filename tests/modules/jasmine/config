@@ -1,3 +1,0 @@
-var matchers  = ["./matchers"];
-
-var reporters = ['./reporters/ConsoleReporter','./reporters/PubSubReporter'];
