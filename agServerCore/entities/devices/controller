@@ -19,72 +19,47 @@ var security_code = null;
  * @class
  * @constructor
  * @param {Object} [dto] : initialization object. Should be a scriptr.io document that contains controller data
+ * @param {Object} deviceManager: an instance of DeviceManager
  */
-var Controller = function(dto) {
+var Controller = function(dto, deviceManager) {    
+    
     componentModule.Component.call(this, dto);
-    if (!dto.id) {   
+    if (!deviceManager) {
+        
         throw {
             errorCode: "Missing_Parameter",
-            errorDetail: "Controller: dto.controllerid cannot be null or empty"
+            errorDetail: this.constructor.name + ": deviceManager cannot be null or undefined"
         };
     }
     
-    this.key = dto.keyt
-    this.controllerid = dto.id;
-    this.farmhouse = dto.structure;
-    this.software_version = dto.software_version;
-    this.speaker = dto.speaker;
-    this.microphone = dto.microphone;
-    this.mac_address = dto.mac_address;
-    this.camera = dto.camera;
-    this.ip_address = dto.ip_address;
-    this.api_link = dto.api_link;
-    this.security_code = dto.security_code;
+    this.deviceManager = deviceManager;
 }
 
 Controller.prototype = new componentModule.Component({inheritance: true});
 Controller.prototype.constructor = Controller;
 
 /**
- * return Controller object as JSONObject
- * 
- * @method toJSONObject
- * @param {String} dto
- * @return {JSONObject}
- * @throws {Error}
- */
-Controller.prototype.toJSONObject = function(dto) {    
-    var result = {
-        "controllerid": this.controllerid,
-        "structure": this.farmhouse,
-        "software_version": this.software_version,
-        "speaker": this.speaker,
-        "microphone": this.microphone,
-        "mac_address": this.mac_address,
-        "camera": this.camera,
-        "ip_address": this.ip_address,
-        "api_link": this.api_link,
-        "security_code": this.security_code
-    }
-    
-    return result;
-}
-
-/**
- * lists all available cameras under this farm
+ * list the cameras that are related to the current Controller
  * 
  * @method listCameras
- * @param {String} dto
+ * @param {Object} [dto]: search criteria
  * @return {JSONArray<Camera>}
  * @throws {Error}
  */
-Controller.prototype.listCameras = function(deviceManager, dto) {
-    var controllerid = (!dto || !dto.controllerid) ? this.controllerid : dto.controllerid;
-    var updatedDto = {
-      "controllerid": controllerid
+Controller.prototype.listCameras = function(dto) {
+   
+    var searchDto = {
+      "controllerid": this.id
     };
-    return deviceManager.listCameras(updatedDto);
-}
+    
+    if (dto) {
+        for (var key in dto){
+            searchDto[key] = dto[key];
+        }
+    }
+    
+    return this.deviceManager.listCameras(searchDto);
+};
 
 /**
  * lists all available sensors under this farm
@@ -94,13 +69,20 @@ Controller.prototype.listCameras = function(deviceManager, dto) {
  * @return {JSONArray<Sensor>}
  * @throws {Error}
  */
-Controller.prototype.listSensors = function(deviceManager, dto) {
-    var controllerid = (!dto || !dto.controllerid) ? this.controllerid : dto.controllerid;
-    var updatedDto = {
-      "controllerid": controllerid
+Controller.prototype.listSensors = function(dto) {
+  
+    var searchDto = {
+      "controllerid": this.id
     };
-    return deviceManager.listSensors(updatedDto);
-}
+    
+    if (dto) {
+        for (var key in dto){
+            searchDto[key] = dto[key];
+        }
+    }
+    
+    return this.deviceManager.listSensors(searchDto);
+};
 
 /**
  * lists all available sensor_cores under this farm
@@ -110,10 +92,17 @@ Controller.prototype.listSensors = function(deviceManager, dto) {
  * @return {JSONArray<SensorCore>}
  * @throws {Error}
  */
-Controller.prototype.listSensorCores = function(deviceManager, dto) {
-    var controllerid = (!dto || !dto.controllerid) ? this.controllerid : dto.controllerid;
-    var updatedDto = {
-      "controllerid": controllerid
+Controller.prototype.listSensorCores = function(dto) {
+    
+    var searchDto = {
+      "controllerid": this.id
     };
-    return deviceManager.listSensorCores(updatedDto);
-}
+    
+    if (dto) {
+        for (var key in dto){
+            searchDto[key] = dto[key];
+        }
+    }
+    
+    return this.deviceManager.listSensorCores(searchDto);
+};

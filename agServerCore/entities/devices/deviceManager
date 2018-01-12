@@ -25,7 +25,7 @@ var DeviceManager = function() {
  *
  * @method listControllers
  * @param {Object} [dto]
- * @param {String} [dto.structureId]: the identifier of the structure (e.g. farmhouse) where the controllers are deployed
+ * @param {String} [dto.structureid]: the identifier of the structure (e.g. farmhouse) where the controllers are deployed
  * @return {JSONArray<Controller>} 
  * @throws {Error}
  */
@@ -33,30 +33,30 @@ DeviceManager.prototype.listControllers = function(dto) {
     if (!dto.structureId) {
         throw {
             errorCode: "Missing_Parameter",
-            errorDetail: "DeviceManager.listControllers: structureId cannot be null or empty"
+            errorDetail: "DeviceManager.listControllers: structureid cannot be null or empty"
         };
     }
-    
+
     var queryParam = {
-        query: 'structure="'+ dto.structureId + '" and apsdb.schema="' + CONTROLLER + '"',
+        query: 'structure="'+ dto.structureid + '" and apsdb.schema="' + CONTROLLER + '"',
         fields: "*",
         count: true,
         resultsPerPage: (!dto || !dto.resultsPerPage) ? 50 : dto.resultsPerPage,
         pageNumber: (!dto || !dto.pageNumber) ? 1 : dto.pageNumber
     };
-    
+
     var resp = document.query(queryParam);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
-    
+
     if (!resp.result.documents){
         throw {
             errorCode: "Entity_Not_Found",
             errorDetail: "DeviceManager.listControllers: could not find controllers"
         };
     }
-    
+
     var result = [];
     for (var i=0; i < resp.result.documents.length; i++) {        
         result.push(new controllerModule.Controller(resp.result.documents[i]));
@@ -65,10 +65,11 @@ DeviceManager.prototype.listControllers = function(dto) {
 }
 
 /**
- * get Controller based on farmid, farmhouseid, controllerid
- *
+ * get Controller based on rootStructureid, structureid, controllerid
+ * The unicity is only guaranteed when passing structureid
  * @method getController
- * @param {String} dto
+ * @param {Object} [dto]
+ * @param {String} [dto.controllerid]: the id of the controller
  * @return {Controller}
  * @throws {Error}
  */
@@ -79,47 +80,25 @@ DeviceManager.prototype.getController = function(dto) {
             errorDetail: "DeviceManager.getController: controllerid cannot be null or empty"
         };
     }
-    if (!dto.farmhouse) {
-        throw {
-            errorCode: "Missing_Parameter",
-            errorDetail: "DeviceManager.getController: farmhouse cannot be null or empty"
-        };
-    }
-    
+
     var queryParam = {
-        query: 'id="'+ dto.controllerid + '" and farmhouse="' + dto.farmhouse + '" and apsdb.schema="' + CONTROLLER + '"',
+        query: 'id="'+ dto.controllerid + '"', 
         fields:"*"
     };
-    
+
     var resp = document.query(queryParam);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
-    
+
     if (!resp.result.documents[0]){
         throw {
             errorCode: "Entity_Not_Found",
             errorDetail: "DeviceManager.getController: could not find controller with id " + dto.controllerid
         };
     }
-    
-    var initializationDto = {
-        "key": resp.result.documents[0].key,
-        "controllerid": resp.result.documents[0].id,
-        "farmhouse": resp.result.documents[0].farmhouse,
-        "softwareVersion": resp.result.documents[0].softwareVersion,
-        "speaker": resp.result.documents[0].speaker,
-        "microphone": resp.result.documents[0].microphone,
-        "macAddress": resp.result.documents[0].macAddress,
-        "camera": resp.result.documents[0].camera,
-        "ipAddress": resp.result.documents[0].ipAddress,
-        "apiLink": resp.result.documents[0].apiLink,
-        "securityCode": resp.result.documents[0].securityCode,
-//        "controller": true
-        "inheritance": false
-    };
 
-    return new controllerModule.Controller(initializationDto);
+    return new controllerModule.Controller(resp.result.documents[0], this);
 }
 
 /**
@@ -137,7 +116,7 @@ DeviceManager.prototype.updateController = function(dto) {
             errorDetail: "DeviceManager.updateController: controllerid cannot be null or empty"
         };
     }
-    
+
     var fields = {
         "id": dto.controllerid,
         "farmhouse": dto.farmhouse,
@@ -163,16 +142,16 @@ DeviceManager.prototype.updateController = function(dto) {
         },
         "meta.schema": CONTROLLER
     };
-    
+
     if (dto.key != null) {
         fields.key = dto.key;
     }
-    
+
     var resp = document.save(fields);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
-    
+
     return resp;
 }
 
@@ -191,65 +170,55 @@ DeviceManager.prototype.deleteController = function(dto) {
             errorDetail: "DeviceManager.deleteController: key cannot be null or empty"
         };
     }
-    
+
     var resp = document.delete(dto.key);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
-    
+
     return resp;
 }
 
 /**
- * lists all available cameras
+ * lists all available cameras according to the given search criteria
  *
  * @method listCameras
- * @param {String} dto
+ * @param {Object} [dto]: search criteria
+ * @param {String} [dto.controllerid]: the identifier of the controller to which the camera is linked
  * @return {JSONArray<Camera>} 
  * @throws {Error}
  */
 DeviceManager.prototype.listCameras = function(dto) {
-    if (!dto.controllerid) {
-        throw {
-            errorCode: "Missing_Parameter",
-            errorDetail: "DeviceManager.listCameras: controllerid cannot be null or empty"
-        };
-    }
-    
+
     var queryParam = {
-        query: 'controller="'+ dto.controllerid + '" and apsdb.schema="' + CAMERA + '"',
+        query: 'apsdb.schema="' + CAMERA + '"',
         fields: "*",
         count: true,
         resultsPerPage: (!dto || !dto.resultsPerPage) ? 50 : dto.resultsPerPage,
         pageNumber: (!dto || !dto.pageNumber) ? 1 : dto.pageNumber
     };
-    
+
+    if (dto.controllerid) {
+        queryParam.query +=  ' and controller="'+ dto.controllerid + '"';
+    }
+
     var resp = document.query(queryParam);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
-    
+
     if (!resp.result.documents){
         throw {
             errorCode: "Entity_Not_Found",
             errorDetail: "DeviceManager.listCameras: could not find cameras"
         };
     }
-    
+
     var result = [];
     for (var i=0; i < resp.result.documents.length; i++) {
-        var initializationDto = {
-            "key": resp.result.documents[i].key,
-            "cameraid": resp.result.documents[i].id,
-            "controller": resp.result.documents[i].controller,
-            "embedded": resp.result.documents[i].embedded,
-            "third_party": resp.result.documents[i].third_party,
-            "vendor": resp.result.documents[i].vendor,
-            "model": resp.result.documents[i].model,
-//            "controller": true,
-            "inheritance": false
-        };
-        result.push(new cameraModule.Camera(initializationDto));
+
+        var camera = new cameraModule.Camera(resp.result.documents[i]); 
+        result.push(camera);
     }
     return result;
 }
@@ -275,24 +244,24 @@ DeviceManager.prototype.getCamera = function(dto) {
             errorDetail: "DeviceManager.getCamera: controller cannot be null or empty"
         };
     }
-    
+
     var queryParam = {
         query: 'id="'+ dto.cameraid + '" and controller="' + dto.controller + '" and apsdb.schema="' + CAMERA + '"',
         fields:"*"
     };
-    
+
     var resp = document.query(queryParam);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
-    
+
     if (!resp.result.documents[0]){
         throw {
             errorCode: "Entity_Not_Found",
             errorDetail: "DeviceManager.getCamera: could not find camera with id " + dto.cameraid
         };
     }
-    
+
     var initializationDto = {
         "key": resp.result.documents[0].key,
         "cameraid": resp.result.documents[0].id,
@@ -301,7 +270,7 @@ DeviceManager.prototype.getCamera = function(dto) {
         "third_party": resp.result.documents[0].third_party,
         "vendor": resp.result.documents[0].vendor,
         "model": resp.result.documents[0].model,
-//        "controller": true,
+        //        "controller": true,
         "inheritance": false
     };
 
@@ -323,7 +292,7 @@ DeviceManager.prototype.updateCamera = function(dto) {
             errorDetail: "DeviceManager.updateCamera: cameraid cannot be null or empty"
         };
     }
-    
+
     var fields = {
         "id": dto.cameraid,
         "controller": dto.controller,
@@ -341,16 +310,16 @@ DeviceManager.prototype.updateCamera = function(dto) {
         },
         "meta.schema": CAMERA
     };
-    
+
     if (dto.key != null) {
         fields.key = dto.key;
     }
-    
+
     var resp = document.save(fields);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
-    
+
     return resp;
 }
 
@@ -369,12 +338,12 @@ DeviceManager.prototype.deleteCamera = function(dto) {
             errorDetail: "DeviceManager.deleteCamera: key cannot be null or empty"
         };
     }
-    
+
     var resp = document.delete(dto.key);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
-    
+
     return resp;
 }
 
@@ -393,7 +362,7 @@ DeviceManager.prototype.listSensors = function(dto) {
             errorDetail: "DeviceManager.listSensors: controllerid cannot be null or empty"
         };
     }
-    
+
     var queryParam = {
         query: 'controller="'+ dto.controllerid + '" and apsdb.schema="' + SENSOR + '"',
         fields: "*",
@@ -401,19 +370,19 @@ DeviceManager.prototype.listSensors = function(dto) {
         resultsPerPage: (!dto || !dto.resultsPerPage) ? 50 : dto.resultsPerPage,
         pageNumber: (!dto || !dto.pageNumber) ? 1 : dto.pageNumber
     };
-    
+
     var resp = document.query(queryParam);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
-    
+
     if (!resp.result.documents){
         throw {
             errorCode: "Entity_Not_Found",
             errorDetail: "DeviceManager.listSensors: could not find sensors"
         };
     }
-    
+
     var result = [];
     for (var i=0; i < resp.result.documents.length; i++) {
         var initializationDto = {
@@ -423,7 +392,7 @@ DeviceManager.prototype.listSensors = function(dto) {
             "controller": resp.result.documents[i].controller,
             "sensor_type": resp.result.documents[i].sensor_type,
             "port": resp.result.documents[i].port,
-//            "controller": true,
+            //            "controller": true,
             "inheritance": false
         };
         result.push(new sensorModule.Sensor(initializationDto));
@@ -452,24 +421,24 @@ DeviceManager.prototype.getSensor = function(dto) {
             errorDetail: "DeviceManager.getSensor: controller cannot be null or empty"
         };
     }
-    
+
     var queryParam = {
         query: 'id="'+ dto.sensorid + '" and controller="' + dto.controller + '" and apsdb.schema="' + SENSOR + '"',
         fields:"*"
     };
-    
+
     var resp = document.query(queryParam);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
-    
+
     if (!resp.result.documents[0]){
         throw {
             errorCode: "Entity_Not_Found",
             errorDetail: "DeviceManager.getSensor: could not find sensor with id " + dto.sensorid
         };
     }
-    
+
     var initializationDto = {
         "key": resp.result.documents[0].key,
         "sensorid": resp.result.documents[0].id,
@@ -477,7 +446,7 @@ DeviceManager.prototype.getSensor = function(dto) {
         "controller": resp.result.documents[0].controller,
         "sensor_type": resp.result.documents[0].sensor_type,
         "port": resp.result.documents[0].port,
-//        "controller": true,
+        //        "controller": true,
         "inheritance": false
     };
 
@@ -499,7 +468,7 @@ DeviceManager.prototype.updateSensor = function(dto) {
             errorDetail: "DeviceManager.updateSensor: sensorid cannot be null or empty"
         };
     }
-    
+
     var fields = {
         "id": dto.sensorid,
         "sensor_core": dto.sensor_core,
@@ -515,16 +484,16 @@ DeviceManager.prototype.updateSensor = function(dto) {
         },
         "meta.schema": SENSOR
     };
-    
+
     if (dto.key != null) {
         fields.key = dto.key;
     }
-    
+
     var resp = document.save(fields);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
-    
+
     return resp;
 }
 
@@ -543,12 +512,12 @@ DeviceManager.prototype.deleteSensor = function(dto) {
             errorDetail: "DeviceManager.deleteSensor: key cannot be null or empty"
         };
     }
-    
+
     var resp = document.delete(dto.key);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
-    
+
     return resp;
 }
 
@@ -567,7 +536,7 @@ DeviceManager.prototype.listSensorCores = function(dto) {
             errorDetail: "DeviceManager.listSensorCores: controllerid cannot be null or empty"
         };
     }
-    
+
     var queryParam = {
         query: 'controller="'+ dto.controllerid + '" and apsdb.schema="' + SENSORCORE + '"',
         fields: "*",
@@ -575,19 +544,19 @@ DeviceManager.prototype.listSensorCores = function(dto) {
         resultsPerPage: (!dto || !dto.resultsPerPage) ? 50: dto.resultsPerPage,
         pageNumber: (!dto || !dto.pageNumber) ? 1 : dto.pageNumber
     };
-    
+
     var resp = document.query(queryParam);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
-    
+
     if (!resp.result.documents){
         throw {
             errorCode: "Entity_Not_Found",
             errorDetail: "DeviceManager.listSensorCores: could not find sensorcores"
         };
     }
-    
+
     var result = [];
     for (var i=0; i < resp.result.documents.length; i++) {
         var initializationDto = {
@@ -597,7 +566,7 @@ DeviceManager.prototype.listSensorCores = function(dto) {
             "embedded": resp.result.documents[i].embedded,
             "mac_address": resp.result.documents[i].mac_address,
             "hash": resp.result.documents[i].hash,
-//            "controller": true,
+            //            "controller": true,
             "inheritance": false
         };
         result.push(new sensorCoreModule.SensorCore(initializationDto));
@@ -626,24 +595,24 @@ DeviceManager.prototype.getSensorCore = function(dto) {
             errorDetail: "DeviceManager.getSensorCore: controller cannot be null or empty"
         };
     }
-    
+
     var queryParam = {
         query: 'id="'+ dto.sensor_coreid + '" and dto.controller="' + dto.controller + '" and apsdb.schema="' + SENSORCORE + '"',
         fields:"*"
     };
-    
+
     var resp = document.query(queryParam);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
-    
+
     if (!resp.result.documents[0]){
         throw {
             errorCode: "Entity_Not_Found",
             errorDetail: "DeviceManager.getSensorCore: could not find sensorCore with id " + dto.sensor_coreid
         };
     }
-    
+
     var initializationDto = {
         "key": resp.result.documents[0].key,
         "sensor_coreid": resp.result.documents[0].id,
@@ -651,7 +620,7 @@ DeviceManager.prototype.getSensorCore = function(dto) {
         "embedded": resp.result.documents[0].embedded,
         "mac_address": resp.result.documents[0].mac_address,
         "hash": resp.result.documents[0].hash,
-//        "controller": true,
+        //        "controller": true,
         "inheritance": false
     };
 
@@ -673,7 +642,7 @@ DeviceManager.prototype.updateSensorCore = function(dto) {
             errorDetail: "DeviceManager.updateSensorCore: sensor_coreid cannot be null or empty"
         };
     }
-    
+
     var fields = {
         "id": dto.sensor_coreid,
         "controller": dto.controller,
@@ -689,16 +658,16 @@ DeviceManager.prototype.updateSensorCore = function(dto) {
         },
         "meta.schema": SENSORCORE
     };
-    
+
     if (dto.key != null) {
         fields.key = dto.key;
     }
-    
+
     var resp = document.save(fields);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
-    
+
     return resp;
 }
 
@@ -717,12 +686,12 @@ DeviceManager.prototype.deleteSensorCore = function(dto) {
             errorDetail: "DeviceManager.deleteSensorCore: key cannot be null or empty"
         };
     }
-    
+
     var resp = document.delete(dto.key);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
-    
+
     return resp;
 }
 
@@ -741,7 +710,7 @@ DeviceManager.prototype.listActuators = function(dto) {
             errorDetail: "DeviceManager.listActuators: controllerid cannot be null or empty"
         };
     }
-    
+
     var queryParam = {
         query: 'controller="'+ dto.controllerid + '" and apsdb.schema="' + ACTUATOR + '"',
         fields: "*",
@@ -749,19 +718,19 @@ DeviceManager.prototype.listActuators = function(dto) {
         resultsPerPage: (!dto || !dto.resultsPerPage) ? 50 : dto.resultsPerPage,
         pageNumber: (!dto || !dto.pageNumber) ? 1 : dto.pageNumber
     };
-    
+
     var resp = document.query(queryParam);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
-    
+
     if (!resp.result.documents){
         throw {
             errorCode: "Entity_Not_Found",
             errorDetail: "DeviceManager.listActuators: could not find actuators"
         };
     }
-    
+
     var result = [];
     for (var i=0; i < resp.result.documents.length; i++) {
         var initializationDto = {
@@ -772,7 +741,7 @@ DeviceManager.prototype.listActuators = function(dto) {
             "ip_address": resp.result.documents[i].ip_address,
             "mac_address": resp.result.documents[i].mac_address,
             "hash": resp.result.documents[i].hash,
-//            "controller": true,
+            //            "controller": true,
             "inheritance": false
         };
         result.push(new actuatorModule.Actuator(initializationDto));
@@ -801,24 +770,24 @@ DeviceManager.prototype.getActuator = function(dto) {
             errorDetail: "DeviceManager.getActuator: controller cannot be null or empty"
         };
     }
-    
+
     var queryParam = {
         query: 'id="'+ dto.actuatorid + '" and controller="' + dto.controller + '" and apsdb.schema="' + ACTUATOR + '"',
         fields:"*"
     };
-    
+
     var resp = document.query(queryParam);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
-    
+
     if (!resp.result.documents[0]){
         throw {
             errorCode: "Entity_Not_Found",
             errorDetail: "DeviceManager.getActuator: could not find actuator with id " + dto.actuatorid
         };
     }
-    
+
     var initializationDto = {
         "key": resp.result.documents[0].key,
         "actuatorid": resp.result.documents[0].id,
@@ -827,7 +796,7 @@ DeviceManager.prototype.getActuator = function(dto) {
         "ip_address": resp.result.documents[0].ip_address,
         "mac_address": resp.result.documents[0].mac_address,
         "hash": resp.result.documents[0].hash,
-//        "controller": true,
+        //        "controller": true,
         "inheritance": false
     };
 
@@ -849,7 +818,7 @@ DeviceManager.prototype.updateActuator = function(dto) {
             errorDetail: "DeviceManager.updateActuator: actuatorid cannot be null or empty"
         };
     }
-    
+
     var fields = {
         "id": dto.actuatorid,
         "controller": dto.controller,
@@ -867,16 +836,16 @@ DeviceManager.prototype.updateActuator = function(dto) {
         },
         "meta.schema": ACTUATOR
     };
-    
+
     if (dto.key != null) {
         fields.key = dto.key;
     }
-    
+
     var resp = document.save(fields);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
-    
+
     return resp;
 }
 
@@ -895,12 +864,12 @@ DeviceManager.prototype.deleteActuator = function(dto) {
             errorDetail: "DeviceManager.deleteActuator: key cannot be null or empty"
         };
     }
-    
+
     var resp = document.delete(dto.key);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
-    
+
     return resp;
 }
 
@@ -919,11 +888,11 @@ DeviceManager.prototype.deleteDevice = function(dto) {
             errorDetail: "DeviceManager.deleteDevice: key cannot be null or empty"
         };
     }
-    
+
     var resp = document.delete(dto.key);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
-    
+
     return resp;
 }
