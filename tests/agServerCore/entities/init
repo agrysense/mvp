@@ -10,6 +10,8 @@ const CAMERA_KEY_PREFIX = "TEST_CAMERA_";
 const CAMERA_NAME_PREFIX = "TEST_CAMERA_";
 const SENSOR_KEY_PREFIX = "TEST_SENSOR_";
 const SENSOR_NAME_PREFIX = "TEST_SENSOR_";
+const SENSORCORE_KEY_PREFIX = "TEST_SENSORCORE_";
+const SENSORCORE_NAME_PREFIX = "TEST_SENSORCORE_";
 
 function createController() {
 
@@ -37,7 +39,8 @@ function createController() {
     }
 
     createCamera(data.key);
-    createSensor(data.key);
+    var coreid = createSensorCore(data.key);
+    createSensor(data.key, coreid);
     return data.key;
 }
 
@@ -74,7 +77,27 @@ function createCamera(controllerid) {
     return data.key;
 }
 
-function createSensor(controllerid) {
+function createSensorCore(controllerid) {
+    
+    var uid = guid();
+    var data = {
+
+        "key": SENSORCORE_KEY_PREFIX + uid,
+        "controller": controllerid,
+        "mac_address": mac(),
+        "hash": guid(6),
+        "meta.schema": "SensorCore"
+    };
+
+    var resp = document.save(data);    
+    if (resp.metadata.status == "failure") {
+        throw(JSON.stringify(resp.metadata));
+    }
+
+    return data.key;
+}
+
+function createSensor(controllerid, coreid) {
 
     var types = ["CO2", "Ammonia", "Temperature", "Humidity", "Light"];
     var uid = guid();
@@ -82,7 +105,7 @@ function createSensor(controllerid) {
 
         "key": SENSOR_KEY_PREFIX + uid,
         "sensor_type": types[Math.round(Math.random() * (types.length - 1))],
-        "sensor_core": "",
+        "sensor_core": coreid ? coreid : "",
         "controller": controllerid,
         "port": Math.round(Math.random() * 1000) + 100,
         "meta.schema": "Sensor"
@@ -96,12 +119,13 @@ function createSensor(controllerid) {
     return data.key;
 }
 
-function guid() {
+function guid(max) {
 
     var choice = "abcdefghijklmnopqrstuvwxyz0123456789";
     var uid = "";
+    var length =  max && max <= choice.length -1 ? max : choice.length -1
     for (var i = 0; i < 15; i++) {
-        uid += choice[Math.round(Math.random() * (choice.length -1))];
+        uid += choice[Math.round(Math.random() * length)];
     }
 
     return uid;

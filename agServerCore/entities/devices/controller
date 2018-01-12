@@ -14,14 +14,13 @@ var api_link = null;
 var security_code = null;
 
 /**
- * Defines the Controller object
- *
+ * Defines the Controller object *
  * @class
  * @constructor
  * @param {Object} [dto] : initialization object. Should be a scriptr.io document that contains controller data
  * @param {Object} deviceManager: an instance of DeviceManager
  */
-var Controller = function(dto, deviceManager) {    
+function Controller(dto, deviceManager) {    
     
     componentModule.Component.call(this, dto);
     if (!deviceManager) {
@@ -72,7 +71,7 @@ Controller.prototype.listCameras = function(dto) {
 Controller.prototype.listSensors = function(dto) {
   
     var searchDto = {
-      "controllerid": this.id
+      "controller": this.id
     };
     
     if (dto) {

@@ -11,9 +11,9 @@ var model = null;
 
 /**
  * Defines the Camera object
- *
  * @class
  * @constructor
+ * @param {Object} [dto] : initialization object. Should be a scriptr.io document that contains camera data
  */
 function Camera(dto) {
     componentModule.Component.call(this, dto);

@@ -35,7 +35,7 @@ DeviceController.prototype.listControllers = function(dto) {
  * @return {Controller}
  * @throws {Error}
  */
-DeviceController.prototype.getController = function(dto) {
+DeviceController.prototype.getController = function(dto) { console.log(JSON.stringify(dto))
     var deviceMgr = new deviceManager.DeviceManager();
     return deviceMgr.getController(dto);
 }

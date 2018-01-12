@@ -7,7 +7,7 @@ var deviceManager = new deviceManagerModule.DeviceManager();
 var controller = null; // controller instance under testing
 
 jasmine.describe("Testing the Controller class", function() {
-   
+
     jasmine.beforeAll(function(){
 
         var controllerKey = init.createController();
@@ -23,14 +23,43 @@ jasmine.describe("Testing the Controller class", function() {
 
     });
 
-    jasmine.it("controller.listCameras() returns an array of Camera instances", function() {
+    jasmine.it("controller.listCameras() returns an array of 1 Camera instances", function() {
 
         try {
-            
+
             var list = controller.listCameras();
             jasmine.expect(list).not.toBeNull(null);
             jasmine.expect(list.length).toBe(1);
             jasmine.expect(list[0].constructor.name).toBe("Camera");
+            jasmine.expect(list[0].controller).toBe(controller.id);
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }
+    });
+
+    jasmine.it("controller.listSensorCores() returns an array of 1 SensorCore instances", function() {
+
+        try {
+
+            var list = controller.listSensorCores();
+            jasmine.expect(list).not.toBeNull(null);
+            jasmine.expect(list.length).toBe(1);
+            jasmine.expect(list[0].constructor.name).toBe("SensorCore");
+            jasmine.expect(list[0].controller).toBe(controller.id);
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }
+    });
+
+    jasmine.it("controller.listSensors() returns an array of 1 Sensor instances", function() {
+
+        try {
+
+            var list = controller.listSensors();
+            jasmine.expect(list).not.toBeNull(null);
+            jasmine.expect(list.length).toBe(1);
+            jasmine.expect(list[0].constructor.name).toBe("Sensor");
+            jasmine.expect(list[0].controller).toBe(controller.id);
         }catch(exception){
             throw(JSON.stringify(exception));
         }

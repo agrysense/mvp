@@ -180,11 +180,11 @@ DeviceManager.prototype.deleteController = function(dto) {
 }
 
 /**
- * lists all available cameras according to the given search criteria
- *
- * @method listCameras
- * @param {Object} [dto]: search criteria
- * @param {String} [dto.controllerid]: the identifier of the controller to which the camera is linked
+ * lists available cameras according to the given search criteria
+ * @param {Object} [dto]
+ * @param {String} [dto.controller]: the identifier of the controller to which pertains the camera (optional)
+ * @param {Number} [dto.resultsPerPage]: how many results to return per call (optional, defaults to 50)
+ * @param {Number} [dto.pageNumber]: the page number in case there are more than one pages of results (optional, defaults to 1)
  * @return {JSONArray<Camera>} 
  * @throws {Error}
  */
@@ -220,8 +220,9 @@ DeviceManager.prototype.listCameras = function(dto) {
         var camera = new cameraModule.Camera(resp.result.documents[i]); 
         result.push(camera);
     }
+    
     return result;
-}
+};
 
 /**
  * get Camera based on farmid, farmhouseid, controller, cameraid
@@ -275,7 +276,7 @@ DeviceManager.prototype.getCamera = function(dto) {
     };
 
     return new cameraModule.Camera(initializationDto);
-}
+};
 
 /**
  * updates a Camera object. If it doesn't exist, the method creates it
@@ -321,7 +322,7 @@ DeviceManager.prototype.updateCamera = function(dto) {
     }
 
     return resp;
-}
+};
 
 /**
  * flags a Camera as deleted
@@ -345,26 +346,22 @@ DeviceManager.prototype.deleteCamera = function(dto) {
     }
 
     return resp;
-}
+};
 
 /**
- * lists all available sensors
- *
+ * lists available sensors
  * @method listSensors
- * @param {String} dto
+ * @param {Object} [dto]
+ * @param {String} [dto.controller]: the identifier of the controller to which pertains the sensors (optional)
+ * @param {Number} [dto.resultsPerPage]: how many results to return per call (optional, defaults to 50)
+ * @param {Number} [dto.pageNumber]: the page number in case there are more than one pages of results (optional, defaults to 1)
  * @return {JSONArray<Sensor>} 
  * @throws {Error}
  */
 DeviceManager.prototype.listSensors = function(dto) {
-    if (!dto.controllerid) {
-        throw {
-            errorCode: "Missing_Parameter",
-            errorDetail: "DeviceManager.listSensors: controllerid cannot be null or empty"
-        };
-    }
-
+    
     var queryParam = {
-        query: 'controller="'+ dto.controllerid + '" and apsdb.schema="' + SENSOR + '"',
+        query: 'controller="'+ dto.controller + '" and apsdb.schema="' + SENSOR + '"',
         fields: "*",
         count: true,
         resultsPerPage: (!dto || !dto.resultsPerPage) ? 50 : dto.resultsPerPage,
@@ -385,20 +382,11 @@ DeviceManager.prototype.listSensors = function(dto) {
 
     var result = [];
     for (var i=0; i < resp.result.documents.length; i++) {
-        var initializationDto = {
-            "key": resp.result.documents[i].key,
-            "sensorid": resp.result.documents[i].id,
-            "sensor_core": resp.result.documents[i].sensor_core,
-            "controller": resp.result.documents[i].controller,
-            "sensor_type": resp.result.documents[i].sensor_type,
-            "port": resp.result.documents[i].port,
-            //            "controller": true,
-            "inheritance": false
-        };
-        result.push(new sensorModule.Sensor(initializationDto));
+        result.push(new sensorModule.Sensor(resp.result.documents[i]));
     }
+    
     return result;
-}
+};
 
 /**
  * get Sensor based on farmid, farmhouseid, controller, sensorid
@@ -451,7 +439,7 @@ DeviceManager.prototype.getSensor = function(dto) {
     };
 
     return new sensorModule.Sensor(initializationDto);
-}
+};
 
 /**
  * updates a Sensor object. If it doesn't exist, the method creates it

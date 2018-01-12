@@ -10,44 +10,13 @@ var port = null;
 
 /**
  * Defines the Sensor object
- *
- * @class
+ * @class Sensor
  * @constructor
+ * @param {Object} [dto] : initialization object. Should be a scriptr.io document that contains sensor data
  */
-var Sensor = function(dto) {
+function Sensor(dto) {
     componentModule.Component.call(this, dto);
-    if (!dto.sensorid) {   
-        throw {
-            errorCode: "Missing_Parameter",
-            errorDetail: "Sensor: dto.sensorid cannot be null or empty"
-        };
-    }
-    this.sensorid = dto.sensorid;
-    this.sensor_core = dto.sensor_core;
-    this.controller = dto.controller;
-    this.sensor_type = dto.sensor_type;
-    this.port = dto.port;
 }
 
 Sensor.prototype = new componentModule.Component({inheritance: true});
 Sensor.prototype.constructor = Sensor;
-
-/**
- * return Sensor object as JSONObject
- * 
- * @method toJSONObject
- * @param {String} dto
- * @return {JSONObject}
- * @throws {Error}
- */
-Sensor.prototype.toJSONObject = function(dto) {    
-    var result = {
-        "sensorid": this.sensorid,
-        "sensor_core": this.sensor_core,
-        "controller": this.controller,
-        "sensor_type": this.sensor_type,
-        "port": this.port
-    }
-    
-    return result;
-}

@@ -3,7 +3,6 @@
  * @class Component
  * @class constructor
  * @param {Object} [dto]
- * @param {String} [dto.type]: the type of the current component, should match a schema name 
  * @throws {Error}
  */
 function Component(dto) {

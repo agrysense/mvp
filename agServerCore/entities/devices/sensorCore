@@ -13,41 +13,11 @@ var hash = null;
  *
  * @class
  * @constructor
+ * @param {Object} [dto] : initialization object. Should be a scriptr.io document that contains sensor core data
  */
-var SensorCore = function(dto) {
+function SensorCore(dto) {
     componentModule.Component.call(this, dto);
-    if (!dto.sensor_coreid) {   
-        throw {
-            errorCode: "Missing_Parameter",
-            errorDetail: "SensorCore: dto.sensor_coreid cannot be null or empty"
-        };
-    }
-    this.sensor_coreid = dto.sensor_coreid;
-    this.controller = dto.controller;
-    this.embedded = dto.embedded;
-    this.mac_address = dto.mac_address;
-    this.hash = dto.hash;
 }
 
 SensorCore.prototype = new componentModule.Component({inheritance: true});
 SensorCore.prototype.constructor = SensorCore;
-
-/**
- * return SensorCore object as JSONObject
- * 
- * @method toJSONObject
- * @param {String} dto
- * @return {JSONObject}
- * @throws {Error}
- */
-SensorCore.prototype.toJSONObject = function(dto) {    
-    var result = {
-        "sensor_coreid": this.sensor_coreid,
-        "controller": this.controller,
-        "embedded": this.embedded,
-        "mac_address": this.mac_address,
-        "hash": this.hash
-    }
-    
-    return result;
-}
