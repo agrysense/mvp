@@ -1,0 +1,357 @@
+var log = require("log"); log.setLevel("info");
+var deviceManager = require("../entities/devices/deviceManager");
+
+/**
+ * Defines the DeviceController class
+ *
+ * @class
+ * @constructor
+ */
+var DeviceController = function (dto) {
+}
+
+/**
+ * list all available controllers
+ *
+ * @method listControllers
+ * @param {String} dto
+ * @return {JSONArray<Controller>} 
+ * @throws {Error}
+ */
+DeviceController.prototype.listControllers = function(dto) {
+    try {
+        var deviceMgr = new deviceManager.DeviceManager();
+        return deviceMgr.listControllers(dto);
+    } catch (exception) {
+        return exception;
+    }
+}
+
+/**
+ * get Controller based on farmhouseid, controllerid
+ *
+ * @method getController
+ * @param {String} dto
+ * @return {Controller}
+ * @throws {Error}
+ */
+DeviceController.prototype.getController = function(dto) { console.log(JSON.stringify(dto))
+    var deviceMgr = new deviceManager.DeviceManager();
+    return deviceMgr.getController(dto);
+}
+
+/**
+ * Update a Controller, create it if it doesn't exist
+ *
+ * @method updateController
+ * @param {String} dto
+ * @return {Object} 
+ * @throws {Error}
+ */
+DeviceController.prototype.updateController = function(dto) {
+    try {
+        var customParams = JSON.parse(JSON.stringify(dto));
+
+        var deviceMgr = new deviceManager.DeviceManager();
+        var deviceObject = null;
+        try {
+            deviceObject = deviceMgr.getController(dto);
+        } catch(exception) {
+        }
+        if (deviceObject != null && deviceObject.key != null) {
+            if (dto.software_version == null)
+                customParams.software_version = deviceObject.software_version;
+            if (dto.speaker == null)
+                customParams.speaker = deviceObject.speaker;
+            if (dto.microphone == null)
+                customParams.microphone = deviceObject.microphone;
+            if (dto.mac_address == null)
+                customParams.mac_address = deviceObject.mac_address;
+            if (dto.camera == null)
+                customParams.camera = deviceObject.camera;
+            if (dto.ip_address == null)
+                customParams.ip_address = deviceObject.ip_address;
+            if (dto.api_link == null)
+                customParams.api_link = deviceObject.api_link;
+            if (dto.security_code == null)
+                customParams.security_code = deviceObject.security_code;
+            customParams.key = deviceObject.key;            
+        }
+        return deviceMgr.updateController(customParams);
+    }catch(exception) {
+        return exception;
+    }
+}
+
+/**
+ * list all available cameras
+ *
+ * @method listCameras
+ * @param {String} dto
+ * @return {JSONArray<Cameras>} 
+ * @throws {Error}
+ */
+DeviceController.prototype.listCameras = function(dto) {
+    try {
+        var deviceMgr = new deviceManager.DeviceManager();
+        return deviceMgr.listCameras(dto);
+    } catch (exception) {
+        return exception;
+    }
+}
+
+/**
+ * get Camera based on farmhouseid, controllerid
+ *
+ * @method getCamera
+ * @param {String} dto
+ * @return {Camera}
+ * @throws {Error}
+ */
+DeviceController.prototype.getCamera = function(dto) {
+    var deviceMgr = new deviceManager.DeviceManager();
+    return deviceMgr.getCamera(dto);
+}
+
+/**
+ * Update a Camera, create it if it doesn't exist
+ *
+ * @method updateCamera
+ * @param {String} dto
+ * @return {Object} 
+ * @throws {Error}
+ */
+DeviceController.prototype.updateCamera = function(dto) {
+    try {
+        var customParams = JSON.parse(JSON.stringify(dto));
+
+        var deviceMgr = new deviceManager.DeviceManager();
+        var deviceObject = null;
+        try {
+            deviceObject = deviceMgr.getCamera(dto);
+        } catch(exception) {
+        }
+        if (deviceObject != null && deviceObject.key != null) {
+            if (dto.embedded == null)
+                customParams.embedded = deviceObject.embedded;
+            if (dto.third_party == null)
+                customParams.third_party = deviceObject.third_party;
+            if (dto.vendor == null)
+                customParams.vendor = deviceObject.vendor;
+            if (dto.model == null)
+                customParams.model = deviceObject.model;
+            customParams.key = deviceObject.key;
+        }
+        return deviceMgr.updateCamera(customParams);
+    }catch(exception) {
+        return exception;
+    }
+}
+
+/**
+ * list all available sensors
+ *
+ * @method listSensors
+ * @param {String} dto
+ * @return {JSONArray<Sensors>} 
+ * @throws {Error}
+ */
+DeviceController.prototype.listSensors = function(dto) {
+    try {
+        var deviceMgr = new deviceManager.DeviceManager();
+        return deviceMgr.listSensors(dto);
+    } catch (exception) {
+        return exception;
+    }
+}
+
+/**
+ * get Sensor based on farmhouseid, controllerid
+ *
+ * @method getSensor
+ * @param {String} dto
+ * @return {Sensor}
+ * @throws {Error}
+ */
+DeviceController.prototype.getSensor = function(dto) {
+    var deviceMgr = new deviceManager.DeviceManager();
+    return deviceMgr.getSensor(dto);
+}
+
+/**
+ * Update a Sensor, create it if it doesn't exist
+ *
+ * @method updateSensor
+ * @param {String} dto
+ * @return {Object} 
+ * @throws {Error}
+ */
+DeviceController.prototype.updateSensor = function(dto) {
+    try {
+        if (!dto.sensor_core || !dto.controller) {
+            var customParams = JSON.parse(JSON.stringify(dto));
+
+            var deviceMgr = new deviceManager.DeviceManager();
+            var deviceObject = null;
+            try {
+                deviceObject = deviceMgr.getSensor(dto);
+            } catch(exception) {
+            }
+            if (deviceObject != null && deviceObject.key != null) {
+                if (dto.sensor_type == null)
+                    customParams.sensor_type = deviceObject.sensor_type;
+                if (dto.port == null)
+                    customParams.port = deviceObject.port;
+
+                if (dto.sensor_core == null)
+                    customParams.sensor_core = deviceObject.sensor_core;
+                if (dto.controller == null)
+                    customParams.controller = deviceObject.controller;
+
+                customParams.key = deviceObject.key;
+            }
+            return deviceMgr.updateSensor(customParams);
+        } else {
+            throw {
+                errorCode: "Missing_Parameter",
+                errorDetail: "DeviceController.updateSensor: controller and sensor_core cannot be both null or empty"
+            };
+        }
+    }catch(exception) {
+        return exception;
+    }
+}
+
+/**
+ * get SensorCore based on farmhouseid, controllerid
+ *
+ * @method getSensorCore
+ * @param {String} dto
+ * @return {SensorCore}
+ * @throws {Error}
+ */
+DeviceController.prototype.getSensorCore = function(dto) {
+    var deviceMgr = new deviceManager.DeviceManager();
+    return deviceMgr.getSensorCore(dto);
+}
+
+/**
+ * Update a SensorCore, create it if it doesn't exist
+ *
+ * @method updateSensorCore
+ * @param {String} dto
+ * @return {Object} 
+ * @throws {Error}
+ */
+DeviceController.prototype.updateSensorCore = function(dto) {
+    try {
+        var customParams = JSON.parse(JSON.stringify(dto));
+
+        var deviceMgr = new deviceManager.DeviceManager();
+        var deviceObject = null;
+        try {
+            deviceObject = deviceMgr.getSensorCore(dto);
+        } catch(exception) {
+        }
+        if (deviceObject != null && deviceObject.key != null) {
+            if (dto.embedded == null)
+                customParams.embedded = deviceObject.embedded;
+            if (dto.mac_address == null)
+                customParams.mac_address = deviceObject.mac_address;
+            if (dto.hash == null)
+                customParams.hash = deviceObject.hash;
+            customParams.key = deviceObject.key;
+        }
+        return deviceMgr.updateSensorCore(customParams);
+    }catch(exception) {
+        return exception;
+    }
+}
+
+/**
+ * get Actuator based on farmhouseid, controllerid
+ *
+ * @method getActuator
+ * @param {String} dto
+ * @return {Actuator}
+ * @throws {Error}
+ */
+DeviceController.prototype.getActuator = function(dto) {
+    var deviceMgr = new deviceManager.DeviceManager();
+    return deviceMgr.getActuator(dto);
+}
+
+/**
+ * Update a Actuator, create it if it doesn't exist
+ *
+ * @method updateActuator
+ * @param {String} dto
+ * @return {Object} 
+ * @throws {Error}
+ */
+DeviceController.prototype.updateActuator = function(dto) {
+    try {
+        var customParams = JSON.parse(JSON.stringify(dto));
+
+        var deviceMgr = new deviceManager.DeviceManager();
+        var deviceObject = null;
+        try {
+            deviceObject = deviceMgr.getActuator(dto);
+        } catch(exception) {
+        }
+        if (deviceObject != null && deviceObject.key != null) {
+            if (dto.ip_address == null)
+                customParams.ip_address = deviceObject.ip_address;
+            if (dto.mac_address == null)
+                customParams.mac_address = deviceObject.mac_address;
+            if (dto.hash == null)
+                customParams.hash = deviceObject.hash;
+            customParams.key = deviceObject.key;
+        }
+        return deviceMgr.updateActuator(customParams);
+    }catch(exception) {
+        return exception;
+    }
+}
+
+/**
+ * flags a Device as deleted
+ *
+ * @method deleteDevice
+ * @param {String} dto
+ * @return {Object}
+ * @throws {Error}
+ */
+DeviceController.prototype.deleteDevice = function(dto) {
+    var availableTypes = [""];
+    if (!params.deviceType)
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "deleteDevice: deviceType cannot be null or empty"
+        };
+    else {
+        var deviceMgr = new deviceManager.DeviceManager();
+        var deviceObject = null;
+        if (dto.deviceObject)
+            dto.deviceObject = deviceMgr["get" + dto.deviceType]();
+        return deviceMgr.deleteDevice(deviceObject);
+        /*
+        if (dto.deviceType == "controller")
+            deviceObject = deviceMgr.getController(dto);
+        if (dto.deviceType == "camera")
+            deviceObject = deviceMgr.getCamera(dto);
+        if (dto.deviceType == "sensor")
+            deviceObject = deviceMgr.getSensor(dto);
+        if (dto.deviceType == "sensorCore")
+            deviceObject = deviceMgr.getSensorCore(dto);
+        if (dto.deviceType == "actuator")
+            deviceObject = deviceMgr.getActuator(dto);
+        if (deviceObject.key != null) {
+            return deviceMgr.deleteDevice(deviceObject);
+        } else 
+            throw {
+                errorCode: "Entity_Not_Found",
+                errorDetail: "deleteDevice: Device not found"
+            };*/
+    }
+}

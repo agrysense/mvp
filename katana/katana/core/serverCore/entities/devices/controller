@@ -1,0 +1,107 @@
+var document = require("document");
+var log = require("log"); log.setLevel("info");
+var componentModule = require("../component");
+
+var controllerid = null;
+var farmhouse = null;
+var software_version = null;
+var speaker = null;
+var microphone = null;
+var mac_address = null;
+var camera = null;
+var ip_address = null;
+var api_link = null;
+var security_code = null;
+
+/**
+ * Defines the Controller object *
+ * @class
+ * @constructor
+ * @param {Object} [dto] : initialization object. Should be a scriptr.io document that contains controller data
+ * @param {Object} deviceManager: an instance of DeviceManager
+ */
+function Controller(dto, deviceManager) {    
+    
+    componentModule.Component.call(this, dto);
+    if (!deviceManager) {
+        
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: this.constructor.name + ": deviceManager cannot be null or undefined"
+        };
+    }
+    
+    this.deviceManager = deviceManager;
+}
+
+Controller.prototype = new componentModule.Component({inheritance: true});
+Controller.prototype.constructor = Controller;
+
+/**
+ * list the cameras that are related to the current Controller
+ * 
+ * @method listCameras
+ * @param {Object} [dto]: search criteria
+ * @return {JSONArray<Camera>}
+ * @throws {Error}
+ */
+Controller.prototype.listCameras = function(dto) {
+   
+    var searchDto = {
+      "controllerid": this.id
+    };
+    
+    if (dto) {
+        for (var key in dto){
+            searchDto[key] = dto[key];
+        }
+    }
+    
+    return this.deviceManager.listCameras(searchDto);
+};
+
+/**
+ * lists all available sensors under this farm
+ * 
+ * @method listSensors
+ * @param {String} dto
+ * @return {JSONArray<Sensor>}
+ * @throws {Error}
+ */
+Controller.prototype.listSensors = function(dto) {
+  
+    var searchDto = {
+      "controller": this.id
+    };
+    
+    if (dto) {
+        for (var key in dto){
+            searchDto[key] = dto[key];
+        }
+    }
+    
+    return this.deviceManager.listSensors(searchDto);
+};
+
+/**
+ * lists all available sensor_cores under this farm
+ * 
+ * @method listSensorCores
+ * @param {String} dto
+ * @return {JSONArray<SensorCore>}
+ * @throws {Error}
+ */
+Controller.prototype.listSensorCores = function(dto) {
+    
+    var searchDto = {
+      "controllerid": this.id
+    };
+    
+    if (dto) {
+        for (var key in dto){
+            searchDto[key] = dto[key];
+        }
+    }
+    
+    return this.deviceManager.listSensorCores(searchDto);
+};

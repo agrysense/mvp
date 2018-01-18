@@ -1,0 +1,82 @@
+var document = require("document");
+var log = require("log"); log.setLevel("info");
+var componentModule = require("../component");
+
+var farmhouseid = null;
+var farm = null;
+var name = null;
+var location = null;
+var gps = null;
+var description = null;
+var category = null;
+var length = null;
+var width = null;
+
+/**
+ * Defines the Farmhouse object
+ *
+ * @class
+ * @constructor
+ */
+var Farmhouse = function(dto) {
+    componentModule.Component.call(this, dto);
+    if (!dto.farmhouseid) {   
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "Farmhouse: dto.farmhouseid cannot be null or empty"
+        };
+    }
+    
+    this.farmhouseid = dto.farmhouseid;
+    this.farm = dto.farm;
+    this.name = dto.name;
+    this.location = dto.location;
+    this.gps = dto.gps;
+    this.description = dto.description;
+    this.category = dto.category;
+    this.length = dto.length;
+    this.width = dto.width;
+}
+
+Farmhouse.prototype = new componentModule.Component({inheritance: true});
+Farmhouse.prototype.constructor = Farmhouse;
+
+/**
+ * return Farmhouse object as JSONObject
+ * 
+ * @method toJSONObject
+ * @param {String} dto
+ * @return {JSONObject}
+ * @throws {Error}
+ */
+Farmhouse.prototype.toJSONObject = function(dto) {
+    var result = {
+        "farmhouseid": this.farmhouseid,
+        "farm": this.farm,
+        "name": this.name,
+        "location": this.location,
+        "gps": this.gps,
+        "description": this.description,
+        "category": this.category,
+        "length": this.length,
+        "width": this.width
+    }
+    
+    return result;
+}
+
+/**
+ * lists all available controllers under this farm
+ * 
+ * @method listControllers
+ * @param {String} dto
+ * @return {JSONArray<Controller>}
+ * @throws {Error}
+ */
+Farmhouse.prototype.listControllers = function(deviceManager, dto) {
+    var farmhouseid = (dto != null && dto.farmhouseid != null) ? dto.farmhouseid : this.farmhouseid;
+    var updatedDto = {
+      "farmhouseid": farmhouseid
+    };
+    return deviceManager.listControllers(updatedDto);
+}

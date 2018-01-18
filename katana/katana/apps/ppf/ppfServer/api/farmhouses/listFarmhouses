@@ -1,0 +1,14 @@
+var farmController = require("../../applications/farmController");
+var log = require("log"); log.setLevel("info");
+
+var params =  request.parameters;
+if (params.body) {
+    params = JSON.parse(params.body);
+}
+
+try {
+    var farmCtrl = new farmController.FarmController();
+	return farmCtrl.listFarmhouses(params);
+}catch(exception) {
+    return exception;
+}

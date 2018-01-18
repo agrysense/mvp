@@ -1,0 +1,25 @@
+var deviceController = require("../../applications/deviceController");
+var log = require("log"); log.setLevel("info");
+
+var params = request.parameters;
+if (params.body) {
+    params = JSON.parse(params.body);
+}
+
+var customParams = JSON.parse(JSON.stringify(params));
+
+try {
+    var deviceCtrl = new deviceController.DeviceController();
+	return deviceCtrl.updateActuator(params);
+} catch(exception) {
+    return exception;
+}
+
+/*
+var actuatorid = null;
+var controller = null;
+var device_type = null;
+var ip_address = null;
+var mac_address = null;
+var hash = null;
+*/

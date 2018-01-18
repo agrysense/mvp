@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>My HTML File</title>
+        <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.min.css">
+        <!-- font awesome.css -->
+        <script src="https://use.fontawesome.com/3d61d6959e.js"></script>
+        <link href="//fonts.googleapis.com/css?family=Josefin+Sans|Montserrat" rel="stylesheet">
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>	
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+
+
+        <link rel="stylesheet" href="/UIComponents/layout/frontend/components/menu/menu.css">
+        <link rel="stylesheet" href="/UIComponents/examples/app/css/dashboard.css">
+
+
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular-route.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-animate.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-sanitize.js"></script>
+        <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-2.4.0.js"></script>
+
+        <script src="/UIComponents/layout/frontend/components/module.js"></script>
+        <script src="/UIComponents/layout/frontend/components/menu/menu.js"></script>
+
+        <script src="/UIComponents/layout/frontend/components/header/header.js"></script>
+        <link rel="stylesheet" href="/UIComponents/layout/frontend/components/header/header.css">
+
+        <!-- JQUERY Material  To use jQuery, simply ensure it is loaded before the angular.js file. -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <script src="//code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js" ></script>
+
+        <script src="/agClientCore/login/widgets/authorization.js" ></script>
+
+        <!-- Add this -->
+        <link rel="stylesheet" href="/happiness/view/css/style.css">
+
+
+        <script type="text/javascript"> 
+            var authorization  = $.scriptr.authorization(
+                {
+                    onTokenValid: function(){ 
+                    
+                    }, 
+                    loginPage:"/agClientCore/login/html/login.html"}
+            );
+        </script>
+
+        <script>
+            var underscore = angular.module('underscore', []);
+            underscore.factory('_', ['$window', function($window) {		
+                return $window._; // assumes underscore has already been loaded on the page		
+            }]);
+
+            // App
+            var myApp = angular.module('myApp', ["Layout"]);
+            var routingItems = {
+                "params": [
+                    {"route": "main", "template": "/agClientCore/view/main_holder.html"},
+                    {"route": "farm", "template": "/agClientCore/view/farm_holder.html"},                    
+                    {"route": "logout", "template": "/agClientCore/view/logout.html"}               
+                ]
+            };            
+
+            myApp
+                .constant("menuItemsJson",  {
+                "mainMenu": "col1",
+                "col1": [
+                    {"id":"1", "iconClass":"fa fa-dashboard", "label": "Main Dashboard", "route":"#/main", "active":"true"},
+                    {"id":"2", "iconClass":"fa fa-cogs", "label": "Farm", "route": "#/farm","active":"false"},                    
+                ]
+            }).constant("routingJson", routingItems)
+                .config(
+                function($routeProvider, routingJson){
+                    for(var i = 0; i < routingJson.params.length; i++){
+                        $routeProvider
+                            .when("/", {
+                            templateUrl : "/agClientCore/view/main_holder.html"
+                        })
+                            .when("/" + routingJson.params[i].route,
+                                  {
+                            templateUrl: routingJson.params[i].template
+                        })
+                    }
+                });
+
+            // Controller
+            myApp.controller('testCtrl', function($scope, menuItemsJson) {
+                var vm = this 
+                vm.menuItems = menuItemsJson
+                vm.user = {login: (atob(document.cookie.split("=")[1]).split(":")[1])};
+            });
+        </script>
+    </head>
+
+    <body ng-app="myApp">  
+        <div ng-controller="testCtrl as vm">
+            <main>      
+                <header-top 
+
+                            user="vm.user" 
+                            header-items='{
+                                          "items": [],
+                                          "subitems": [],                      
+                                          "appname": "Agrysense",
+                                          "logout": {"icon": "fa fa-sign-out", "label": "Logout", "route":"#/logout"},     
+                                          "logo": "data:image/png;base64,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"
+                                          }'>
+                </header-top>
+                <!-- menu items can also be passed as a json object directly here -->
+                <menu class="menu-wrap" menu-items="vm.menuItems"></menu>                      
+                <section>
+                    <div class="page-content">
+                        <ng-view></ng-view>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </body>
+
+</html>

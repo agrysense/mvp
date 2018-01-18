@@ -1,0 +1,29 @@
+var deviceController = require("../../applications/deviceController");
+var log = require("log"); log.setLevel("info");
+
+var params = request.parameters;
+if (params.body) {
+    params = JSON.parse(params.body);
+}
+
+var customParams = JSON.parse(JSON.stringify(params));
+
+try {
+    var deviceCtrl = new deviceController.DeviceController();
+	return deviceCtrl.updateController(params);
+} catch(exception) {
+    return exception;
+}
+
+/*
+<field>id</field>
+				<field>farmhouse</field>
+				<field>software_version</field>
+				<field>speaker</field>
+				<field>microphone</field>
+				<field>camera</field>
+				<field>ip_address</field>
+				<field>mac_address</field>
+				<field>api_link</field>
+				<field>security_code</field>
+*/

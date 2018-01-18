@@ -1,0 +1,10 @@
+const SENSOR = "sensor";
+
+/**
+ * @class ComponentManager
+ * @constructor
+ */
+function ComponentManager() {
+    
+}
+

@@ -1,0 +1,22 @@
+var document = require("document");
+var log = require("log"); log.setLevel("info");
+var componentModule = require("../component");
+
+var sensorid = null;
+var sensor_core = null;
+var controller = null;
+var sensor_type = null;
+var port = null;
+
+/**
+ * Defines the Sensor object
+ * @class Sensor
+ * @constructor
+ * @param {Object} [dto] : initialization object. Should be a scriptr.io document that contains sensor data
+ */
+function Sensor(dto) {
+    componentModule.Component.call(this, dto);
+}
+
+Sensor.prototype = new componentModule.Component({inheritance: true});
+Sensor.prototype.constructor = Sensor;

@@ -1,0 +1,208 @@
+var document = require("document");
+var log = require("log"); log.setLevel("info");
+var farmhouseModule = require("./farmhouse");
+var deviceManager = require("../devices/deviceManager");
+const FARMHOUSE = "FarmHouse";
+
+
+/**
+ * Defines the FarmManager helper class
+ *
+ * @class
+ * @constructor
+ */
+var FarmhouseManager = function() {
+};
+
+/**
+ * lists all available farms
+ *
+ * @method listFarmhouses
+ * @param {String} dto
+ * @return {JSONArray<Farmhouse>} 
+ * @throws {Error}
+ */
+FarmhouseManager.prototype.listFarmhouses = function(dto) {
+/*    if (!dto.farmid) {
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "FarmhouseManager.listFarmhouses: farmid cannot be null or empty"
+        };
+    }
+*/    
+    var queryParam = {
+//        query: 'farm="'+ dto.farmid + '" and apsdb.schema="' + FARMHOUSE + '"',
+        query: 'apsdb.schema="' + FARMHOUSE + '"',
+        fields: "*",
+        count: true,
+        resultsPerPage: (!dto || !dto.resultsPerPage) ? 50 : dto.resultsPerPage,
+        pageNumber: (!dto || !dto.pageNumber) ? 1 : dto.pageNumber
+    };
+    
+    var resp = document.query(queryParam);
+    if (resp.metadata.status == "failure") {
+        throw resp.metadata;
+    }
+    
+    if (!resp.result.documents){
+        throw {
+            errorCode: "Entity_Not_Found",
+            errorDetail: "FarmManager.listFarmhouses: could not find farmhouses"
+        };
+    }
+    
+    var result = [];
+    for (var i=0; i < resp.result.documents.length; i++) {
+        var initializationDto = {
+            "key": resp.result.documents[i].key,
+            "farmhouseid": resp.result.documents[i].id,
+            "name": resp.result.documents[i].name,
+            "location": resp.result.documents[i].location,
+            "gps": resp.result.documents[i].gps,
+            "farm": resp.result.documents[i].farm,
+            "description": resp.result.documents[i].description,
+            "category": resp.result.documents[i].category,
+            "length": resp.result.documents[i].length,
+            "width": resp.result.documents[i].width,
+            "inheritance": false,
+            "controller": true
+        };
+
+        result.push(new farmhouseModule.Farmhouse(initializationDto));
+    }
+    return result;
+}
+
+/**
+ * get Farmhouse based on farmhouseid
+ *
+ * @method getFarmhouse
+ * @param {String} dto
+ * @return {Farmhouse}
+ * @throws {Error}
+ */
+FarmhouseManager.prototype.getFarmhouse = function(dto) {
+    if (!dto.farmhouseid) {
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "FarmhouseManager.getFarmhouse: farmhouseid cannot be null or empty"
+        };
+    }
+    if (!dto.farm) {
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "FarmhouseManager.getFarmhouse: farm cannot be null or empty"
+        };
+    }
+    
+    var queryParam = {
+        query: 'id="'+ dto.farmhouseid + '" and farm="'+ dto.farm + '" and apsdb.schema="' + FARMHOUSE + '"',
+        fields:"*"
+    };
+    
+    var resp = document.query(queryParam);
+    if (resp.metadata.status == "failure") {
+        throw resp.metadata;
+    }
+    
+    if (!resp.result.documents[0]){
+        throw {
+            errorCode: "Entity_Not_Found",
+            errorDetail: "FarmhouseManager.getFarmhouse: could not find farmhouse with id " + dto.farmhouseid
+        };
+    }
+    
+    var initializationDto = {
+        "key": resp.result.documents[0].key,
+        "farmhouseid": resp.result.documents[0].id,
+        "name": resp.result.documents[0].name,
+        "location": resp.result.documents[0].location,
+        "gps": resp.result.documents[0].gps,
+        "farm": resp.result.documents[0].farm,
+        "description": resp.result.documents[0].description,
+        "category": resp.result.documents[0].category,
+        "length": resp.result.documents[0].length,
+        "width": resp.result.documents[0].width,
+        "inheritance": false,
+        "controller": true
+    };
+
+    return new farmhouseModule.Farmhouse(initializationDto);
+}
+
+/**
+ * updates a Farmhouse object. If it doesn't exist, the method creates it
+ *
+ * @method updateFarmhouse
+ * @param {String} dto
+ * @return {Object}
+ * @throws {Error}
+ */
+FarmhouseManager.prototype.updateFarmhouse = function(dto) {
+    if (!dto.farmhouseid) {
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "FarmhouseManager.updateFarmhouse: farmid cannot be null or empty"
+        };
+    }
+    
+    var fields = {
+        "id": dto.farmhouseid,
+        "name": dto.name,
+        "location": dto.location,
+        "gps": dto.gps,
+        "farm": dto.farm,
+        "description": dto.description,
+        "category": dto.category,
+        "length": dto.length,
+        "width": dto.width,
+        "meta.types": {
+            "id": "string",
+            "name": "string",
+            "location": "string",
+            "gps": "geospatial",
+            "farm": "string",
+            "description": "string",
+            "category": "string",
+            "length": "string",
+            "width": "string",
+        },
+        "meta.schema": FARMHOUSE
+    };
+    
+    if (dto.key != null) {
+        fields.key = dto.key;
+    }
+    
+    var resp = document.save(fields);
+    if (resp.metadata.status == "failure") {
+        throw resp.metadata;
+    }
+    
+    return resp;
+}
+
+/**
+ * flags a Farmhouse as deleted
+ *
+ * @method deleteFarmhouse
+ * @param {String} dto
+ * @return {Object}
+ * @throws {Error}
+ */
+FarmhouseManager.prototype.deleteFarmhouse = function(dto) {
+    if (!dto.key) {
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "FarmhouseManager.deleteFarmhouse: key cannot be null or empty"
+        };
+    }
+    
+    var resp = document.delete(dto.key);
+    if (resp.metadata.status == "failure") {
+        throw resp.metadata;
+    }
+    
+    return resp;
+}
+

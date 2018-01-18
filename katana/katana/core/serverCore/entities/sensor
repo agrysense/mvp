@@ -1,0 +1,106 @@
+var document = require("document");
+var componentModule = require("./component");
+
+const SENSOR_VALUE = "sensor_value";
+const SENSOR_CORE = "sensor_core";
+
+/**
+ * @class Sensor
+ * @constructor
+ * @throws {Error}
+ */ 
+function Sensor(dto) {
+    
+    componentModule.Component.call(this, dto);
+    
+    if (!dto.sensorid) {
+        
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "Sensor: dto.sensorid cannot be null or empty"
+        };
+    }
+    
+    this.core = null;
+    this.type = null;
+}
+
+Sensor.prototype = new componentModule.Component({inheritance: true});
+Sensor.prototype.constructor = Sensor;
+
+/**
+ * If not available, lazy load the sensor_core data that relates to this sensor
+ * @method getSensorCore
+ * @return {Object}
+ * @throws {Error}
+ */
+Sensor.prototype.getCore = function() {
+  
+    if (this.core && !this.sensor_core) {
+        return this.core;
+    }  
+    
+    var queryParams = {
+        fields: '*'
+    };
+    
+    var resp = document.get(this.sensor_core); 
+    if (resp.metadata.status == "failure") {
+        throw resp.metadata;
+    }
+    
+    this.core = this.getPropertiesFromDocument(resp.result);
+    return this.core;
+};
+
+/**
+ * List sensor's values
+ * @method listValues
+ * @param {Object} [dto] or 
+ * @param {String} [dto.from]: optional, dateTime in the following format: yyyy-MM-dd'T'HH:mm:ssZ or yyyy-MM-dd
+ * @param {String} [dto.to]: optional, dateTime in the following format: yyyy-MM-dd'T'HH:mm:ssZ or yyyy-MM-dd
+ * @param {Number} [dto.pageNumber]: optional, indicates which page to return when results are paginated
+ * @param {Number} [dto.resultsPerPage]: optional, specifies how many items to return per page (defaults to 50)
+ * @param {Object} [dto.sort]: optional, used to sort on a field
+ * @param {String} [dto.sort.dir] : one of ASC or DESC
+ * @param {String} [dto.sort.field]: the name of the field to sort on
+ * @param {String} [dto.sort.fieldType]: the type of the field to sort on (string, numeric, date, text, geospatial)
+ * @return {Array}
+ * @throws {Error}
+ */
+Sensor.prototype.listValues = function(dto) {
+    
+    var queryParams = {
+        fields: '*'
+    };
+    
+    var query = 'sensor = "' + this.sensorid + '" and schema = "' + SENSOR_VALUE + '"';
+    if (dto && dto.from) {
+        query += ' and creationTime<date> >="' + dto.from + '"';
+    }
+    
+    if (dto && dto.to) {
+        query += ' and creationTime<date> <="' + dto.to + '"';
+    }
+    
+    queryParams.query = query;
+    
+    if (dto && dto.pageNumber) {
+        queryParams.pageNumber = dto.pageNumber;
+    }
+    
+    if (dto && dto.resultsPerPage) {
+        queryParams.resultsPerPage = dto.resultsPerPage;
+    }
+    
+    if (dto && dto.sort) {
+        queryParams.sort = dto.sort.field + "<" + dto.sort.fieldType + ":" + dto.sort.dir
+    }
+    
+    var resp = document.query(queryParams); 
+    if (resp.metadata.status == "failure") {
+        throw resp.metadata;
+    }
+    
+    return resp.result.documents;
+};

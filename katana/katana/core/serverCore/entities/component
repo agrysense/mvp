@@ -1,0 +1,92 @@
+/**
+ * Abstract base class. When writing the inheritance code, pass {inheritance:true}
+ * @class Component
+ * @class constructor
+ * @param {Object} [dto]
+ * @throws {Error}
+ */
+function Component(dto) {
+
+    if (dto.inheritance) {
+        return;
+    }
+
+    if (!dto) {
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: this.constructor.name + ": dto cannot be null or empty"
+        };
+    }
+
+    if (!dto.key && !dto.id) {   
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: this.constructor.name + ": dto.key or dto.id cannot be null or empty"
+        };
+    }
+
+    this.setPropertiesFromDocument(dto);      
+}
+
+/**
+ * Filters out the fields that are specific to scriptr.io documents (e.g. creationDate, schema), except the key,
+ * then assigns the values of the remaining fields to the instance's properties
+ * @setPropertiesFromDocument
+ * @param {Object} document
+ */
+Component.prototype.setPropertiesFromDocument = function(doc) {
+
+    var exclude = ["versionNumber", "creator", "lastModifiedDate", "lastModifiedBy", "creationDate", "schema", "latest", "meta."];
+    if (doc) {
+
+        for (var key in doc) {
+
+            if (key == "key") {
+                this.id = doc.key;
+            }
+
+            if (key.indexOf("apsdb") == -1 && exclude.indexOf(key) == -1) {
+                this[key] = doc[key];
+            }        
+        }
+    }
+};
+
+/**
+ * Filters out any document-only fields from a document 
+ * @function getPropertiesFromDocument
+ * @param {Object} document
+ * @return {Object} map of properties
+ */
+Component.prototype.getPropertiesFromDocument = function(doc) {
+
+    var exclude = ["versionNumber", "creator", "lastModifiedDate", "lastModifiedBy", "creationDate", "schema", "latest", "meta.types"];
+    var properties = {};
+    if (doc) {
+
+        for (var key in doc) {
+
+            if (key.indexOf("apsdb") == -1 && exclude.indexOf(key) == -1) {
+                properties[key] = doc[key];
+            }        
+        }
+    }
+
+    return properties;
+};
+
+/**
+ * return instance object as JSONObject
+ * @method toJSONObject
+ * @return {JSONObject}
+ * @throws {Error}
+ */
+Component.prototype.toJSONObject = function() {    
+    
+    var struct = {};
+    for (var key in this){
+        struct[key] = this[key];
+    }
+    
+    return struct;
+};

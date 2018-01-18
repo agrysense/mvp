@@ -1,0 +1,14 @@
+var deviceController = require("../../applications/deviceController");
+var log = require("log"); log.setLevel("info");
+
+var params =  request.parameters;
+if (params.body) {
+    params = JSON.parse(params.body);
+}
+
+try {
+    var deviceCtrl = new deviceController.DeviceController();
+	return deviceCtrl.deleteDevice(params);
+}catch(exception) {
+    return exception;
+}
