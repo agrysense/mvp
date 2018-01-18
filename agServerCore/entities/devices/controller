@@ -2,7 +2,9 @@ var document = require("document");
 var log = require("log"); log.setLevel("info");
 var componentModule = require("../component");
 
-var controllerid = null;
+const CONTROLLER = "Controller";
+
+var id = null;
 var farmhouse = null;
 var software_version = null;
 var speaker = null;
@@ -21,16 +23,16 @@ var security_code = null;
  * @param {Object} deviceManager: an instance of DeviceManager
  */
 function Controller(dto, deviceManager) {    
-    
+
     componentModule.Component.call(this, dto);
     if (!deviceManager) {
-        
+
         throw {
             errorCode: "Missing_Parameter",
             errorDetail: this.constructor.name + ": deviceManager cannot be null or undefined"
         };
     }
-    
+
     this.deviceManager = deviceManager;
 }
 
@@ -46,18 +48,46 @@ Controller.prototype.constructor = Controller;
  * @throws {Error}
  */
 Controller.prototype.listCameras = function(dto) {
-   
+
     var searchDto = {
-      "controllerid": this.id
+        "controllerid": this.id
     };
-    
+
     if (dto) {
         for (var key in dto){
             searchDto[key] = dto[key];
         }
     }
-    
+
     return this.deviceManager.listCameras(searchDto);
+};
+
+/**
+ * Add a new camera to this controller
+ * @method addCamera
+ * @param {Object} [obj] : can be an instance of the Camera class or a map of key/values describing a camera
+ * @return {Object}
+ * @throw {Error}
+ */
+Controller.prototype.addCamera = function(obj) {
+    
+    if (!obj) {
+        
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "Controller.addCamera: obj cannot be null or undefined"
+        }; 
+    }
+    
+    if (!typeof(obj) == "object") {
+        
+         throw {
+            errorCode: "Invalid_Parameter",
+            errorDetail: "Controller.addCamera: obj should be an instance of Camera of a JavaScript map"
+        }; 
+    }
+    
+    return this.deviceManager.updateCamera(obj);
 };
 
 /**
@@ -69,17 +99,17 @@ Controller.prototype.listCameras = function(dto) {
  * @throws {Error}
  */
 Controller.prototype.listSensors = function(dto) {
-  
+
     var searchDto = {
-      "controller": this.id
+        "controller": this.id
     };
-    
+
     if (dto) {
         for (var key in dto){
             searchDto[key] = dto[key];
         }
     }
-    
+
     return this.deviceManager.listSensors(searchDto);
 };
 
@@ -92,16 +122,36 @@ Controller.prototype.listSensors = function(dto) {
  * @throws {Error}
  */
 Controller.prototype.listSensorCores = function(dto) {
-    
+
     var searchDto = {
-      "controllerid": this.id
+        "controllerid": this.id
     };
-    
+
     if (dto) {
         for (var key in dto){
             searchDto[key] = dto[key];
         }
     }
-    
+
     return this.deviceManager.listSensorCores(searchDto);
+};
+
+/**
+ * Update the controller's persisted data in the store, with the values of the fields of the current instance
+ * This only updates the controller, not the corresponding cameras, sensors and cores if any
+ * @method update
+ */
+Controller.prototype.update = function() {
+	this.deviceManager.updateController(this.toJSONObject());
+};
+
+/**
+ * @method toJSONObject
+ * @return {Object} current instance as a JSON object
+ */
+Controller.prototype.toJSONObject = function() {
+  
+    var asJson = componentModule.Component.prototype.toJSONObject.call(this);
+    delete asJson.deviceManager; 
+    return asJson;
 };

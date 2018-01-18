@@ -36,7 +36,7 @@ function Component(dto) {
  */
 Component.prototype.setPropertiesFromDocument = function(doc) {
 
-    var exclude = ["versionNumber", "creator", "lastModifiedDate", "lastModifiedBy", "creationDate", "schema", "latest", "meta."];
+    var exclude = ["versionNumber", "creator", "lastModifiedDate", "lastModifiedBy", "creationDate", "schema", "latest", "meta.types", "meta.schema", "rootkey"];
     if (doc) {
 
         for (var key in doc) {
@@ -60,7 +60,7 @@ Component.prototype.setPropertiesFromDocument = function(doc) {
  */
 Component.prototype.getPropertiesFromDocument = function(doc) {
 
-    var exclude = ["versionNumber", "creator", "lastModifiedDate", "lastModifiedBy", "creationDate", "schema", "latest", "meta.types"];
+    var exclude = ["versionNumber", "creator", "lastModifiedDate", "lastModifiedBy", "creationDate", "meta.schema", "latest", "meta.types", "meta.schema", "rootkey"];
     var properties = {};
     if (doc) {
 
@@ -84,8 +84,13 @@ Component.prototype.getPropertiesFromDocument = function(doc) {
 Component.prototype.toJSONObject = function() {    
     
     var struct = {};
-    for (var key in this){
-        struct[key] = this[key];
+    var keys = Object.keys(this);
+    for (var i = 0; keys && i < keys.length; i++){
+        
+        var type = typeof(this[keys[i]]);
+        if(type != "object" && type != "function") {
+            struct[keys[i]] = this[keys[i]];
+        }             
     }
     
     return struct;
