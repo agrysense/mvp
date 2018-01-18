@@ -1,0 +1,142 @@
+/**
+ * Test suite of the Controller operations defined in the DeviceManager class.
+ * Note: avoid doing lengthy tests (split them in multiple scripts if this is the case)
+ */
+
+var jasmine = require("/tests/modules/jasmine/boot");
+var deviceManagerModule = require("/agServerCore/entities/devices/deviceManager");
+var init = require("../init");
+
+var deviceManager = null; // Instance under testing
+
+jasmine.describe("Testing the DeviceManager class", function() {
+
+    jasmine.beforeAll(function(){
+
+    }); 
+
+    jasmine.beforeEach(function() {
+
+    });
+
+    jasmine.it("deviceManager.listControllers() returns an array of 3 Controller instances", function() {
+
+        // create 3 controllers
+        var keys = [];
+        for(var i = 0; i < 3; i++) {            
+            keys[i] = init.createController();
+        }
+
+        deviceManager = new deviceManagerModule.DeviceManager();
+        try {
+
+            var list = deviceManager.listControllers();
+            jasmine.expect(list).not.toBeNull(null);
+            jasmine.expect(list.length).toBe(3);
+            jasmine.expect(list[0].constructor.name).toBe("Controller");
+            jasmine.expect(keys.indexOf(list[0].id)).not.toBeNull();
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally {
+            init.cleanup();   
+        }
+    });
+
+    jasmine.it("deviceManager.getController() returns the requested controller", function() {
+
+        // create a controller
+        var key = init.createController(); console.log(key)
+        var controllerData = init.getDocument(key);
+        deviceManager = new deviceManagerModule.DeviceManager();
+        try {
+
+            var controller = deviceManager.getController(key);
+            jasmine.expect(controller).not.toBeNull(null);            
+            jasmine.expect(controller.constructor.name).toBe("Controller");            
+            jasmine.expect(controller.id).toBe(key);
+            jasmine.expect(controller.mac_address).toBe(controllerData.mac_address);           
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally {
+            init.cleanup();   
+        }
+    });
+
+    jasmine.it("deviceManager.updateController() effectively updates the specified controller", function() {
+
+        // create a controller
+        var key = init.createController();
+        var controllerData = init.getDocument(key);
+        deviceManager = new deviceManagerModule.DeviceManager();
+        try {
+
+            var controller = deviceManager.getController(key);
+            controller.mac_address = init.mac();
+            controller.ip_address = init.ip();       
+            deviceManager.updateController(controller.toJSONObject());      
+            var updatedControllerData = init.getDocument(key);
+            jasmine.expect(controller.mac_address).toBe(updatedControllerData.mac_address);  
+            jasmine.expect(controller.ip_address).toBe(updatedControllerData.ip_address);           
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally {
+            init.cleanup();   
+        }
+    });
+    
+    jasmine.it("deviceManager.updateController() effectively creates a controller if no key provided", function() {
+
+        // create controller data (not persisted)
+        var data = init.createControllerData(true);
+        // remove the key
+        delete data.key;       
+        deviceManager = new deviceManagerModule.DeviceManager();
+        try {
+
+            var initControllerCount = init.listDocumentsOfType("Controller").length;
+            
+            // create a controller
+            deviceManager.updateController(data);
+            var newControllersCount = init.listDocumentsOfType("Controller").length;
+            jasmine.expect(newControllersCount).toBe(initControllerCount + 1);            
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally {
+            init.cleanup();   
+        }
+    });
+
+    jasmine.it("deviceManager.deleteController() make sure that a controller is deleted from the store", function() {
+
+        // create a controller
+        var key = init.createController();
+        deviceManager = new deviceManagerModule.DeviceManager();
+        try {
+
+            deviceManager.deleteController(key);
+            try {
+                
+            	getDocument(key);                
+                // if here fail
+                it.fail();
+            }catch(exception){
+                // should reach this block
+                jasmine.expect(true).toBe(true);   
+            } 
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally {
+            init.cleanup();   
+        }
+    });
+
+    jasmine.afterEach(function(){        
+
+    });
+
+    jasmine.afterAll(function(){        
+
+    });
+});
+
+jasmine.execute();

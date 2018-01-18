@@ -12,9 +12,10 @@ const SENSOR_KEY_PREFIX = "TEST_SENSOR_";
 const SENSOR_NAME_PREFIX = "TEST_SENSOR_";
 const SENSORCORE_KEY_PREFIX = "TEST_SENSORCORE_";
 const SENSORCORE_NAME_PREFIX = "TEST_SENSORCORE_";
+const STRUCTURE_PREFIX = "TEST_STRUCTURE_";
 
-function createController() {
-
+function createControllerData() {
+    
     var uid = guid();
     var data = {
 
@@ -26,13 +27,19 @@ function createController() {
         "camera": "true",
         "microphone": "true",
         "ip_address": ip(),
-        "structure": "a",
+        "structure": STRUCTURE_PREFIX + structure(),
         "security_code": "123456",
-        "speaker": "TRUE",
+        "speaker": "true",
         "name": CONTROLLER_NAME_PREFIX + uid,
         "meta.schema": "Controller"
     };
+    
+    return data;
+}
 
+function createController() {
+
+    var data = createControllerData();
     var resp = document.save(data);    
     if (resp.metadata.status == "failure") {
         throw(JSON.stringify(resp.metadata));
@@ -119,6 +126,51 @@ function createSensor(controllerid, coreid) {
     return data.key;
 }
 
+// Caution: should be called after every test suite to make sure there aren't too many documents to delete
+function cleanup() {
+    
+    // delete all controllers
+    deleteDocumentsOfType("Controller");
+    
+    // delete all cameras
+    deleteDocumentsOfType("Camera");
+    
+    // delete all sensors
+    deleteDocumentsOfType("Sensor");
+    
+    // delete all sensor cores
+    deleteDocumentsOfType("SensorCore");
+}
+
+// Caution: can cover up to 50 documents
+function listDocumentsOfType(schema) {
+    
+    var queryParams = {
+        
+        query: 'apsdb.schema = "' + schema + '"',
+        fields: "key"
+    };
+    
+    var resp = document.query(queryParams);
+    if (resp.metadata.status == "failure") {
+         throw(JSON.stringify(resp.metadata));
+    }
+    
+    return resp.result.documents;
+}
+
+function deleteDocumentsOfType(schema) {
+    
+    var list = listDocumentsOfType(schema);
+    for (var i = 0; i < list.length; i++) {
+        
+        var resp = document.delete(list[i].key);
+        if (resp.metadata.status == "failure") {
+            console.log("Could not delete " +  list[i].key);
+        }
+    }
+}
+
 function guid(max) {
 
     var choice = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -151,4 +203,11 @@ function mac() {
     }
 
     return mc;
+}
+
+function structure() {
+    
+    const ids = ["Structure1", "Structure2", "Structure2"];
+    var id = ids[Math.round(Math.random() * (ids.length - 1))];
+    return id;
 }
