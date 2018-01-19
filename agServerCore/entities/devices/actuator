@@ -12,45 +12,12 @@ var hash = null;
 /**
  * Defines the Actuator object
  *
- * @class
+ * @class Actuator
  * @constructor
  */
-var Actuator = function(dto) {
+function Actuator(dto) {
     componentModule.Component.call(this, dto);
-    if (!dto.actuatorid) {   
-        throw {
-            errorCode: "Missing_Parameter",
-            errorDetail: "Actuator: dto.actuatorid cannot be null or empty"
-        };
-    }
-    this.actuatorid = dto.actuatorid;
-    this.controller = dto.controller;
-    this.device_type = dto.device_type;
-    this.ip_address = dto.ip_address;
-    this.mac_address = dto.mac_address;
-    this.hash = dto.hash;
 }
 
 Actuator.prototype = new componentModule.Component({inheritance: true});
 Actuator.prototype.constructor = Actuator;
-
-/**
- * return Actuator object as JSONObject
- * 
- * @method toJSONObject
- * @param {String} dto
- * @return {JSONObject}
- * @throws {Error}
- */
-Actuator.prototype.toJSONObject = function(dto) {    
-    var result = {
-        "actuatorid": this.actuatorid,
-        "controller": this.controller,
-        "device_type": this.device_type,
-        "ip_address": this.ip_address,
-        "mac_address": this.mac_address,
-        "hash": this.hash
-    }
-    
-    return result;
-}
