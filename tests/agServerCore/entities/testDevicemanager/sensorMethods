@@ -107,18 +107,17 @@ jasmine.describe("Testing the DeviceManager class", function() {
             init.cleanup();   
         }
     });
-/*
-    jasmine.it("deviceManager.deleteCamera() make sure that a camera is deleted from the store", function() {
 
-        // create a camera
-        var key = init.createCamera();
-        deviceManager = new deviceManagerModule.DeviceManager();
+    jasmine.it("deviceManager.deleteSensor() make sure that a sensor is deleted from the store", function() {
+
+        // create a sensor
+        var key = init.createSensor(controller.key, sensorCore.key);
         try {
 
             deviceManager.deleteCamera(key);
             try {
                 
-            	getDocument(key);                
+            	init.getDocument(key);                
                 // if here fail
                 it.fail();
             }catch(exception){
@@ -131,7 +130,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
             init.cleanup();   
         }
     });
- */   
+ 
     jasmine.afterEach(function(){        
 
     });
