@@ -1,0 +1,144 @@
+/**
+ * Test suite of the Sensor operations defined in the DeviceManager class.
+ * Note: avoid doing lengthy tests (split them in multiple scripts if this is the case)
+ */
+
+var jasmine = require("/tests/modules/jasmine/boot");
+var deviceManagerModule = require("/agServerCore/entities/devices/deviceManager");
+var init = require("../init");
+
+var deviceManager = null; // Instance under testing
+var controller = null; // reference controller
+var sensorCore = null; // reference sensor core, linked to the former
+
+jasmine.describe("Testing the DeviceManager class", function() {
+
+    jasmine.beforeAll(function(){
+		deviceManager = new deviceManagerModule.DeviceManager();
+    }); 
+
+    jasmine.beforeEach(function() {
+
+        // create a reference controller
+        var key = init.createController();
+        controller = init.getDocument(key);
+        sensorCore = init.findDocumentsByCriteria('apsdb.schema="SensorCore" and controller="' + key + '"');
+    });
+
+    jasmine.it("deviceManager.listSensors() returns an array of 2 Sensor instances", function() {
+        
+        // create 1 sensor. Attention: the controller already ships with 1 sensor core and 1 sensor
+        var keys = [];
+        for(var i = 0; i < 1; i++) {            
+            keys[i] = init.createSensor(controller.key, sensorCore.key);
+        }
+
+        try {
+
+            var list = deviceManager.listSensors();
+            jasmine.expect(list).not.toBeNull(null);
+            jasmine.expect(list.length).toBe(2);
+            jasmine.expect(list[0].constructor.name).toBe("Sensor");
+            jasmine.expect(keys.indexOf(list[0].id)).not.toBeNull();
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally {
+            init.cleanup();   
+        }
+    });
+
+    jasmine.it("deviceManager.getSensor() returns the requested sensor instance", function() {
+
+        try {
+
+            key = init.createSensor(controller.key, sensorCore.key);
+            var sensorData = init.getDocument(key);
+            var sensor = deviceManager.getSensor(key);
+            jasmine.expect(sensor).not.toBeNull(null);            
+            jasmine.expect(sensor.constructor.name).toBe("Sensor");            
+            jasmine.expect(sensor.id).toBe(key);
+            jasmine.expect(controller.key).toBe(sensor.controller);    
+            jasmine.expect(sensorCore.key).toBe(sensor.sensor_core);    
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally {
+            init.cleanup();   
+        }
+    });
+
+    jasmine.it("deviceManager.updateSensor() effectively updates the specified sensor", function() {
+
+        // create a sensor
+        try {
+
+            var key = init.createSensor(controller.key, sensorCore.key);
+            var sensorData = init.getDocument(key); 
+            var sensor = deviceManager.getSensor(key);
+            sensor.port = "5555";            
+            deviceManager.updateSensor(sensor.toJSONObject());     
+            var updatedSensor = init.getDocument(key);
+            jasmine.expect(sensor.port).toBe(updatedSensor.port);  
+            jasmine.expect(sensor.sensor_core).toBe(updatedSensor.sensor_core);           
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally{  
+            init.cleanup();   
+        }
+    });
+  
+    jasmine.it("deviceManager.updateSensor() effectively creates a sensor if no key provided", function() {
+
+        // create sensor data (not persisted)
+        var sensorData = init.createSensorData(controller.key, sensorCore.key); 
+       
+        // remove the key
+        delete sensorData.key; 
+        try {
+
+            var initSensorCount = init.listDocumentsOfType("Sensor").length;
+            
+            // create a sensor
+            deviceManager.updateSensor(sensorData);
+            var newSensorCount = init.listDocumentsOfType("Sensor").length;
+            jasmine.expect(newSensorCount).toBe(initSensorCount + 1);            
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally {
+            init.cleanup();   
+        }
+    });
+/*
+    jasmine.it("deviceManager.deleteCamera() make sure that a camera is deleted from the store", function() {
+
+        // create a camera
+        var key = init.createCamera();
+        deviceManager = new deviceManagerModule.DeviceManager();
+        try {
+
+            deviceManager.deleteCamera(key);
+            try {
+                
+            	getDocument(key);                
+                // if here fail
+                it.fail();
+            }catch(exception){
+                // should reach this block
+                jasmine.expect(true).toBe(true);   
+            } 
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally {
+            init.cleanup();   
+        }
+    });
+ */   
+    jasmine.afterEach(function(){        
+
+    });
+
+    jasmine.afterAll(function(){        
+
+    });
+});
+
+jasmine.execute();

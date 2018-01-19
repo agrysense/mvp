@@ -3,6 +3,7 @@
  */
 
 var document = require("document");
+var log = require("log"); log.setLevel("debug");
 
 const CONTROLLER_KEY_PREFIX = "TEST_CONTROLLER_";
 const CONTROLLER_NAME_PREFIX = "TEST_CONTROLLER_";
@@ -15,7 +16,7 @@ const SENSORCORE_NAME_PREFIX = "TEST_SENSORCORE_";
 const STRUCTURE_PREFIX = "TEST_STRUCTURE_";
 
 function createControllerData() {
-    
+
     var uid = guid();
     var data = {
 
@@ -33,7 +34,7 @@ function createControllerData() {
         "name": CONTROLLER_NAME_PREFIX + uid,
         "meta.schema": "Controller"
     };
-    
+
     return data;
 }
 
@@ -51,17 +52,11 @@ function createController() {
     return data.key;
 }
 
-function getDocument(key) {
+function createCameraData(controllerid) {
 
-    var resp = document.get(key);    
-    if (resp.metadata.status == "failure") {
-        throw(JSON.stringify(resp.metadata));
+    if (!controllerid){
+        throw "init.createCameraData needs controllerid";
     }
-
-    return resp.result;
-}
-
-function createCamera(controllerid) {
 
     var uid = guid();
     var data = {
@@ -76,6 +71,12 @@ function createCamera(controllerid) {
         "meta.schema": "Camera"
     };
 
+    return data;
+}
+
+function createCamera(controllerid) {
+
+    var data = createCameraData(controllerid);
     var resp = document.save(data);    
     if (resp.metadata.status == "failure") {
         throw(JSON.stringify(resp.metadata));
@@ -84,8 +85,12 @@ function createCamera(controllerid) {
     return data.key;
 }
 
-function createSensorCore(controllerid) {
-    
+function createSensorCoreData(controllerid) {
+
+    if (!controllerid){
+        throw "init.createSensorCoreData needs controllerid";
+    }
+
     var uid = guid();
     var data = {
 
@@ -96,6 +101,17 @@ function createSensorCore(controllerid) {
         "meta.schema": "SensorCore"
     };
 
+    return data;
+}
+
+
+function createSensorCore(controllerid) {
+
+    if (!controllerid){
+        throw "init.createSensorCore needs controllerid";
+    }
+    
+    var data = createSensorCoreData(controllerid);
     var resp = document.save(data);    
     if (resp.metadata.status == "failure") {
         throw(JSON.stringify(resp.metadata));
@@ -104,7 +120,7 @@ function createSensorCore(controllerid) {
     return data.key;
 }
 
-function createSensor(controllerid, coreid) {
+function createSensorData(controllerid, coreid) {
 
     var types = ["CO2", "Ammonia", "Temperature", "Humidity", "Light"];
     var uid = guid();
@@ -117,53 +133,93 @@ function createSensor(controllerid, coreid) {
         "port": Math.round(Math.random() * 1000) + 100,
         "meta.schema": "Sensor"
     };
+   
+    return data;
+}
 
-    var resp = document.save(data);    
-    if (resp.metadata.status == "failure") {
-        throw(JSON.stringify(resp.metadata));
+function createSensor(controllerid, coreid, nosave) {
+
+    if (!controllerid){
+        throw "init.createSensor needs controllerid";
     }
+    
+    var data = createSensorData(controllerid, coreid);
+    if (!nosave) {
 
+        var resp = document.save(data);    
+        if (resp.metadata.status == "failure") {
+            throw(JSON.stringify(resp.metadata));
+        }
+    }
+   
     return data.key;
 }
 
 // Caution: should be called after every test suite to make sure there aren't too many documents to delete
 function cleanup() {
-    
+
     // delete all controllers
     deleteDocumentsOfType("Controller");
-    
+
     // delete all cameras
     deleteDocumentsOfType("Camera");
-    
+
     // delete all sensors
     deleteDocumentsOfType("Sensor");
-    
+
     // delete all sensor cores
     deleteDocumentsOfType("SensorCore");
 }
 
+function getDocument(key) {
+
+    var resp = document.get(key);    
+    if (resp.metadata.status == "failure") {
+        throw(JSON.stringify(resp.metadata));
+    }
+
+    return resp.result;
+}
+
+// Caution: can cover up to 50 documents
+function findDocumentsByCriteria(expression) {
+
+    var queryParams = {
+
+        query: expression,
+        fields: "*"
+    };
+
+    var resp = document.query(queryParams);
+    if (resp.metadata.status == "failure") {
+        throw(JSON.stringify(resp.metadata));
+    }
+
+    return resp.result.documents;
+}
+
 // Caution: can cover up to 50 documents
 function listDocumentsOfType(schema) {
-    
+
     var queryParams = {
-        
+
         query: 'apsdb.schema = "' + schema + '"',
         fields: "key"
     };
-    
+
     var resp = document.query(queryParams);
     if (resp.metadata.status == "failure") {
-         throw(JSON.stringify(resp.metadata));
+        throw(JSON.stringify(resp.metadata));
     }
-    
+
     return resp.result.documents;
 }
 
 function deleteDocumentsOfType(schema) {
-    
+
     var list = listDocumentsOfType(schema);
     for (var i = 0; i < list.length; i++) {
-        
+
         var resp = document.delete(list[i].key);
         if (resp.metadata.status == "failure") {
             console.log("Could not delete " +  list[i].key);
@@ -206,7 +262,7 @@ function mac() {
 }
 
 function structure() {
-    
+
     const ids = ["Structure1", "Structure2", "Structure2"];
     var id = ids[Math.round(Math.random() * (ids.length - 1))];
     return id;

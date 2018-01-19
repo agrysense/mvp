@@ -45,7 +45,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
     jasmine.it("deviceManager.getController() returns the requested controller", function() {
 
         // create a controller
-        var key = init.createController(); console.log(key)
+        var key = init.createController(); 
         var controllerData = init.getDocument(key);
         deviceManager = new deviceManagerModule.DeviceManager();
         try {
