@@ -37,7 +37,7 @@ DeviceManager.prototype.listControllers = function(dto) {
         resultsPerPage: (!dto || !dto.resultsPerPage) ? 50 : dto.resultsPerPage,
         pageNumber: (!dto || !dto.pageNumber) ? 1 : dto.pageNumber
     };
-    
+
     if (dto && dto.structureid) {        
         queryParam += 'and structure="'+ dto.structureid + '"'; 
     }
@@ -69,13 +69,13 @@ DeviceManager.prototype.listControllers = function(dto) {
  * @throws {Error}
  */
 DeviceManager.prototype.getController = function(controllerid) {
-    
+
     var queryParams = {
-        
-    	query: 'key="' +  controllerid + '"',
+
+        query: 'key="' +  controllerid + '"',
         fields: "*"
     };
-    
+
     var resp = document.query(queryParams);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
@@ -99,17 +99,18 @@ DeviceManager.prototype.getController = function(controllerid) {
  * @throws {Error}
  */
 DeviceManager.prototype.updateController = function(dto) {
-    
+
     if (!dto) {
-        
+
         throw {
             errorCode: "Missing_Parameter",
             errorDetail: "DeviceManager.updateController: controller.id or controller.key cannot be null or empty"
         };
     }
 
-    dto["meta.schema"] = CONTROLLER;    
-    var resp = document.save(dto);  
+    var fields = JSON.parse(JSON.stringify(dto));
+    fields["meta.schema"] = CONTROLLER;    
+    var resp = document.save(fields);  
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
@@ -125,7 +126,7 @@ DeviceManager.prototype.updateController = function(dto) {
  * @throws {Error}
  */
 DeviceManager.prototype.deleteController = function(controllerid) {
-    
+
     if (!controllerid) {
         throw {
             errorCode: "Missing_Parameter",
@@ -183,35 +184,30 @@ DeviceManager.prototype.listCameras = function(dto) {
         var camera = new cameraModule.Camera(resp.result.documents[i]); 
         result.push(camera);
     }
-    
+
     return result;
 };
 
 /**
- * get Camera based on farmid, farmhouseid, controller, cameraid
- *
+ * get Camera based on key
  * @method getCamera
- * @param {String} dto
+ * @param {String} key
  * @return {Camera}
  * @throws {Error}
  */
-DeviceManager.prototype.getCamera = function(dto) {
-    if (!dto.cameraid) {
+DeviceManager.prototype.getCamera = function(key) {
+
+    if (!key) {
         throw {
             errorCode: "Missing_Parameter",
-            errorDetail: "DeviceManager.getCamera: cameraid cannot be null or empty"
-        };
-    }
-    if (!dto.controller) {
-        throw {
-            errorCode: "Missing_Parameter",
-            errorDetail: "DeviceManager.getCamera: controller cannot be null or empty"
+            errorDetail: "DeviceManager.getCamera: key cannot be null or empty"
         };
     }
 
     var queryParam = {
-        query: 'id="'+ dto.cameraid + '" and controller="' + dto.controller + '" and apsdb.schema="' + CAMERA + '"',
-        fields:"*"
+
+        query: 'key="'+ key + '"',
+        fields: "*"
     };
 
     var resp = document.query(queryParam);
@@ -226,19 +222,7 @@ DeviceManager.prototype.getCamera = function(dto) {
         };
     }
 
-    var initializationDto = {
-        
-        "key": resp.result.documents[0].key,
-        "controller": resp.result.documents[0].controller,
-        "embedded": resp.result.documents[0].embedded,
-        "third_party": resp.result.documents[0].third_party,
-        "vendor": resp.result.documents[0].vendor,
-        "model": resp.result.documents[0].model,
-        //        "controller": true,
-        "inheritance": false
-    };
-
-    return new cameraModule.Camera(initializationDto);
+    return new cameraModule.Camera(resp.result.documents[0]);
 };
 
 /**
@@ -249,44 +233,24 @@ DeviceManager.prototype.getCamera = function(dto) {
  * @throws {Error}
  */
 DeviceManager.prototype.updateCamera = function(dto) {
-        
+
     if (!dto) {
         throw {
-            
+
             errorCode: "Missing_Parameter",
             errorDetail: "DeviceManager.updateCamera: dto cannot be null or undefined"
         };
     }
-
-    var camera = dto;
+console.log("updateCamera  " + JSON.stringify(dto));
+    var camera = JSON.parse(JSON.stringify(dto)); console.log("updateCamera  " + JSON.stringify(camera));
     if (dto instanceof cameraModule.Camera) {
-        
+
         camera = new Camera(dto);
         camera = camera.toJSONObject();
     }    
-    
-    var fields = {
-       
-        "controller": camera.controller,
-        "embedded": camera.embedded,
-        "third_party": camera.third_party,
-        "vendor": camera.vendor,
-        "model": camera.model,
-        "meta.types": {
-            "controller": "string",
-            "embedded": "string",
-            "third_party": "string",
-            "vendor": "string",
-            "model": "string"
-        },
-        "meta.schema": CAMERA
-    };
 
-    if (camera.key != null) {
-        fields.key = camera.key ? camera.key : camera.id;
-    }
-
-    var resp = document.save(fields);
+    camera["meta.schema"] = CAMERA
+    var resp = document.save(camera);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
@@ -298,19 +262,20 @@ DeviceManager.prototype.updateCamera = function(dto) {
  * flags a Camera as deleted
  *
  * @method deleteCamera
- * @param {String} dto
+ * @param {String} key
  * @return {Object}
  * @throws {Error}
  */
-DeviceManager.prototype.deleteCamera = function(dto) {
-    if (!dto.key) {
+DeviceManager.prototype.deleteCamera = function(key) {
+    
+    if (!key) {
         throw {
             errorCode: "Missing_Parameter",
             errorDetail: "DeviceManager.deleteCamera: key cannot be null or empty"
         };
     }
 
-    var resp = document.delete(dto.key);
+    var resp = document.delete(key);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
@@ -329,14 +294,20 @@ DeviceManager.prototype.deleteCamera = function(dto) {
  * @throws {Error}
  */
 DeviceManager.prototype.listSensors = function(dto) {
-    
+
+    dto = dto ? dto : {};
     var queryParam = {
-        query: 'controller="'+ dto.controller + '" and apsdb.schema="' + SENSOR + '"',
+       
+        query: 'apsdb.schema="' + SENSOR + '"',
         fields: "*",
         count: true,
         resultsPerPage: (!dto || !dto.resultsPerPage) ? 50 : dto.resultsPerPage,
         pageNumber: (!dto || !dto.pageNumber) ? 1 : dto.pageNumber
     };
+    
+    if (dto.controller) {
+         query += ' and controller="'+ dto.controller;
+    }
 
     var resp = document.query(queryParam);
     if (resp.metadata.status == "failure") {
@@ -354,35 +325,29 @@ DeviceManager.prototype.listSensors = function(dto) {
     for (var i=0; i < resp.result.documents.length; i++) {
         result.push(new sensorModule.Sensor(resp.result.documents[i]));
     }
-    
+
     return result;
 };
 
 /**
- * get Sensor based on farmid, farmhouseid, controller, sensorid
- *
+ * get Sensor
  * @method getSensor
- * @param {String} dto
+ * @param {String} key: the key (identifier) of the sensor
  * @return {Sensor}
  * @throws {Error}
  */
-DeviceManager.prototype.getSensor = function(dto) {
-    
-    if (!dto.sensorid) {
-        throw {
-            errorCode: "Missing_Parameter",
-            errorDetail: "DeviceManager.getSensor: sensorid cannot be null or empty"
-        };
-    }
-    if (!dto.controller) {
-        throw {
-            errorCode: "Missing_Parameter",
-            errorDetail: "DeviceManager.getSensor: controller cannot be null or empty"
-        };
-    }
+DeviceManager.prototype.getSensor = function(key) {
 
+    if (!key) {
+        
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "DeviceManager.getSensor: key  cannot be null or empty"
+        };
+    }
+    
     var queryParam = {
-        query: 'id="'+ dto.sensorid + '" and controller="' + dto.controller + '" and apsdb.schema="' + SENSOR + '"',
+        query: 'key="'+ key + '"',
         fields:"*"
     };
 
@@ -392,64 +357,45 @@ DeviceManager.prototype.getSensor = function(dto) {
     }
 
     if (!resp.result.documents[0]){
+        
         throw {
             errorCode: "Entity_Not_Found",
             errorDetail: "DeviceManager.getSensor: could not find sensor with id " + dto.sensorid
         };
     }
 
-    var initializationDto = {
-        
-        "key": resp.result.documents[0].key,
-        "sensor_core": resp.result.documents[0].sensor_core,
-        "controller": resp.result.documents[0].controller,
-        "sensor_type": resp.result.documents[0].sensor_type,
-        "port": resp.result.documents[0].port,
-        //        "controller": true,
-        "inheritance": false
-    };
-
-    return new sensorModule.Sensor(initializationDto);
+    return new sensorModule.Sensor(resp.result.documents[0]);
 };
 
 /**
  * updates a Sensor object. If it doesn't exist, the method creates it
  *
  * @method updateSensor
- * @param {String} dto
+ * @param {Object} dto: sensor data or Sensor instance
  * @return {Object}
  * @throws {Error}
  */
 DeviceManager.prototype.updateSensor = function(dto) {
-    
-    if (!dto.id || !dto.key) {
+
+    if (!dto) {
+        
         throw {
+
             errorCode: "Missing_Parameter",
-            errorDetail: "DeviceManager.updateSensor: sensorid cannot be null or empty"
+            errorDetail: "DeviceManager.updateSensor: dto cannot be null or undefined"
         };
     }
+    
+    var sensor = JSON.parse(JSON.stringify(dto));
+    if (sensor instanceof sensorModule.Sensor) {
 
-    var fields = {
-        
-        "sensor_core": dto.sensor_core,
-        "controller": dto.controller,
-        "sensor_type": dto.sensor_type,
-        "port": dto.port,
-        "meta.types": {
-            "id": "string",
-            "sensor_core": "string",
-            "controller": "string",
-            "sensor_type": "string",
-            "port": "string"
-        },
-        "meta.schema": SENSOR
-    };
+        sensor = new Sensor(dto);
+        sensor = sensor.toJSONObject();
+    }    
 
-    if (dto.key != null || dto.id != null) {
-        fields.key = dto.key ? dto.key : dto.id;
-    }
-
-    var resp = document.save(fields);
+    sensor["meta.schema"] = SENSOR; console.log("updating  " + JSON.stringify(sensor));
+    
+    var resp = document.save(sensor);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
