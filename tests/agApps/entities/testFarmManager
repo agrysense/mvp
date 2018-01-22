@@ -4,110 +4,35 @@
  */
 
 var jasmine = require("/tests/modules/jasmine/boot");
-var deviceManagerModule = require("/agServerCore/entities/devices/deviceManager");
-var farmManagerModule = require("/agServerCore/entities/devices/controller");
+var farmManagerModule = require("/agApps/ppf/ppfServer/entities/farms/farmManager");
 var init = require("./init");
 
-var deviceManager = new deviceManagerModule.DeviceManager();
-var controller = null; // controller instance under testing
+var farmManager = null; // farmManager instance under testing
+var farm = null;
 
 jasmine.describe("Testing the Controller class", function() {
 
     jasmine.beforeAll(function(){
-
-        var controllerKey = init.createController();
-        var data = init.getDocument(controllerKey);
-        try {
-            controller = new controllerModule.Controller(data, deviceManager);
-        }catch(exception){
-            throw(JSON.stringify(exception));
-        }
+		farmManager = new farmManagerModule.FarmManager();
     }); 
 
-    jasmine.beforeEach(function() {
-
+    jasmine.beforeEach(function() {		
+        farm = createFarm();
     });
 
-    jasmine.it("controller.listCameras() returns an array of 1 Camera instances", function() {
+    jasmine.it("controller.listFarms() returns an array of 1 Farm instance", function() {
 
         try {
 
-            var list = controller.listCameras();
+            var list = farmManager.listFarms();
             jasmine.expect(list).not.toBeNull(null);
             jasmine.expect(list.length).toBe(1);
-            jasmine.expect(list[0].constructor.name).toBe("Camera");
-            jasmine.expect(list[0].controller).toBe(controller.id);
+            jasmine.expect(list[0].constructor.name).toBe("Farm");
+            jasmine.expect(list[0].key).toBe(farm.key);
         }catch(exception){
             throw(JSON.stringify(exception));
         }
-    });
-
-    jasmine.it("controller.listSensorCores() returns an array of 1 SensorCore instances", function() {
-
-        try {
-
-            var list = controller.listSensorCores();
-            jasmine.expect(list).not.toBeNull(null);
-            jasmine.expect(list.length).toBe(1);
-            jasmine.expect(list[0].constructor.name).toBe("SensorCore");
-            jasmine.expect(list[0].controller).toBe(controller.id);
-        }catch(exception){
-            throw(JSON.stringify(exception));
-        }
-    });
-
-    jasmine.it("controller.listSensors() returns an array of 1 Sensor instances", function() {
-
-        try {
-
-            var list = controller.listSensors();
-            jasmine.expect(list).not.toBeNull(null);
-            jasmine.expect(list.length).toBe(1);
-            jasmine.expect(list[0].constructor.name).toBe("Sensor");
-            jasmine.expect(list[0].controller).toBe(controller.id);
-        }catch(exception){
-            throw(JSON.stringify(exception));
-        }
-    });
-
-    jasmine.it("controller.update() effectively updates the data in the store", function() {
-
-        try {
-
-            var formerMac = controller.mac_address;
-            var formerIp = controller.ip_address;
-            controller.mac_address = init.mac();
-            controller.ip_address = init.ip();           
-            controller.update();
-            var updatedController = init.getDocument(controller.key);             
-            jasmine.expect(updatedController.mac_address).toBe(controller.mac_address);
-            jasmine.expect(updatedController.ip_address).toBe(controller.ip_address);            
-        }catch(exception){
-            throw(JSON.stringify(exception));
-        }
-    });
-    
-    jasmine.it("controller.addCamera() effectively adds a new camera and saves it in the store", function() {
-
-        try {
-
-            var cameraKey = init.createCamera(controller.key);
-            var initialCameraCount = controller.listCameras().length;
-            var cameraData = init.getDocument(cameraKey); console.log(JSON.stringify(cameraData));
-            controller.addCamera(cameraData);
-            var newCameraList = controller.listCameras();console.log(JSON.stringify(newCameraList));
-            jasmine.expect(newCameraList).not.toBe(null);
-            jasmine.expect(newCameraList.length).toBe(initialCameraCount + 1);
-            var found = false;
-            for (var i = 0; i < newCameraList.length && !found; i++) {
-            	found = newCameraList[i].key == cameraKey;    
-            }
-            
-            jasmine.expect(found).toBe(true);
-        }catch(exception){
-            throw(JSON.stringify(exception));
-        }
-    });
+    });   
 
     jasmine.afterAll(function(){        
         init.cleanup();
