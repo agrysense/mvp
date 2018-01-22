@@ -1,6 +1,6 @@
 var document = require("document");
 var log = require("log"); log.setLevel("info");
-var componentModule = require("../component");
+var componentModule = require("/agServerCore/entities/component");
 
 var farmid = null;
 var company = null;
@@ -10,47 +10,28 @@ var gps = null;
 
 /**
  * Defines the Farm object
- *
- * @class
+ * @class Farm
  * @constructor
+ * @param {Object} [dto]: a document containing farm data
+ * @param {FarmHouseManager}: farmhouseManager: instance of FarmHouseManager
+ * @throw {Error}
  */
-var Farm = function(dto) {
+function Farm(dto, farmhouseManager) {
+    
     componentModule.Component.call(this, dto);
-    if (!dto.farmid) {   
+    if (!farmhouseManager) {
+    	
         throw {
             errorCode: "Missing_Parameter",
-            errorDetail: "Farm: dto.farmid cannot be null or empty"
+            errorDetail: "farmhouseManager cannot be null or undefined"
         };
-    }
-    this.farmid = dto.farmid;
-    this.company = dto.company;
-    this.name = dto.name;
-    this.location = dto.location;
-    this.gps = dto.gps;
+    }    
+    
+    this.farmhouseManager = farmhouseManager;
 }
 
 Farm.prototype = new componentModule.Component({inheritance: true});
 Farm.prototype.constructor = Farm;
-
-/**
- * return Controller object as JSONObject
- * 
- * @method toJSONObject
- * @param {String} dto
- * @return {JSONObject}
- * @throws {Error}
- */
-Farm.prototype.toJSONObject = function(dto) {
-    var result = {
-        "farmid": this.farmid,
-        "company": this.company,
-        "name": this.name,
-        "location": this.location,
-        "gps": this.gps
-    }
-    
-    return result;
-}
 
 /**
  * lists all available farmhouses under this farm
@@ -60,12 +41,14 @@ Farm.prototype.toJSONObject = function(dto) {
  * @return {JSONArray<FarmHouse>}
  * @throws {Error}
  */
-Farm.prototype.listFarmhouses = function(farmhouseManager, dto) {
+Farm.prototype.listFarmhouses = function(dto) {
+    
     var farmid = (dto != null && dto.farmid != null) ? dto.farmid : this.farmid;
     var updatedDto = {
       "farmid": farmid
     };
-    return farmhouseManager.listFarmhouses(updatedDto);
+    
+    return this.farmhouseManager.listFarmhouses(updatedDto);
 }
 
 /**
@@ -76,8 +59,8 @@ Farm.prototype.listFarmhouses = function(farmhouseManager, dto) {
  * @return {Object} 
  * @throws {Error}
  */
-Farm.prototype.getTotalFarmhouses = function(farmhouseManager, dto) {
-    return this.listFarmhouses(farmhouseManager, dto).length;
+Farm.prototype.getTotalFarmhouses = function(dto) {    
+    return this.listFarmhouses(dto).length;
 }
 
 /**

@@ -1,8 +1,7 @@
 var document = require("document");
 var log = require("log"); log.setLevel("info");
 var farmModule = require("./farm");
-var farmhouseManager = require("../farmhouses/farmhouseManager");
-var deviceManagerModule = require("/agServerCore/entities/devices/deviceManager");
+var farmhouseManagerModule = require("../farmhouses/farmhouseManager");
 
 const FARM = "Farm";
 
@@ -13,19 +12,24 @@ const FARM = "Farm";
  * @constructor
  */
 var FarmManager = function() {
-    this.deviceManager = new deviceManagerModule.DeviceManager();
+    this.farmhouseManager = new farmhouseManagerModule.FarmhouseManager();
 };
 
 /**
  * lists all available farms
  *
  * @method listFarms
- * @param {String} dto
+ * @method listFarmhouses
+ * @param {Object} [dto] : contains optional filtering criteria
+ * @param {Number} [dto.pageNumber]: when paginating, specifies the page to return, optional, defaults to 1
+ * @param {Number} [dto.resultsPerPage]: specifies how many results to return per page, optional, defaults to 50
  * @return {JSONArray<Farm>}
  * @throws {Error}
  */
 FarmManager.prototype.listFarms = function(dto) {
+    
     var queryParam = {
+        
         query: 'apsdb.schema="' + FARM + '"',
         fields: "*",
         count: true,
@@ -38,7 +42,14 @@ FarmManager.prototype.listFarms = function(dto) {
         throw resp.metadata;
     }
     
-    return resp.result.documents;
+    var list = [];
+    for (var i = 0; i < resp.result.documents.length; i++) {
+    	
+        var farm = new farmModule.farm(resp.result.documents[i]);
+        list.push(farm);
+    }
+    
+    return list;
 };
 
 /**
