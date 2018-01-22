@@ -15,55 +15,32 @@ var width = null;
 /**
  * Defines the Farmhouse object
  *
- * @class
+ * @class Farmhouse
  * @constructor
+ * @param {Object} [dto] a document containing Farmhouse data
+ * @param {DeviceManager} deviceManager instance of DeviceManager
  */
-var Farmhouse = function(dto) {
+function Farmhouse(dto, deviceManager) {
+    
     componentModule.Component.call(this, dto);
-    if (!dto.farmhouseid) {   
+    if (!dto.id || !dto.key) {   
         throw {
             errorCode: "Missing_Parameter",
-            errorDetail: "Farmhouse: dto.farmhouseid cannot be null or empty"
+            errorDetail: "Farmhouse: dto.id or dto.key cannot be null or empty"
         };
     }
     
-    this.farmhouseid = dto.farmhouseid;
-    this.farm = dto.farm;
-    this.name = dto.name;
-    this.location = dto.location;
-    this.gps = dto.gps;
-    this.description = dto.description;
-    this.category = dto.category;
-    this.length = dto.length;
-    this.width = dto.width;
+    if (!deviceManager) {   
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "Farmhouse: deviceManager cannot be null or undefined"
+        };
+    }
 }
 
 Farmhouse.prototype = new componentModule.Component({inheritance: true});
 Farmhouse.prototype.constructor = Farmhouse;
 
-/**
- * return Farmhouse object as JSONObject
- * 
- * @method toJSONObject
- * @param {String} dto
- * @return {JSONObject}
- * @throws {Error}
- */
-Farmhouse.prototype.toJSONObject = function(dto) {
-    var result = {
-        "farmhouseid": this.farmhouseid,
-        "farm": this.farm,
-        "name": this.name,
-        "location": this.location,
-        "gps": this.gps,
-        "description": this.description,
-        "category": this.category,
-        "length": this.length,
-        "width": this.width
-    }
-    
-    return result;
-}
 
 /**
  * lists all available controllers under this farm
@@ -74,6 +51,7 @@ Farmhouse.prototype.toJSONObject = function(dto) {
  * @throws {Error}
  */
 Farmhouse.prototype.listControllers = function(deviceManager, dto) {
+    
     var farmhouseid = (dto != null && dto.farmhouseid != null) ? dto.farmhouseid : this.farmhouseid;
     var updatedDto = {
       "farmhouseid": farmhouseid

@@ -2,6 +2,8 @@ var document = require("document");
 var log = require("log"); log.setLevel("info");
 var farmModule = require("./farm");
 var farmhouseManager = require("../farmhouses/farmhouseManager");
+var deviceManagerModule = require("/agServerCore/entities/devices/deviceManager");
+
 const FARM = "Farm";
 
 /**
@@ -11,6 +13,7 @@ const FARM = "Farm";
  * @constructor
  */
 var FarmManager = function() {
+    this.deviceManager = new deviceManagerModule.DeviceManager();
 };
 
 /**
@@ -42,12 +45,13 @@ FarmManager.prototype.listFarms = function(dto) {
  * returns an instance of Farm based on the farmid
  *
  * @method getFarm
- * @param {String} dto
+ * @param {String} farmid
  * @return {Farm}
  * @throws {Error}
  */
-FarmManager.prototype.getFarm = function(dto) {
-    if (!dto.farmid) {
+FarmManager.prototype.getFarm = function(farmid) {
+    
+    if (!farmid) {
         throw {
             errorCode: "Missing_Parameter",
             errorDetail: "FarmManager.getFarm: farmid cannot be null or empty"
@@ -55,7 +59,7 @@ FarmManager.prototype.getFarm = function(dto) {
     }
     
     var queryParam = {
-        query: 'id="'+ dto.farmid + '" and apsdb.schema="' + FARM + '"',
+        query: 'key="'+ dto.farmid + '" and apsdb.schema="' + FARM + '"',
         fields:"*"
     };
     
@@ -71,18 +75,6 @@ FarmManager.prototype.getFarm = function(dto) {
         };
     }
     
-    var initializationDto = {
-        "key": resp.result.documents[0].key,
-        "farmid": resp.result.documents[0].id,
-        "company": resp.result.documents[0].company,
-        "name": resp.result.documents[0].name,
-        "location": resp.result.documents[0].location,
-        "gps": resp.result.documents[0].gps,
-        "inheritance": false,
-        "controller": true,
-        "farmhouseManager": farmhouseManager
-    };
-
     return new farmModule.Farm(initializationDto);
 };
 
