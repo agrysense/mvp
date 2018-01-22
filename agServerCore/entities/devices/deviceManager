@@ -241,16 +241,10 @@ DeviceManager.prototype.updateCamera = function(dto) {
             errorDetail: "DeviceManager.updateCamera: dto cannot be null or undefined"
         };
     }
-console.log("updateCamera  " + JSON.stringify(dto));
-    var camera = JSON.parse(JSON.stringify(dto)); console.log("updateCamera  " + JSON.stringify(camera));
-    if (dto instanceof cameraModule.Camera) {
 
-        camera = new Camera(dto);
-        camera = camera.toJSONObject();
-    }    
-
+    var camera = JSON.parse(JSON.stringify(dto)); 
     camera["meta.schema"] = CAMERA
-    var resp = document.save(camera);
+    var resp = document.save(camera); 
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
@@ -306,7 +300,7 @@ DeviceManager.prototype.listSensors = function(dto) {
     };
     
     if (dto.controller) {
-         query += ' and controller="'+ dto.controller;
+         queryParam.query += ' and controller="'+ dto.controller + '"';
     }
 
     var resp = document.query(queryParam);
@@ -387,14 +381,7 @@ DeviceManager.prototype.updateSensor = function(dto) {
     }
     
     var sensor = JSON.parse(JSON.stringify(dto));
-    if (sensor instanceof sensorModule.Sensor) {
-
-        sensor = new Sensor(dto);
-        sensor = sensor.toJSONObject();
-    }    
-
-    sensor["meta.schema"] = SENSOR; console.log("updating  " + JSON.stringify(sensor));
-    
+    sensor["meta.schema"] = SENSOR; console.log("updating  " + JSON.stringify(sensor));    
     var resp = document.save(sensor);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
