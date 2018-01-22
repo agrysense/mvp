@@ -1,0 +1,107 @@
+/**
+ * This file contains functions only relying on scriptr.io's API to create farms and farmhouses in the storage   
+ */
+
+var document = require("document");
+var log = require("log"); log.setLevel("debug");
+var util = require("/tests/util");
+var initCore = require("/tests/agServerCore/entities/init");
+
+const FARM_KEY_PREFIX = "TEST_FARM_";
+const FARM_NAME_PREFIX = "TEST_FARM_";
+const FARMHOUSE_KEY_PREFIX = "TEST_FARMHOUSE_";
+const FARMHOUSE_NAME_PREFIX = "TEST_FARMHOUSE_";
+
+function createFarmData() {
+
+    var uid = guid();
+    var data = {
+
+        "key": FARM_KEY_PREFIX + uid,
+        "company": ip(),
+        "name": FARM_NAME_PREFIX + uid,
+        "location": "test",
+        "gps": gps(),       
+        "meta.schema": "Farm"
+    };
+
+    return data;
+}
+
+function createFarm() {
+
+    var data = createFarmData();
+    var resp = document.save(data);    
+    if (resp.metadata.status == "failure") {
+        throw(JSON.stringify(resp.metadata));
+    }
+
+    createFarmhouse(data.key);
+    return data.key;
+}
+
+function createFarmhouseData(farmid, gps) {
+
+    if (!farmid){
+        throw "init.createFarmhouseData needs farmid";
+    }
+
+    var uid = guid();
+    var data = {
+
+        "key": FARMHOUSE_KEY_PREFIX + uid,
+        "name": FARMHOUSE_NAME_PREFIX + uid,
+        "gps": gps ? gps : gps(),
+        "farm": farmid,
+		"description": "some farmhouse",
+		"category": category(),
+		"length": size(),
+		"width": size()
+    };
+
+    return data;
+}
+
+function createFarmHouse(farmid, gps) {
+
+    var data = createFarmHouseData();
+    var resp = document.save(data);    
+    if (resp.metadata.status == "failure") {
+        throw(JSON.stringify(resp.metadata));
+    }
+
+    createFarmhouse(data.key);
+    initCore.createController(data.key);
+    return data.key;
+}
+
+// Caution: should be called after every test suite to make sure there aren't too many documents to delete
+function cleanup() {
+
+    // delete all farms
+    util.deleteDocumentsOfType("Farm");
+
+    // delete all farmhouses
+    util.deleteDocumentsOfType("Farmhouse");
+    
+    initCore.cleanup();
+
+}
+
+function gps() {
+
+    const choice = ["33.853378,35.616584", "33.852520,35.625431", "33.851157,35.619466", "34.032937,35.749176", "34.016917,35.731493"];
+    var location = choice[Math.round(Math.random() * (choice.length - 1))];
+    return  location;
+}
+
+function category() {
+    
+    const choice = ["A", "B", "C", "D", "E"];
+    var category = choice[Math.round(Math.random() * (choice.length - 1))];
+    return  location;
+}
+
+function size() {
+    return Math.round(Math.random() * 30) + 20;
+}
