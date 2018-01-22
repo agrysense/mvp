@@ -1,0 +1,69 @@
+var document = require("document");
+
+function guid(max) {
+
+    var choice = "abcdefghijklmnopqrstuvwxyz0123456789";
+    var uid = "";
+    var length =  max && max <= choice.length -1 ? max : choice.length -1
+    for (var i = 0; i < 15; i++) {
+        uid += choice[Math.round(Math.random() * length)];
+    }
+
+    return uid;
+}
+
+function getDocument(key) {
+
+    var resp = document.get(key);    
+    if (resp.metadata.status == "failure") {
+        throw(JSON.stringify(resp.metadata));
+    }
+
+    return resp.result;
+}
+
+// Caution: can cover up to 50 documents
+function findDocumentsByCriteria(expression) {
+
+    var queryParams = {
+
+        query: expression,
+        fields: "*"
+    };
+
+    var resp = document.query(queryParams);
+    if (resp.metadata.status == "failure") {
+        throw(JSON.stringify(resp.metadata));
+    }
+
+    return resp.result.documents;
+}
+
+// Caution: can cover up to 50 documents
+function listDocumentsOfType(schema) {
+
+    var queryParams = {
+
+        query: 'apsdb.schema = "' + schema + '"',
+        fields: "key"
+    };
+
+    var resp = document.query(queryParams);
+    if (resp.metadata.status == "failure") {
+        throw(JSON.stringify(resp.metadata));
+    }
+
+    return resp.result.documents;
+}
+
+function deleteDocumentsOfType(schema) {
+
+    var list = listDocumentsOfType(schema);
+    for (var i = 0; i < list.length; i++) {
+
+        var resp = document.delete(list[i].key);
+        if (resp.metadata.status == "failure") {
+            console.log("Could not delete " +  list[i].key);
+        }
+    }
+}
