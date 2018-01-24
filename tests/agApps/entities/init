@@ -14,11 +14,11 @@ const FARMHOUSE_NAME_PREFIX = "TEST_FARMHOUSE_";
 
 function createFarmData() {
 
-    var uid = guid();
+    var uid = util.guid();
     var data = {
 
         "key": FARM_KEY_PREFIX + uid,
-        "company": ip(),
+        "company": "acme",
         "name": FARM_NAME_PREFIX + uid,
         "location": "test",
         "gps": gps(),       
@@ -40,37 +40,37 @@ function createFarm() {
     return data.key;
 }
 
-function createFarmhouseData(farmid, gps) {
+function createFarmhouseData(farmid, location) { 
 
     if (!farmid){
         throw "init.createFarmhouseData needs farmid";
     }
 
-    var uid = guid();
+    var uid = util.guid();
     var data = {
 
         "key": FARMHOUSE_KEY_PREFIX + uid,
         "name": FARMHOUSE_NAME_PREFIX + uid,
-        "gps": gps ? gps : gps(),
+        "gps": location ? location : gps(),
         "farm": farmid,
 		"description": "some farmhouse",
 		"category": category(),
 		"length": size(),
-		"width": size()
-    };
+		"width": size(),
+        "meta.schema": "FarmHouse"
+    }; 
 
     return data;
 }
 
-function createFarmHouse(farmid, gps) {
+function createFarmhouse(farmid, location) {
 
-    var data = createFarmHouseData();
+    var data = createFarmhouseData(farmid, location);
     var resp = document.save(data);    
     if (resp.metadata.status == "failure") {
         throw(JSON.stringify(resp.metadata));
     }
 
-    createFarmhouse(data.key);
     initCore.createController(data.key);
     return data.key;
 }
@@ -82,7 +82,7 @@ function cleanup() {
     util.deleteDocumentsOfType("Farm");
 
     // delete all farmhouses
-    util.deleteDocumentsOfType("Farmhouse");
+    util.deleteDocumentsOfType("FarmHouse");
     
     initCore.cleanup();
 
@@ -92,14 +92,14 @@ function gps() {
 
     const choice = ["33.853378,35.616584", "33.852520,35.625431", "33.851157,35.619466", "34.032937,35.749176", "34.016917,35.731493"];
     var location = choice[Math.round(Math.random() * (choice.length - 1))];
-    return  location;
+    return location;
 }
 
 function category() {
     
     const choice = ["A", "B", "C", "D", "E"];
     var category = choice[Math.round(Math.random() * (choice.length - 1))];
-    return  location;
+    return category;
 }
 
 function size() {

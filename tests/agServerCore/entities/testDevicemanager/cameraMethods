@@ -6,6 +6,7 @@
 var jasmine = require("/tests/modules/jasmine/boot");
 var deviceManagerModule = require("/agServerCore/entities/devices/deviceManager");
 var init = require("../init");
+var util = require("/tests/util");
 
 var deviceManager = null; // Instance under testing
 var controller = null; // reference controller
@@ -20,7 +21,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
        
         // create a reference controller
         var key = init.createController();
-        controller = init.getDocument(key);
+        controller = util.getDocument(key);
     });
 
     jasmine.it("deviceManager.listCameras() returns an array of 3 Camera instances", function() {
@@ -50,7 +51,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
         try {
 
             key = init.createCamera(controller.key);
-            var cameraData = init.getDocument(key);
+            var cameraData = util.getDocument(key);
             var camera = deviceManager.getCamera(key);
             jasmine.expect(camera).not.toBeNull(null);            
             jasmine.expect(camera.constructor.name).toBe("Camera");            
@@ -69,11 +70,11 @@ jasmine.describe("Testing the DeviceManager class", function() {
         try {
 
             var key = init.createCamera(controller.key);
-            var cameraData = init.getDocument(key); 
+            var cameraData = util.getDocument(key); 
             var camera = deviceManager.getCamera(key);
             camera.third_party = "mac";            
             deviceManager.updateCamera(camera.toJSONObject());     
-            var updatedCameraData = init.getDocument(key);
+            var updatedCameraData = util.getDocument(key);
             jasmine.expect(camera.third_party).toBe(updatedCameraData.third_party);  
             jasmine.expect(camera.controller).toBe(updatedCameraData.controller);           
         }catch(exception){
@@ -82,7 +83,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
             init.cleanup();   
         }
     });
-   
+  
     jasmine.it("deviceManager.updateCamera() effectively creates a camera if no key provided", function() {
 
         // create camera data (not persisted)
@@ -92,11 +93,11 @@ jasmine.describe("Testing the DeviceManager class", function() {
         delete cameraData.key;       
         try {
 
-            var initCameraCount = init.listDocumentsOfType("Camera").length;
+            var initCameraCount = util.listDocumentsOfType("Camera").length;
             
             // create a camera
             deviceManager.updateCamera(cameraData);
-            var newCameraCount = init.listDocumentsOfType("Camera").length;
+            var newCameraCount = util.listDocumentsOfType("Camera").length;
             jasmine.expect(newCameraCount).toBe(initCameraCount + 1);            
         }catch(exception){
             throw(JSON.stringify(exception));
@@ -114,7 +115,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
             deviceManager.deleteCamera(key);
             try {
                 
-            	init.getDocument(key);                
+            	util.getDocument(key);                
                 // if here fail
                 it.fail();
             }catch(exception){

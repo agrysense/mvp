@@ -6,6 +6,7 @@
 var jasmine = require("/tests/modules/jasmine/boot");
 var deviceManagerModule = require("/agServerCore/entities/devices/deviceManager");
 var init = require("../init");
+var util = require("/tests/util");
 
 var deviceManager = null; // Instance under testing
 var controller = null; // reference controller
@@ -21,8 +22,8 @@ jasmine.describe("Testing the DeviceManager class", function() {
 
         // create a reference controller
         var key = init.createController();
-        controller = init.getDocument(key);
-        sensorCore = init.findDocumentsByCriteria('apsdb.schema="SensorCore" and controller="' + key + '"');
+        controller = util.getDocument(key);
+        sensorCore = util.findDocumentsByCriteria('apsdb.schema="SensorCore" and controller="' + key + '"');
     });
 
     jasmine.it("deviceManager.listSensors() returns an array of 2 Sensor instances", function() {
@@ -52,7 +53,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
         try {
 
             key = init.createSensor(controller.key, sensorCore.key);
-            var sensorData = init.getDocument(key);
+            var sensorData = util.getDocument(key);
             var sensor = deviceManager.getSensor(key);
             jasmine.expect(sensor).not.toBeNull(null);            
             jasmine.expect(sensor.constructor.name).toBe("Sensor");            
@@ -72,11 +73,11 @@ jasmine.describe("Testing the DeviceManager class", function() {
         try {
 
             var key = init.createSensor(controller.key, sensorCore.key);
-            var sensorData = init.getDocument(key); 
+            var sensorData = util.getDocument(key); 
             var sensor = deviceManager.getSensor(key);
             sensor.port = "5555";            
             deviceManager.updateSensor(sensor.toJSONObject());     
-            var updatedSensor = init.getDocument(key);
+            var updatedSensor = util.getDocument(key);
             jasmine.expect(sensor.port).toBe(updatedSensor.port);  
             jasmine.expect(sensor.sensor_core).toBe(updatedSensor.sensor_core);           
         }catch(exception){
@@ -95,11 +96,11 @@ jasmine.describe("Testing the DeviceManager class", function() {
         delete sensorData.key; 
         try {
 
-            var initSensorCount = init.listDocumentsOfType("Sensor").length;
+            var initSensorCount = util.listDocumentsOfType("Sensor").length;
             
             // create a sensor
             deviceManager.updateSensor(sensorData);
-            var newSensorCount = init.listDocumentsOfType("Sensor").length;
+            var newSensorCount = util.listDocumentsOfType("Sensor").length;
             jasmine.expect(newSensorCount).toBe(initSensorCount + 1);            
         }catch(exception){
             throw(JSON.stringify(exception));

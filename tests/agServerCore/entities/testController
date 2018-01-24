@@ -7,6 +7,7 @@ var jasmine = require("/tests/modules/jasmine/boot");
 var deviceManagerModule = require("/agServerCore/entities/devices/deviceManager");
 var controllerModule = require("/agServerCore/entities/devices/controller");
 var init = require("./init");
+var util = require("/tests/util");
 
 var deviceManager = new deviceManagerModule.DeviceManager();
 var controller = null; // controller instance under testing
@@ -16,7 +17,7 @@ jasmine.describe("Testing the Controller class", function() {
     jasmine.beforeAll(function(){
 
         var controllerKey = init.createController();
-        var data = init.getDocument(controllerKey);
+        var data = util.getDocument(controllerKey);
         try {
             controller = new controllerModule.Controller(data, deviceManager);
         }catch(exception){
@@ -38,7 +39,6 @@ jasmine.describe("Testing the Controller class", function() {
             jasmine.expect(list[0].constructor.name).toBe("Camera");
             jasmine.expect(list[0].controller).toBe(controller.id);
         }catch(exception){
-            throw(JSON.stringify(exception));
         }
     });
 
@@ -79,7 +79,7 @@ jasmine.describe("Testing the Controller class", function() {
             controller.mac_address = init.mac();
             controller.ip_address = init.ip();           
             controller.update();
-            var updatedController = init.getDocument(controller.key);             
+            var updatedController = util.getDocument(controller.key);             
             jasmine.expect(updatedController.mac_address).toBe(controller.mac_address);
             jasmine.expect(updatedController.ip_address).toBe(controller.ip_address);            
         }catch(exception){
@@ -91,16 +91,15 @@ jasmine.describe("Testing the Controller class", function() {
 
         try {
 
-            var cameraKey = init.createCamera(controller.key);
-            var initialCameraCount = controller.listCameras().length;
-            var cameraData = init.getDocument(cameraKey); console.log(JSON.stringify(cameraData));
+            var cameraData = init.createCameraData(controller.key);
+            var initialList = controller.listCameras(); 
             controller.addCamera(cameraData);
-            var newCameraList = controller.listCameras();console.log(JSON.stringify(newCameraList));
+            var newCameraList = controller.listCameras();
             jasmine.expect(newCameraList).not.toBe(null);
-            jasmine.expect(newCameraList.length).toBe(initialCameraCount + 1);
+            jasmine.expect(newCameraList.length).toBe(initialList.length + 1);
             var found = false;
             for (var i = 0; i < newCameraList.length && !found; i++) {
-            	found = newCameraList[i].key == cameraKey;    
+            	found = newCameraList[i].key == cameraData.key;    
             }
             
             jasmine.expect(found).toBe(true);

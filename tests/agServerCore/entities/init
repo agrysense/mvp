@@ -4,6 +4,7 @@
 
 var document = require("document");
 var log = require("log"); log.setLevel("debug");
+var util = require("/tests/util");
 
 const CONTROLLER_KEY_PREFIX = "TEST_CONTROLLER_";
 const CONTROLLER_NAME_PREFIX = "TEST_CONTROLLER_";
@@ -15,9 +16,9 @@ const SENSORCORE_KEY_PREFIX = "TEST_SENSORCORE_";
 const SENSORCORE_NAME_PREFIX = "TEST_SENSORCORE_";
 const STRUCTURE_PREFIX = "TEST_STRUCTURE_";
 
-function createControllerData() {
-
-    var uid = guid();
+function createControllerData(struct) {
+try {
+    var uid = util.guid();
     var data = {
 
         "key": CONTROLLER_KEY_PREFIX + uid,
@@ -28,7 +29,7 @@ function createControllerData() {
         "camera": "true",
         "microphone": "true",
         "ip_address": ip(),
-        "structure": STRUCTURE_PREFIX + structure(),
+        "structure": struct ? struct : STRUCTURE_PREFIX + structure(),
         "security_code": "123456",
         "speaker": "true",
         "name": CONTROLLER_NAME_PREFIX + uid,
@@ -36,11 +37,15 @@ function createControllerData() {
     };
 
     return data;
+}catch(exception){
+    console.log(JSON.stringify(exception));
+    throw exception;
+}
 }
 
-function createController() {
+function createController(struct) {
 
-    var data = createControllerData();
+    var data = createControllerData(struct);
     var resp = document.save(data);    
     if (resp.metadata.status == "failure") {
         throw(JSON.stringify(resp.metadata));
@@ -58,7 +63,7 @@ function createCameraData(controllerid) {
         throw "init.createCameraData needs controllerid";
     }
 
-    var uid = guid();
+    var uid = util.guid();
     var data = {
 
         "key": CAMERA_KEY_PREFIX + uid,
@@ -74,12 +79,15 @@ function createCameraData(controllerid) {
     return data;
 }
 
-function createCamera(controllerid) {
+function createCamera(controllerid, nosave) {
 
     var data = createCameraData(controllerid);
-    var resp = document.save(data);    
-    if (resp.metadata.status == "failure") {
-        throw(JSON.stringify(resp.metadata));
+    if (!nosave) {
+
+        var resp = document.save(data);    
+        if (resp.metadata.status == "failure") {
+            throw(JSON.stringify(resp.metadata));
+        }
     }
 
     return data.key;
@@ -91,13 +99,13 @@ function createSensorCoreData(controllerid) {
         throw "init.createSensorCoreData needs controllerid";
     }
 
-    var uid = guid();
+    var uid = util.guid();
     var data = {
 
         "key": SENSORCORE_KEY_PREFIX + uid,
         "controller": controllerid,
         "mac_address": mac(),
-        "hash": guid(6),
+        "hash": util.guid(6),
         "meta.schema": "SensorCore"
     };
 
@@ -110,7 +118,7 @@ function createSensorCore(controllerid) {
     if (!controllerid){
         throw "init.createSensorCore needs controllerid";
     }
-    
+
     var data = createSensorCoreData(controllerid);
     var resp = document.save(data);    
     if (resp.metadata.status == "failure") {
@@ -123,7 +131,7 @@ function createSensorCore(controllerid) {
 function createSensorData(controllerid, coreid) {
 
     var types = ["CO2", "Ammonia", "Temperature", "Humidity", "Light"];
-    var uid = guid();
+    var uid = util.guid();
     var data = {
 
         "key": SENSOR_KEY_PREFIX + uid,
@@ -133,7 +141,7 @@ function createSensorData(controllerid, coreid) {
         "port": Math.round(Math.random() * 1000) + 100,
         "meta.schema": "Sensor"
     };
-   
+
     return data;
 }
 
@@ -142,7 +150,7 @@ function createSensor(controllerid, coreid, nosave) {
     if (!controllerid){
         throw "init.createSensor needs controllerid";
     }
-    
+
     var data = createSensorData(controllerid, coreid);
     if (!nosave) {
 
@@ -151,7 +159,7 @@ function createSensor(controllerid, coreid, nosave) {
             throw(JSON.stringify(resp.metadata));
         }
     }
-   
+
     return data.key;
 }
 
@@ -159,84 +167,16 @@ function createSensor(controllerid, coreid, nosave) {
 function cleanup() {
 
     // delete all controllers
-    deleteDocumentsOfType("Controller");
+    util.deleteDocumentsOfType("Controller");
 
     // delete all cameras
-    deleteDocumentsOfType("Camera");
+    util.deleteDocumentsOfType("Camera");
 
     // delete all sensors
-    deleteDocumentsOfType("Sensor");
+    util.deleteDocumentsOfType("Sensor");
 
     // delete all sensor cores
-    deleteDocumentsOfType("SensorCore");
-}
-
-function getDocument(key) {
-
-    var resp = document.get(key);    
-    if (resp.metadata.status == "failure") {
-        throw(JSON.stringify(resp.metadata));
-    }
-
-    return resp.result;
-}
-
-// Caution: can cover up to 50 documents
-function findDocumentsByCriteria(expression) {
-
-    var queryParams = {
-
-        query: expression,
-        fields: "*"
-    };
-
-    var resp = document.query(queryParams);
-    if (resp.metadata.status == "failure") {
-        throw(JSON.stringify(resp.metadata));
-    }
-
-    return resp.result.documents;
-}
-
-// Caution: can cover up to 50 documents
-function listDocumentsOfType(schema) {
-
-    var queryParams = {
-
-        query: 'apsdb.schema = "' + schema + '"',
-        fields: "key"
-    };
-
-    var resp = document.query(queryParams);
-    if (resp.metadata.status == "failure") {
-        throw(JSON.stringify(resp.metadata));
-    }
-
-    return resp.result.documents;
-}
-
-function deleteDocumentsOfType(schema) {
-
-    var list = listDocumentsOfType(schema);
-    for (var i = 0; i < list.length; i++) {
-
-        var resp = document.delete(list[i].key);
-        if (resp.metadata.status == "failure") {
-            console.log("Could not delete " +  list[i].key);
-        }
-    }
-}
-
-function guid(max) {
-
-    var choice = "abcdefghijklmnopqrstuvwxyz0123456789";
-    var uid = "";
-    var length =  max && max <= choice.length -1 ? max : choice.length -1
-    for (var i = 0; i < 15; i++) {
-        uid += choice[Math.round(Math.random() * length)];
-    }
-
-    return uid;
+    util.deleteDocumentsOfType("SensorCore");
 }
 
 function ip() {

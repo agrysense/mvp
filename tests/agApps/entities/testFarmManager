@@ -6,9 +6,10 @@
 var jasmine = require("/tests/modules/jasmine/boot");
 var farmManagerModule = require("/agApps/ppf/ppfServer/entities/farms/farmManager");
 var init = require("./init");
+var util = require("/tests/util");
 
 var farmManager = null; // farmManager instance under testing
-var farm = null;
+var farmKey = "";
 
 jasmine.describe("Testing the Controller class", function() {
 
@@ -17,24 +18,117 @@ jasmine.describe("Testing the Controller class", function() {
     }); 
 
     jasmine.beforeEach(function() {		
-        farm = createFarm();
+        
     });
 
     jasmine.it("controller.listFarms() returns an array of 1 Farm instance", function() {
 
+        farmKey = init.createFarm();
         try {
 
-            var list = farmManager.listFarms();
+            var list = farmManager.listFarms(); 
             jasmine.expect(list).not.toBeNull(null);
-            jasmine.expect(list.length).toBe(1);
+            jasmine.expect(list.length).toBe(1); 
             jasmine.expect(list[0].constructor.name).toBe("Farm");
-            jasmine.expect(list[0].key).toBe(farm.key);
+            jasmine.expect(list[0].key).toBe(farmKey);
         }catch(exception){
             throw(JSON.stringify(exception));
+        }finally{
+            init.cleanup();
+        }
+    });   
+    
+    jasmine.it("controller.getFarm() returns the correct instance of Farm", function() {
+
+        farmKey = init.createFarm();
+        try {
+
+            var farm = farmManager.getFarm(farmKey); 
+            jasmine.expect(farm).not.toBeNull(null);
+            jasmine.expect(farm.constructor.name).toBe("Farm");
+            jasmine.expect(farm.key).toBe(farmKey);
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally{
+            // init.cleanup();
+        }
+    });   
+    
+    jasmine.it("controller.updateFarm() actually updates a farm in the store", function() {
+
+        farmKey = init.createFarm();
+        try {
+
+            var farm = util.getDocument(farmKey);  console.log("farm: " +  JSON.stringify(farm));
+            var initialLocation = farm.location;
+            var newLocation = "";
+            do{
+                newLocation = init.gps();
+            }while(newLocation ==  farm.location);
+            
+            farm.location = newLocation;
+            farmManager.updateFarm(farm);
+            var updatedFarm = util.getDocument(farmKey);
+            jasmine.expect(updatedFarm).not.toBeNull(null);          
+            jasmine.expect(updatedFarm.key).toBe(farmKey);
+            jasmine.expect(updatedFarm.location).toBe(newLocation);
+            jasmine.expect(updatedFarm.location).not.toBe(initialLocation);
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally{
+            // init.cleanup();
+        }
+    });   
+   
+    jasmine.it("controller.updateFarm() actually creates a farm in the store if it did not exist", function() {
+
+        var farmData = init.createFarmData();
+        console.log("farmData: " +  JSON.stringify(farmData));
+        try {
+
+            var list = farmManager.listFarms(); 
+            farmManager.updateFarm(farmData);          
+            var newList = farmManager.listFarms(); 
+            jasmine.expect(newList).not.toBeNull(null);          
+            jasmine.expect(newList.length).toBe(list.length + 1);
+            var found = false;
+            for (var i = 0; !found && i < newList.length; i++) {
+                found = newList[i].location == farmData.location
+            }
+            
+            jasmine.expect(found).toBe(true);
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally{
+            // init.cleanup();
+        }
+    });   
+    
+    jasmine.it("controller.deleteFarm() actually deletes a farm from the store", function() {
+
+        var farmKey = init.createFarm();
+        try {
+
+            try {
+          		
+                farmManager.deleteFarm(farmKey);
+                var farm = util.getDocument(farmKey);
+                jasmine.fail(); // if still here, should fail
+            }catch(exception){
+                jasmine.expect(true).toBe(true);
+            }
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally{
+            // init.cleanup();
         }
     });   
 
-    jasmine.afterAll(function(){        
+    jasmine.afterEach(function(){        
+        
+    });
+    
+     jasmine.afterAll(function(){        
         init.cleanup();
     });
 });

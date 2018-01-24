@@ -6,6 +6,7 @@
 var jasmine = require("/tests/modules/jasmine/boot");
 var deviceManagerModule = require("/agServerCore/entities/devices/deviceManager");
 var init = require("../init");
+var util = require("/tests/util");
 
 var deviceManager = null; // Instance under testing
 
@@ -46,7 +47,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
 
         // create a controller
         var key = init.createController(); 
-        var controllerData = init.getDocument(key);
+        var controllerData = util.getDocument(key);
         deviceManager = new deviceManagerModule.DeviceManager();
         try {
 
@@ -66,7 +67,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
 
         // create a controller
         var key = init.createController();
-        var controllerData = init.getDocument(key);
+        var controllerData = util.getDocument(key);
         deviceManager = new deviceManagerModule.DeviceManager();
         try {
 
@@ -74,7 +75,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
             controller.mac_address = init.mac();
             controller.ip_address = init.ip();       
             deviceManager.updateController(controller.toJSONObject());      
-            var updatedControllerData = init.getDocument(key);
+            var updatedControllerData = util.getDocument(key);
             jasmine.expect(controller.mac_address).toBe(updatedControllerData.mac_address);  
             jasmine.expect(controller.ip_address).toBe(updatedControllerData.ip_address);           
         }catch(exception){
@@ -93,11 +94,11 @@ jasmine.describe("Testing the DeviceManager class", function() {
         deviceManager = new deviceManagerModule.DeviceManager();
         try {
 
-            var initControllerCount = init.listDocumentsOfType("Controller").length;
+            var initControllerCount = util.listDocumentsOfType("Controller").length;
             
             // create a controller
             deviceManager.updateController(data);
-            var newControllersCount = init.listDocumentsOfType("Controller").length;
+            var newControllersCount = util.listDocumentsOfType("Controller").length;
             jasmine.expect(newControllersCount).toBe(initControllerCount + 1);            
         }catch(exception){
             throw(JSON.stringify(exception));
