@@ -73,3 +73,14 @@ Farm.prototype.getTotalFarmhouses = function(dto) {
  */
 Farm.prototype.getTotalBirds = function(dto) {
 }
+
+/**
+ * @method toJSONObject
+ * @return {Object} current instance as a JSON object
+ */
+Farm.prototype.toJSONObject = function() {
+  
+    var asJson = componentModule.Component.prototype.toJSONObject.call(this);
+    delete asJson.farmhouseManager; 
+    return asJson;
+};

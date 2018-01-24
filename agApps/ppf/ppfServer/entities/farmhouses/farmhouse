@@ -1,6 +1,6 @@
 var document = require("document");
 var log = require("log"); log.setLevel("info");
-var componentModule = require("../component");
+var componentModule = require("/agServerCore/entities/component");
 
 var farmhouseid = null;
 var farm = null;
@@ -18,9 +18,9 @@ var width = null;
  * @class Farmhouse
  * @constructor
  * @param {Object} [dto] a document containing Farmhouse data
- * @param {DeviceManager} deviceManager instance of DeviceManager
+ * @param {FarmhouseManager} farmhouseManager instance of FarmhouseManager
  */
-function Farmhouse(dto, deviceManager) {
+function Farmhouse(dto, farmhouseManager) {
     
     componentModule.Component.call(this, dto);
     if (!dto.id || !dto.key) {   
@@ -30,12 +30,14 @@ function Farmhouse(dto, deviceManager) {
         };
     }
     
-    if (!deviceManager) {   
+    if (!farmhouseManager) {   
         throw {
             errorCode: "Missing_Parameter",
-            errorDetail: "Farmhouse: deviceManager cannot be null or undefined"
+            errorDetail: "Farmhouse: farmhouseManager cannot be null or undefined"
         };
     }
+    
+    this.farmhouseManager = farmhouseManager;
 }
 
 Farmhouse.prototype = new componentModule.Component({inheritance: true});
@@ -43,18 +45,121 @@ Farmhouse.prototype.constructor = Farmhouse;
 
 
 /**
- * lists all available controllers under this farm
- * 
+ * lists all available controllers under this farmhouse
  * @method listControllers
- * @param {String} dto
+ * @param {Object} [dto] optional filtering and pagination parameters
  * @return {JSONArray<Controller>}
  * @throws {Error}
  */
-Farmhouse.prototype.listControllers = function(deviceManager, dto) {
+Farmhouse.prototype.listControllers = function(dto) {
     
-    var farmhouseid = (dto != null && dto.farmhouseid != null) ? dto.farmhouseid : this.farmhouseid;
-    var updatedDto = {
-      "farmhouseid": farmhouseid
-    };
-    return deviceManager.listControllers(updatedDto);
-}
+    var searchDto = dto ? dto : {};
+    searchDto.structure = this.key;    
+    return this.deviceManager.listControllers(searchDto);
+};
+
+/**
+ * Retrive a given controller under this farmhouse
+ * @method getController
+ * @param {String} id: the controller id (key)
+ * @return {Controller}
+ * @throws {Error}
+ */
+Farmhouse.prototype.getController = function(id) {
+    return this.deviceManager.getController(id);
+};
+
+/**
+ * Assign a controller to this farmhouse instance. If the controller did not exist in the store, it is created
+ * To unassign a controller you need to assign it to another farmhouse
+ * @method addController
+ * @param {Object} [dto]: instance of Controller or Controller data
+ * @return {Object}
+ * @throw {Error}
+ */
+Farmhouse.prototype.addController = function(dto) {
+    
+    if (!dto) {
+       
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "Farmhouse.addController: dto cannot be null or undefined"
+        };
+    }
+        
+    dto.structure = this.key;
+    return this.deviceManager.update(dto);
+};
+
+/**
+ * List all equipments under this farmhouse
+ * @method listEquipments
+ * @param {Object} [dto]: optional filtering and pagination parameters
+ * @param {Number} [dto.resultsPerPage]: how many results to return per call (optional, defaults to 50)
+ * @param {Number} [dto.pageNumber]: the page number in case there are more than one pages of results (optional, defaults to 1)
+ * @return {Object}
+ * @throw {Error}
+ */
+Farmhouse.prototype.listEquipments = function(dto) {
+    
+    if (!dto) {
+       
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "Farmhouse.addController: dto cannot be null or undefined"
+        };
+    }
+        
+    dto.structure = this.key;
+    return this.deviceManager.update(dto);
+};
+
+/**
+ * Retrive a given equipment under this farmhouse
+ * @method getEquipment
+ * @param {String} id: the equipment id (key)
+ * @return {Equipment}
+ * @throws {Error}
+ */
+Farmhouse.prototype.getEquipment = function(id) {
+    return this.deviceManager.getEquipment(id);
+};
+
+/**
+ * Assign an equipment to this farmhouse instance. If the equipment did not exist in the store, it is created
+ * To unassign a equipment you need to assign it to another farmhouse
+ * @method addController
+ * @param {Object} [dto]: instance of Controller or Controller data
+ * @return {Object}
+ * @throw {Error}
+ */
+Farmhouse.prototype.addEquipement = function(dto) {
+    
+    if (!dto) {
+       
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "Farmhouse.addEquipement: dto cannot be null or undefined"
+        };
+    }
+        
+    dto.structure = this.key;
+    return this.deviceManager.update(dto);
+};
+
+/**
+ * Start a new cycle. There should be no other ongoing cycle
+ * @method startCycle
+ * @param {Object} [dto]
+ * @param {String}
+ */
+Farmhouse.prototype.startCycle = function(dto) {
+};
+
+/**
+ * Get the current cycle. There should be no other ongoing cycle
+ * @method getCycle
+ * @return {Object} cycle
+ */
+Farmhouse.prototype.getCycle = function() {
+};

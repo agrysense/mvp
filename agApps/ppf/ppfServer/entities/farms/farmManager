@@ -2,13 +2,13 @@ var document = require("document");
 var log = require("log"); log.setLevel("info");
 var farmModule = require("./farm");
 var farmhouseManagerModule = require("../farmhouses/farmhouseManager");
+var util = require("/agServerCore/lib/util");
 
 const FARM = "Farm";
 
 /**
  * Defines the FarmManager helper class
- *
- * @class
+ * @class FarmManager
  * @constructor
  */
 var FarmManager = function() {
@@ -17,7 +17,6 @@ var FarmManager = function() {
 
 /**
  * lists all available farms
- *
  * @method listFarms
  * @method listFarmhouses
  * @param {Object} [dto] : contains optional filtering criteria
@@ -45,7 +44,7 @@ FarmManager.prototype.listFarms = function(dto) {
     var list = [];
     for (var i = 0; i < resp.result.documents.length; i++) {
     	
-        var farm = new farmModule.farm(resp.result.documents[i]);
+        var farm = new farmModule.Farm(resp.result.documents[i], this.farmhouseManager);
         list.push(farm);
     }
     
@@ -54,7 +53,6 @@ FarmManager.prototype.listFarms = function(dto) {
 
 /**
  * returns an instance of Farm based on the farmid
- *
  * @method getFarm
  * @param {String} farmid
  * @return {Farm}
@@ -70,7 +68,7 @@ FarmManager.prototype.getFarm = function(farmid) {
     }
     
     var queryParam = {
-        query: 'key="'+ dto.farmid + '" and apsdb.schema="' + FARM + '"',
+        query: 'key="'+ farmid + '" and apsdb.schema="' + FARM + '"',
         fields:"*"
     };
     
@@ -80,51 +78,36 @@ FarmManager.prototype.getFarm = function(farmid) {
     }
     
     if (!resp.result.documents[0]){
+        
         throw {
             errorCode: "Entity_Not_Found",
             errorDetail: "FarmManager.getFarm: could not find farm with id " + dto.farmid
         };
     }
     
-    return new farmModule.Farm(initializationDto);
+    return new farmModule.Farm(resp.result.documents[0], this.farmhouseManager);
 };
 
 /**
  * updates a Farm object. If it doesn't exist, this method creates it
- *
  * @method updateFarm
- * @param {String} dto
+ * @param {Object} [dto] farm data or instance of Farm
  * @return {Object}
  * @throws {Error}
  */
 FarmManager.prototype.updateFarm = function(dto) {
-    if (!dto.farmid) {
+   
+    if (!dto) {
+        
         throw {
             errorCode: "Missing_Parameter",
-            errorDetail: "FarmManager.updateFarm: farmid cannot be null or empty"
+            errorDetail: "FarmManager.deleteFarm: dto cannot be null or undefined"
         };
     }
     
-    var fields = {
-        "id": dto.farmid,
-        "company": dto.company,
-        "name": dto.name,
-        "location": dto.location,
-        "gps": dto.gps,
-        "meta.types": {
-            "id": "string",
-            "company": "string",
-            "name": "string",
-            "location": "string",
-            "gps": "geospatial"
-        },
-        "meta.schema": FARM
-    };
-    
-    if (dto.key != null) {
-        fields.key = dto.key;
-    }
-    
+    var fields = JSON.parse(JSON.stringify(dto));
+    fields = util.removeMetaData(fields);
+    fields["meta.schema"] = FARM; 
     var resp = document.save(fields);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
@@ -135,17 +118,18 @@ FarmManager.prototype.updateFarm = function(dto) {
 
 /**
  * flag a Farm as deleted
- *
  * @method deleteFarm
- * @param {String} dto
+ * @param {String} farmid
  * @return {Object} 
  * @throws {Error}
  */
-FarmManager.prototype.deleteFarm = function(dto) {
-    if (!dto.key) {
+FarmManager.prototype.deleteFarm = function(farmid) {
+    
+    if (!farmid) {
+        
         throw {
             errorCode: "Missing_Parameter",
-            errorDetail: "FarmManager.deleteFarm: key cannot be null or empty"
+            errorDetail: "FarmManager.deleteFarm: farmid cannot be null or empty"
         };
     }
     
