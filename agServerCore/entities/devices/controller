@@ -4,17 +4,6 @@ var componentModule = require("../component");
 
 const CONTROLLER = "Controller";
 
-var id = null;
-var farmhouse = null;
-var software_version = null;
-var speaker = null;
-var microphone = null;
-var mac_address = null;
-var camera = null;
-var ip_address = null;
-var api_link = null;
-var security_code = null;
-
 /**
  * Defines the Controller object *
  * @class
@@ -32,7 +21,7 @@ function Controller(dto, deviceManager) {
             errorDetail: this.constructor.name + ": deviceManager cannot be null or undefined"
         };
     }
-
+    
     this.deviceManager = deviceManager;
 }
 
@@ -43,14 +32,14 @@ Controller.prototype.constructor = Controller;
  * list the cameras that are related to the current Controller
  * 
  * @method listCameras
- * @param {Object} [dto]: search criteria
+ * @param {Object} [dto]: optional search criteria and pagination
  * @return {JSONArray<Camera>}
  * @throws {Error}
  */
 Controller.prototype.listCameras = function(dto) {
 
     var searchDto = {
-        "controllerid": this.id
+        "controller": this.id
     };
 
     if (dto) {
@@ -94,7 +83,7 @@ Controller.prototype.addCamera = function(obj) {
  * lists all available sensors under this farm
  * 
  * @method listSensors
- * @param {String} dto
+ * @param {Object} [dto] optional search criteria and pagination
  * @return {JSONArray<Sensor>}
  * @throws {Error}
  */
@@ -117,14 +106,14 @@ Controller.prototype.listSensors = function(dto) {
  * lists all available sensor_cores under this farm
  * 
  * @method listSensorCores
- * @param {String} dto
+ * @param {Object} [dto]: optional search criteria and pagination
  * @return {JSONArray<SensorCore>}
  * @throws {Error}
  */
 Controller.prototype.listSensorCores = function(dto) {
 
     var searchDto = {
-        "controllerid": this.id
+        "controller": this.id
     };
 
     if (dto) {

@@ -2,13 +2,6 @@ var document = require("document");
 var log = require("log"); log.setLevel("info");
 var componentModule = require("../component");
 
-var cameraid = null;
-var controller = null;
-var embedded = null;
-var third_party = null;
-var vendor = null;
-var model = null;
-
 /**
  * Defines the Camera object
  * @class

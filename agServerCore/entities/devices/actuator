@@ -2,13 +2,6 @@ var document = require("document");
 var log = require("log"); log.setLevel("info");
 var componentModule = require("../component");
 
-var actuatorid = null;
-var controller = null;
-var device_type = null;
-var ip_address = null;
-var mac_address = null;
-var hash = null;
-
 /**
  * Defines the Actuator object
  *

@@ -1,0 +1,16 @@
+var document = require("document");
+var log = require("log"); log.setLevel("info");
+var componentModule = require("../component");
+
+/**
+ * Defines the Equipment object
+ * @class Equipment
+ * @constructor
+ * @param {Object} [dto] : initialization object. Could be a scriptr.io document that contains sensor data
+ */
+function Equipment(dto) {
+    componentModule.Component.call(this, dto);
+}
+
+Equipment.prototype = new componentModule.Component({inheritance: true});
+Equipment.prototype.constructor = Equipment;

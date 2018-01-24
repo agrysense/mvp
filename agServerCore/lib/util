@@ -1,0 +1,20 @@
+function removeMetaData(doc) {
+    
+    var exclude = ["versionNumber", "creator", "lastModifiedDate", "lastModifiedBy", "creationDate", "schema", "latest", "meta.types", "meta.schema", "rootkey"];
+    
+    if (doc) {
+
+        for (var key in doc) {
+
+            if (key == "key") {
+                this.id = doc.key;
+            }
+
+            if (key.indexOf("apsdb") == -1 && exclude.indexOf(key) == -1) {
+                this[key] = doc[key];
+            }        
+        }
+    }
+    
+    return doc;
+}

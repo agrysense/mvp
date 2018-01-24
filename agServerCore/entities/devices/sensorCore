@@ -2,12 +2,6 @@ var document = require("document");
 var log = require("log"); log.setLevel("info");
 var componentModule = require("../component");
 
-var sensor_coreid = null;
-var controller = null;
-var embedded = null;
-var mac_address = null;
-var hash = null;
-
 /**
  * Defines the SensorCore object
  *

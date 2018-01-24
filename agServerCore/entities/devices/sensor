@@ -2,12 +2,6 @@ var document = require("document");
 var log = require("log"); log.setLevel("info");
 var componentModule = require("../component");
 
-var sensorid = null;
-var sensor_core = null;
-var controller = null;
-var sensor_type = null;
-var port = null;
-
 /**
  * Defines the Sensor object
  * @class Sensor
