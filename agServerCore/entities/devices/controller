@@ -21,7 +21,7 @@ function Controller(dto, deviceManager) {
             errorDetail: this.constructor.name + ": deviceManager cannot be null or undefined"
         };
     }
-    
+
     this.deviceManager = deviceManager;
 }
 
@@ -38,16 +38,8 @@ Controller.prototype.constructor = Controller;
  */
 Controller.prototype.listCameras = function(dto) {
 
-    var searchDto = {
-        "controller": this.id
-    };
-
-    if (dto) {
-        for (var key in dto){
-            searchDto[key] = dto[key];
-        }
-    }
-
+    var searchDto =  dto ? JSON.parse(JSON.stringify(dto)) : {};
+    searchDto.controller = this.id;
     return this.deviceManager.listCameras(searchDto);
 };
 
@@ -59,23 +51,23 @@ Controller.prototype.listCameras = function(dto) {
  * @throw {Error}
  */
 Controller.prototype.addCamera = function(obj) {
-    
+
     if (!obj) {
-        
+
         throw {
             errorCode: "Missing_Parameter",
             errorDetail: "Controller.addCamera: obj cannot be null or undefined"
         }; 
     }
-    
+
     if (!typeof(obj) == "object") {
-        
-         throw {
+
+        throw {
             errorCode: "Invalid_Parameter",
             errorDetail: "Controller.addCamera: obj should be an instance of Camera of a JavaScript map"
         }; 
     }
-    
+
     return this.deviceManager.updateCamera(obj);
 };
 
@@ -89,16 +81,8 @@ Controller.prototype.addCamera = function(obj) {
  */
 Controller.prototype.listSensors = function(dto) {
 
-    var searchDto = {
-        "controller": this.id
-    };
-
-    if (dto) {
-        for (var key in dto){
-            searchDto[key] = dto[key];
-        }
-    }
-
+    var searchDto =  dto ? JSON.parse(JSON.stringify(dto)) : {};
+    searchDto.controller = this.id;
     return this.deviceManager.listSensors(searchDto);
 };
 
@@ -112,16 +96,8 @@ Controller.prototype.listSensors = function(dto) {
  */
 Controller.prototype.listSensorCores = function(dto) {
 
-    var searchDto = {
-        "controller": this.id
-    };
-
-    if (dto) {
-        for (var key in dto){
-            searchDto[key] = dto[key];
-        }
-    }
-
+    var searchDto =  dto ? JSON.parse(JSON.stringify(dto)) : {};
+    searchDto.controller = this.id;
     return this.deviceManager.listSensorCores(searchDto);
 };
 
@@ -131,7 +107,7 @@ Controller.prototype.listSensorCores = function(dto) {
  * @method update
  */
 Controller.prototype.update = function() {
-	this.deviceManager.updateController(this.toJSONObject());
+    this.deviceManager.updateController(this.toJSONObject());
 };
 
 /**
@@ -139,7 +115,7 @@ Controller.prototype.update = function() {
  * @return {Object} current instance as a JSON object
  */
 Controller.prototype.toJSONObject = function() {
-  
+
     var asJson = componentModule.Component.prototype.toJSONObject.call(this);
     delete asJson.deviceManager; 
     return asJson;

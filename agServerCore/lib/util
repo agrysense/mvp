@@ -2,19 +2,32 @@ function removeMetaData(doc) {
     
     var exclude = ["versionNumber", "creator", "lastModifiedDate", "lastModifiedBy", "creationDate", "schema", "latest", "meta.types", "meta.schema", "rootkey"];
     
+    var newDoc = {};
     if (doc) {
 
         for (var key in doc) {
 
             if (key == "key") {
-                this.id = doc.key;
+                newDoc.id = doc.key;
             }
 
             if (key.indexOf("apsdb") == -1 && exclude.indexOf(key) == -1) {
-                this[key] = doc[key];
+                newDoc[key] = doc[key];
             }        
         }
     }
     
-    return doc;
+    return newDoc;
+}
+
+/**
+ * @param {Date} date. If not provided, uses current date
+ * @return {String} YYYY-MM-DD
+ */
+function toShortDate(date) {
+     
+    date = date ? date : new Date();console.log(date);
+    var dateStr = date.toISOString();
+    dateStr = dateStr.substring(0, dateStr.indexOf("T"));
+    return dateStr;
 }

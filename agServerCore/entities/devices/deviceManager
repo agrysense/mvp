@@ -558,7 +558,7 @@ DeviceManager.prototype.getDevice = function(id, caller) {
 /**
  * Generic method to update the peristed data of a device
  * @method updateDevice
- * @param {Object} [dto]: device related data of device instance
+ * @param {Object} [dto]: device related data or device instance
  * @param {String} schema: the schema to use when persisting the data
  * @param {String} caller: the caller method
  * @return {Object}
