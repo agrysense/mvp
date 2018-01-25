@@ -1,6 +1,8 @@
 var document = require("document");
 var log = require("log"); log.setLevel("info");
 var componentModule = require("/agServerCore/entities/component");
+var cycleModule = require("./cycle");
+var util = require("/agServerCore/lib/util");
 
 var farmhouseid = null;
 var farm = null;
@@ -23,7 +25,7 @@ var width = null;
 function Farmhouse(dto, farmhouseManager) {
     
     componentModule.Component.call(this, dto);
-    if (!dto.id || !dto.key) {   
+    if (!dto.key) {   
         throw {
             errorCode: "Missing_Parameter",
             errorDetail: "Farmhouse: dto.id or dto.key cannot be null or empty"
@@ -38,6 +40,7 @@ function Farmhouse(dto, farmhouseManager) {
     }
     
     this.farmhouseManager = farmhouseManager;
+    this.deviceManager = this.farmhouseManager.getDeviceManager();
 }
 
 Farmhouse.prototype = new componentModule.Component({inheritance: true});
@@ -148,18 +151,58 @@ Farmhouse.prototype.addEquipement = function(dto) {
 };
 
 /**
- * Start a new cycle. There should be no other ongoing cycle
+ * Start a new cycle. There should be no other ongoing cycle.
  * @method startCycle
- * @param {Object} [dto]
- * @param {String}
+ * @param {Object} [dto]: cycle data
+ * @param {String} [dto.startDate]: cycle start date (YYYY-MM-DD). Optional, defaults to current date
+ * @param {String} [dto.endtDate]: cycle end date (YYYY-MM-DD). Optional 
+ * @param {Number} [dto.birdNbrIn]: initial count of birds in the cyle
+ * @param {Number} [dto.currentBirdCount]: current count of birds in the cyle, optional. Defaults to initial count 
+ * @param {String} [dto.endBirdCount]: end count of birds in the cyle, optional. Defaults to initial count
+ * @return {Object}
+ * @throws {Error}
  */
 Farmhouse.prototype.startCycle = function(dto) {
+    
+    var currentCycle = this.getCurrentCycle();
+    if (currentCycle && !currentCycle.endData) {
+        
+        throw {
+            errorCode: "Invalid_Action",
+            errorDetail: "Farmhouse.startCycle: a cycle (" + currentCycle.key + ") is already ongoing"
+        };
+    }
+    
+    var data = dto ? JSON.parse(JSON.stringify(dto)) : {};
+    data.farmhouse = this.key;
+    data.startDate = dto.startDate ? util.toShortDate(dto.startDate) : util.toShortDate();
+    data.currentBirdCount = dto.currentBirdCount ? dto.currentBirdCount : dto.birdNbrIn;
+    data.endBirdCount = dto.endBirdCount ? dto.endBirdCount : dto.birdNbrIn;
+    return this.farmhouseManager.updateCycle(dto);
 };
 
 /**
  * Get the current cycle. There should be no other ongoing cycle
  * @method getCycle
- * @return {Object} cycle
+ * @return {Object} cycle or null if no cycle is started
  */
-Farmhouse.prototype.getCycle = function() {
+Farmhouse.prototype.getCurrentCycle = function() {
+    
+    var dto = {
+        
+       farmhouse: this.key,
+ 		resultsPerPage: 1,
+ 		sortExp: "startData<date:DESC>"
+    };
+    
+    var cycle = null;
+    try {
+        cycle = this.farmhouseManager.listCycles(dto);
+    }catch(exception){
+        log.info("Farmhouse.getCurrentCycle:\n" + JSON.stringify(exception));
+    }
+    
+    if (cycle) {
+        return new cycleModule.Cycle(cycle);
+    }
 };

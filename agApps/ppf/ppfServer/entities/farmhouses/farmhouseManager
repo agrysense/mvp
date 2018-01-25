@@ -1,9 +1,12 @@
 var document = require("document");
 var log = require("log"); log.setLevel("info");
 var farmhouseModule = require("./farmhouse");
-var deviceManagerModule = require("/agServerCore/entities/deviceManager");
+var cycleModule = require("./cycle");
+var deviceManagerModule = require("/agServerCore/entities/devices/deviceManager");
+var util = require("/agServerCore/lib/util");
 
 const FARMHOUSE = "FarmHouse";
+const CYCLE = "Cycle";
 
 /**
  * Defines the FarmhouseManager helper class
@@ -11,29 +14,45 @@ const FARMHOUSE = "FarmHouse";
  * @constructor
  */
 var FarmhouseManager = function() {
+    this.deviceManager = null;
 }
+
+/**
+ * @method getDeviceManager
+ * @return {DeviceManager};
+ */
+FarmhouseManager.prototype.getDeviceManager = function() {
+
+    if (!this.deviceManager) {
+        this.deviceManager = new deviceManagerModule.DeviceManager();
+    }
+
+    return this.deviceManager;
+};
 
 /**
  * lists all available farms
  * @method listFarmhouses
  * @param {Object} [dto] : contains optional filtering criteria
- * @param {String} [dto.farm]: return all farmhouses related to this farm (key)
+ * @param {String} [dto.farmhouse]: optional, filter by farmhouses related to this farm (key)
+ * @param {Number} [dto.resultsPerPage]: how many results to return per call (optional, defaults to 50)
+ * @param {Number} [dto.pageNumber]: the page number in case there are more than one pages of results (optional, defaults to 1)
  * @return {JSONArray<Farmhouse>} 
  * @throws {Error}
  */
 FarmhouseManager.prototype.listFarmhouses = function(dto) {
-        
+
     var queryParam = {
-       
+
         query: 'apsdb.schema="' + FARMHOUSE + '"',
         fields: "*",
         count: true,
         resultsPerPage: (!dto || !dto.resultsPerPage) ? 50 : dto.resultsPerPage,
         pageNumber: (!dto || !dto.pageNumber) ? 1 : dto.pageNumber
     };
-    
-    if (dto && dto.farm) {
-        queryParam.query += '& farm="'+ dto.farm + '"';
+
+    if (dto && dto.farmhouse) {
+        queryParam.query += '& farmhouse="'+ dto.farm + '"';
     }
 
     var resp = document.query(queryParam);
@@ -50,11 +69,11 @@ FarmhouseManager.prototype.listFarmhouses = function(dto) {
 
     var result = [];
     for (var i=0; i < resp.result.documents.length; i++) {
-        result.push(new farmhouseModule.Farmhouse( resp.result.documents[i]));
+        result.push(new farmhouseModule.Farmhouse(resp.result.documents[i], this));
     }
-    
+
     return result;
-}
+};
 
 /**
  * get Farmhouse based on farmhouseid
@@ -64,38 +83,21 @@ FarmhouseManager.prototype.listFarmhouses = function(dto) {
  * @throws {Error}
  */
 FarmhouseManager.prototype.getFarmhouse = function(id) {
-    
+
     var doc = this.getFarmhouseObject(id);
-    return new farmhouseModule.Farmhouse(doc);
+    return new farmhouseModule.Farmhouse(doc, this);
 }
 
 /**
  * updates a Farmhouse object. If it doesn't exist, the method creates it
- *
  * @method updateFarmhouse
  * @param {Object} [dto]  farmhouse data or Farmhouse instance
  * @return {Object}
  * @throws {Error}
  */
 FarmhouseManager.prototype.updateFarmhouse = function(dto) {
-    
-    if (!dto) {
-        
-        throw {
-            errorCode: "Missing_Parameter",
-            errorDetail: "FarmhouseManager.updateFarmhouse: dto cannot be null or undefined"
-        };
-    }
-    
-    var fields = JSON.parse(JSON.stringify(dto));
-    fields["meta.schema"] = FARMHOUSE;
-    var resp = document.save(fields);
-    if (resp.metadata.status == "failure") {
-        throw resp.metadata;
-    }
-
-    return resp;
-}
+    return this.updateFarmhouseObject(dto, FARMHOUSE, "updateFarmhouse");
+};
 
 /**
  * flags a Farmhouse as deleted
@@ -105,8 +107,95 @@ FarmhouseManager.prototype.updateFarmhouse = function(dto) {
  * @throws {Error}
  */
 FarmhouseManager.prototype.deleteFarmhouse = function(id) {
-   return this.deleteFarmhouseObject(id);
-}
+    return this.deleteFarmhouseObject(id);
+};
+
+/**
+ * @method listCycles
+ * @param {String} [dto.farmhouse]: optional, filter by farmhouses related to this farm (key)
+ * @param {Number} [dto.resultsPerPage]: how many results to return per call (optional, defaults to 50)
+ * @param {Number} [dto.pageNumber]: the page number in case there are more than one pages of results (optional, defaults to 1)
+ * @param {String} [dto.firterExp]: optional, a filter expression, e.g. "fieldX<numeric> = 123"
+ * @param {String} [dto.sortExp]: optional, sort expression, e.g "startDate<date> > '2018-01-01'"
+ * @return {Array<Cycle>}
+ * @throw {Error}
+ */
+FarmhouseManager.prototype.listCycles = function(dto) {
+
+    var queryParam = {
+
+        query: 'apsdb.schema="' + CYCLE + '"',
+        fields: "*",
+        count: true,
+        resultsPerPage: (!dto || !dto.resultsPerPage) ? 50 : dto.resultsPerPage,
+        pageNumber: (!dto || !dto.pageNumber) ? 1 : dto.pageNumber
+    };
+
+    if (dto && dto.farmhouse) {
+        queryParam.query += ' and farmhouse="'+ dto.farm + '"';
+    }
+    
+    if (dto && dto.filterExp) {
+        queryParam.query += ' and ' + dto.filterExp;
+    }
+    
+    if (dto && dto.sortExp) {
+        queryParam.sort = dto.sortExp;
+    }
+
+    var resp = document.query(queryParam);
+    if (resp.metadata.status == "failure") {
+        throw resp.metadata;
+    }
+
+    if (!resp.result.documents){
+        throw {
+            errorCode: "Entity_Not_Found",
+            errorDetail: "FarmManager.listCycles: could not find cycles"
+        };
+    }
+
+    var result = [];
+    for (var i=0; i < resp.result.documents.length; i++) {
+        result.push(new cycleModule.Cycle(resp.result.documents[i]));
+    }
+
+    return result;
+};
+
+/**
+ * @method getCycle
+ * @param {String} cycle id
+ * @return {Cycle}
+ * @throw {Error}
+ */
+FarmhouseManager.prototype.getCycle = function(id) {
+
+    var doc = this.getFarmhouseObject(id);
+    return new cycleModule.Cycle(doc);
+};
+
+/**
+ * updates a Cycle object. If it doesn't exist, the method creates it
+ * @method updateCycle
+ * @param {Object} [dto]  farmhouse data or Farmhouse instance
+ * @return {Object}
+ * @throws {Error}
+ */
+FarmhouseManager.prototype.updateCycle = function(dto) {
+    return this.updateFarmhouseObject(dto, CYCLE, "updateCycle");
+};
+
+/**
+ * flags a Cycle as deleted
+ * @method deleteCycle
+ * @param {String} id identifier or the cycle
+ * @return {Object}
+ * @throws {Error}
+ */
+FarmhouseManager.prototype.deleteCycle = function(id) {
+    return this.deleteFarmhouseObject(id);
+};
 
 /**
  * Generic method: get an object that is related to a farmhous based on id
@@ -117,16 +206,16 @@ FarmhouseManager.prototype.deleteFarmhouse = function(id) {
  * @throws {Error}
  */
 FarmhouseManager.prototype.getFarmhouseObject = function(id, caller) {
-    
+
     var method = caller ? caller : "getFarmhouseObject";
     if (!id) {
-        
+
         throw {
             errorCode: "Missing_Parameter",
             errorDetail: "FarmhouseManager." +  method + ": id cannot be null or empty"
         };
     }
-   
+
     var resp = document.get(id);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
@@ -143,10 +232,10 @@ FarmhouseManager.prototype.getFarmhouseObject = function(id, caller) {
  * @throws {Error}
  */
 FarmhouseManager.prototype.deleteFarmhouseObject = function(id, caller) {
-    
+
     var method = caller ? caller : "deleteFarmhouseObject";
     if (!id) {
-        
+
         throw {
             errorCode: "Missing_Parameter",
             errorDetail: "FarmhouseManager." + method + ": id cannot be null or empty"
@@ -154,6 +243,45 @@ FarmhouseManager.prototype.deleteFarmhouseObject = function(id, caller) {
     }
 
     var resp = document.delete(id);
+    if (resp.metadata.status == "failure") {
+        throw resp.metadata;
+    }
+
+    return resp;
+};
+
+/**
+ * Generic method to update a Farmhouse object. If it doesn't exist, the method creates it
+ * @method updateFarmhouseObject
+ * @param {Object} [dto]: farmhouse related data or farmhouse object instance
+ * @param {String} schema: the schema to use when persisting the data
+ * @param {String} caller: the caller method
+ * @return {Object}
+ * @throws {Error}
+ */
+FarmhouseManager.prototype.updateFarmhouseObject = function(dto, schema, caller) {
+
+    var method = caller ? caller : "updateDevice";
+    if (!dto) {
+
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "FarmhouseManager." + method + ": dto cannot be null or empty"
+        };
+    }
+
+    if (!schema) {
+
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "FarmhouseManager.updateDevice: schema cannot be null or empty"
+        };        
+    }
+
+    var fields = JSON.parse(JSON.stringify(dto));
+    fields = util.removeMetaData(fields);
+    fields["meta.schema"] = schema;
+    var resp = document.save(fields);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }

@@ -106,7 +106,7 @@ FarmManager.prototype.updateFarm = function(dto) {
     }
     
     var fields = JSON.parse(JSON.stringify(dto));
-    fields = util.removeMetaData(fields);
+    fields = util.removeMetaData(fields); 
     fields["meta.schema"] = FARM; 
     var resp = document.save(fields);
     if (resp.metadata.status == "failure") {
