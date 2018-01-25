@@ -40,12 +40,12 @@ function findDocumentsByCriteria(expression) {
 }
 
 // Caution: can cover up to 50 documents
-function listDocumentsOfType(schema) {
+function listDocumentsOfType(schema, keyOnly) {
 
     var queryParams = {
 
         query: 'apsdb.schema = "' + schema + '"',
-        fields: "key"
+        fields: keyOnly ? "key" : "*"
     };
 
     var resp = document.query(queryParams);
@@ -66,4 +66,21 @@ function deleteDocumentsOfType(schema) {
             console.log("Could not delete " +  list[i].key);
         }
     }
+}
+
+function getDateAfter(startDate, days) {
+    
+    var date = startDate ? startDate : new Date();
+    var time = date.getTime(); 
+    var daysAsTime = days * 24 * 3600 * 1000; 
+    var newTime = time + daysAsTime; c
+    return toShortDate(new Date(newTime));
+}
+
+function toShortDate(date) {
+    
+    date = date ? date : new Date();console.log(date);
+    var dateStr = date.toISOString();
+    dateStr = dateStr.substring(0, dateStr.indexOf("T"));
+    return dateStr;
 }

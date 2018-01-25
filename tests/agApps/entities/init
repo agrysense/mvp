@@ -11,6 +11,8 @@ const FARM_KEY_PREFIX = "TEST_FARM_";
 const FARM_NAME_PREFIX = "TEST_FARM_";
 const FARMHOUSE_KEY_PREFIX = "TEST_FARMHOUSE_";
 const FARMHOUSE_NAME_PREFIX = "TEST_FARMHOUSE_";
+const MAX_BIRDS = 2000;
+const MIN_BIRDS = 200;
 
 function createFarmData() {
 
@@ -75,6 +77,33 @@ function createFarmhouse(farmid, location) {
     return data.key;
 }
 
+function createCycleData(farmhouse) {
+    
+    var birdCount = Math.round(Math.random()  * (MAX_BIRDS - MIN_BIRDS)) + MIN_BIRDS;
+    var data = {
+        
+        "key": util.guid(),
+        "startDate": someDate(),
+        "birdNbrIn": birdCount,
+        "currentBirdCount": birdCount,
+        "farmhouse": farmhouse,
+        "meta.schema": "Cycle" 
+    };
+    
+    return data;
+}
+
+function createCycle(farmhouse) {
+    
+    var data = createCycleData(farmhouse);
+    var resp = document.save(data);    
+    if (resp.metadata.status == "failure") {
+        throw(JSON.stringify(resp.metadata));
+    }
+
+    return data.key;
+}
+
 // Caution: should be called after every test suite to make sure there aren't too many documents to delete
 function cleanup() {
 
@@ -83,6 +112,9 @@ function cleanup() {
 
     // delete all farmhouses
     util.deleteDocumentsOfType("FarmHouse");
+    
+     // delete all cycles
+    util.deleteDocumentsOfType("Cycle");
     
     initCore.cleanup();
 
@@ -104,4 +136,10 @@ function category() {
 
 function size() {
     return Math.round(Math.random() * 30) + 20;
+}
+
+function someDate() {
+    
+    var days = Math.round(Math.random() * 10);
+    return util.getDateAfter(days);
 }

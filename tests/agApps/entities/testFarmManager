@@ -11,7 +11,7 @@ var util = require("/tests/util");
 var farmManager = null; // farmManager instance under testing
 var farmKey = "";
 
-jasmine.describe("Testing the Controller class", function() {
+jasmine.describe("Testing the FarmManager class", function() {
 
     jasmine.beforeAll(function(){
 		farmManager = new farmManagerModule.FarmManager();
@@ -21,24 +21,25 @@ jasmine.describe("Testing the Controller class", function() {
         
     });
 
-    jasmine.it("controller.listFarms() returns an array of 1 Farm instance", function() {
+    jasmine.it("FarmManager.listFarms() returns an array of n + 1 Farm instance", function() {
 
+        var initialFarmCount = util.listDocumentsOfType("Farm").length;
         farmKey = init.createFarm();
         try {
 
             var list = farmManager.listFarms(); 
             jasmine.expect(list).not.toBeNull(null);
-            jasmine.expect(list.length).toBe(1); 
+            jasmine.expect(list.length).toBe(1 + initialFarmCount); 
             jasmine.expect(list[0].constructor.name).toBe("Farm");
             jasmine.expect(list[0].key).toBe(farmKey);
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally{
-            init.cleanup();
+            
         }
     });   
     
-    jasmine.it("controller.getFarm() returns the correct instance of Farm", function() {
+    jasmine.it("FarmManager.getFarm() returns the correct instance of Farm", function() {
 
         farmKey = init.createFarm();
         try {
@@ -50,16 +51,16 @@ jasmine.describe("Testing the Controller class", function() {
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally{
-            // init.cleanup();
+            
         }
     });   
     
-    jasmine.it("controller.updateFarm() actually updates a farm in the store", function() {
+    jasmine.it("FarmManager.updateFarm() actually updates a farm in the store", function() {
 
         farmKey = init.createFarm();
         try {
 
-            var farm = util.getDocument(farmKey);  console.log("farm: " +  JSON.stringify(farm));
+            var farm = util.getDocument(farmKey);  
             var initialLocation = farm.location;
             var newLocation = "";
             do{
@@ -76,35 +77,34 @@ jasmine.describe("Testing the Controller class", function() {
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally{
-            // init.cleanup();
+            
         }
     });   
-   
-    jasmine.it("controller.updateFarm() actually creates a farm in the store if it did not exist", function() {
+  
+    jasmine.it("FarmManager.updateFarm() actually creates a farm in the store if it did not exist", function() {
 
-        var farmData = init.createFarmData();
-        console.log("farmData: " +  JSON.stringify(farmData));
+        var farmData = init.createFarmData(); 
         try {
 
-            var list = farmManager.listFarms(); 
+            var list = util.listDocumentsOfType("Farm"); 
             farmManager.updateFarm(farmData);          
-            var newList = farmManager.listFarms(); 
+            var newList = util.listDocumentsOfType("Farm");
             jasmine.expect(newList).not.toBeNull(null);          
             jasmine.expect(newList.length).toBe(list.length + 1);
             var found = false;
             for (var i = 0; !found && i < newList.length; i++) {
-                found = newList[i].location == farmData.location
+                found = newList[i].location == farmData.location;  
             }
             
             jasmine.expect(found).toBe(true);
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally{
-            // init.cleanup();
+          
         }
     });   
     
-    jasmine.it("controller.deleteFarm() actually deletes a farm from the store", function() {
+    jasmine.it("FarmManager.deleteFarm() actually deletes a farm from the store", function() {
 
         var farmKey = init.createFarm();
         try {
@@ -120,7 +120,7 @@ jasmine.describe("Testing the Controller class", function() {
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally{
-            // init.cleanup();
+          
         }
     });   
 
