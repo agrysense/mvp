@@ -6,7 +6,7 @@ var sensorModule = require("./sensor");
 var sensorCoreModule = require("./sensorCore");
 var actuatorModule = require("./actuator");
 var equipmentModule = require("./equipment");
-var util = require("/agServerCore/lib/util");
+var managerModule = require("../manager");
 
 const CONTROLLER = "Controller";
 const CAMERA = "Camera";
@@ -23,12 +23,15 @@ const EQUIPMENT = "Equipment";
 function DeviceManager() {
 };
 
+DeviceManager.prototype = new managerModule.Manager();
+DeviceManager.prototype.constructor = DeviceManager;
+
 /**
  * lists all available controllers
  *
  * @method listControllers
  * @param {Object} [dto]
- * @param {String} [dto.structureid]: the identifier of the structure (e.g. farmhouse) where the controllers are deployed, optional
+ * @param {String} [dto.structure]: the identifier of the structure (e.g. farmhouse) where the controllers are deployed, optional
  * @return {JSONArray<Controller>} 
  * @throws {Error}
  */
@@ -42,8 +45,8 @@ DeviceManager.prototype.listControllers = function(dto) {
         pageNumber: (!dto || !dto.pageNumber) ? 1 : dto.pageNumber
     };
 
-    if (dto && dto.structureid) {        
-        queryParam += 'and structure="'+ dto.structureid + '"'; 
+    if (dto && dto.structure) {        
+        queryParam.query += ' and structure="'+ dto.structure + '"'; 
     }
 
     var resp = document.query(queryParam);
@@ -74,7 +77,7 @@ DeviceManager.prototype.listControllers = function(dto) {
  */
 DeviceManager.prototype.getController = function(controllerid) {
 	
-    var doc = this.getDevice(controllerid, "getController");
+    var doc = this.getObject(controllerid, "getController");
     return new controllerModule.Controller(doc, this);
 }
 
@@ -86,7 +89,7 @@ DeviceManager.prototype.getController = function(controllerid) {
  * @throws {Error}
  */
 DeviceManager.prototype.updateController = function(dto) {
-	return this.updateDevice(dto, CONTROLLER, "updateController");
+	return this.updateObject(dto, CONTROLLER, "updateController");
 };
 
 /**
@@ -97,7 +100,7 @@ DeviceManager.prototype.updateController = function(dto) {
  * @throws {Error}
  */
 DeviceManager.prototype.deleteController = function(controllerid) {
-    this.deleteDevice(controllerid, "deleteController");
+    this.deleteObject(controllerid, "deleteController");
 }
 
 /**
@@ -155,7 +158,7 @@ DeviceManager.prototype.listCameras = function(dto) {
  */
 DeviceManager.prototype.getCamera = function(id) {
 	
-    var doc = this.getDevice(id, "getCamera");
+    var doc = this.getObject(id, "getCamera");
     return new cameraModule.Camera(doc);
 };
 
@@ -167,7 +170,7 @@ DeviceManager.prototype.getCamera = function(id) {
  * @throws {Error}
  */
 DeviceManager.prototype.updateCamera = function(dto) {
-    return this.updateDevice(dto, CAMERA, "updateCamera");
+    return this.updateObject(dto, CAMERA, "updateCamera");
 };
 
 /**
@@ -179,7 +182,7 @@ DeviceManager.prototype.updateCamera = function(dto) {
  * @throws {Error}
  */
 DeviceManager.prototype.deleteCamera = function(id) {
-    this.deleteDevice(id, "deleteCamera");
+    this.deleteObject(id, "deleteCamera");
 };
 
 /**
@@ -237,7 +240,7 @@ DeviceManager.prototype.listSensors = function(dto) {
  */
 DeviceManager.prototype.getSensor = function(id) {
     
-	var doc = this.getDevice(id, "getSensor");
+	var doc = this.getObject(id, "getSensor");
     return new sensorModule.Sensor(doc);
 };
 
@@ -249,7 +252,7 @@ DeviceManager.prototype.getSensor = function(id) {
  * @throws {Error}
  */
 DeviceManager.prototype.updateSensor = function(dto) {
-	return this.updateDevice(dto, SENSOR, "updateSensor");
+	return this.updateObject(dto, SENSOR, "updateSensor");
 };
 
 /**
@@ -260,7 +263,7 @@ DeviceManager.prototype.updateSensor = function(dto) {
  * @throws {Error}
  */
 DeviceManager.prototype.deleteSensor = function(id) {
-     this.deleteDevice(id, "deleteSensor");
+     this.deleteObject(id, "deleteSensor");
 };
 
 /**
@@ -316,7 +319,7 @@ DeviceManager.prototype.listSensorCores = function(dto) {
  */
 DeviceManager.prototype.getSensorCore = function(id) {
     
-    var doc = this.getDevice(id, "getSensorCore");
+    var doc = this.getObject(id, "getSensorCore");
     return new sensorCoreModule.SensorCore(doc);
 };
 
@@ -328,7 +331,7 @@ DeviceManager.prototype.getSensorCore = function(id) {
  * @throws {Error}
  */
 DeviceManager.prototype.updateSensorCore = function(dto) {
-    return this.updateDevice(dto, SENSORCORE, "updateSensorCore");
+    return this.updateObject(dto, SENSORCORE, "updateSensorCore");
 };
 
 /**
@@ -339,7 +342,7 @@ DeviceManager.prototype.updateSensorCore = function(dto) {
  * @throws {Error}
  */
 DeviceManager.prototype.deleteSensorCore = function(id) {
-    return this.deleteDevice(id, "deleteSensorCore");
+    return this.deletObject(id, "deleteSensorCore");
 };
 
 /**
@@ -364,7 +367,7 @@ DeviceManager.prototype.listActuators = function(dto) {
     };
     
     if (dto && dto.controller) {        
-        queryParam.query = ' and controller="'+ dto.controller + '"'; 
+        queryParam.query += ' and controller="'+ dto.controller + '"'; 
     }
 
     var resp = document.query(queryParam);
@@ -396,7 +399,7 @@ DeviceManager.prototype.listActuators = function(dto) {
  */
 DeviceManager.prototype.getActuator = function(id) {
     
-	var doc = this.getDevice(id, "getActuator");
+	var doc = this.getObject(id, "getActuator");
     return new actuatorModule.Actuator(doc);
 };
 
@@ -408,7 +411,7 @@ DeviceManager.prototype.getActuator = function(id) {
  * @throws {Error}
  */
 DeviceManager.prototype.updateActuator = function(dto) {
-    return this.updateDevice(dto, ACTUATOR, "updateActuator");
+    return this.updateObject(dto, ACTUATOR, "updateActuator");
 };
 
 /**
@@ -419,7 +422,7 @@ DeviceManager.prototype.updateActuator = function(dto) {
  * @throws {Error}
  */
 DeviceManager.prototype.deleteActuator = function(id) {
-    this.deleteDevice(id, "deleteActuator");
+    this.deleteObject(id, "deleteActuator");
 };
 
 /**
@@ -444,7 +447,7 @@ DeviceManager.prototype.listEquipments = function(dto) {
     };
     
     if (dto && dto.structure) {        
-        queryParam.query = ' and structure="'+ dto.structure + '"'; 
+        queryParam.query += ' and structure="'+ dto.structure + '"'; 
     }
 
     var resp = document.query(queryParam);
@@ -476,7 +479,7 @@ DeviceManager.prototype.listEquipments = function(dto) {
  * @throws {Error}
  */
 DeviceManager.prototype.getEquipment = function(id) {
-    return new equipmentModule.Equipment(this.getDevice(id));
+    return new equipmentModule.Equipment(this.getObject(id));
 };
 
 /**
@@ -487,7 +490,7 @@ DeviceManager.prototype.getEquipment = function(id) {
  * @throws {Error}
  */
 DeviceManager.prototype.updateEquipment = function(dto) {
-    return this.updateDevice(dto, EQUIPMENT, "updateEquipment");
+    return this.updateObject(dto, EQUIPMENT, "updateEquipment");
 };
 
 /**
@@ -499,98 +502,5 @@ DeviceManager.prototype.updateEquipment = function(dto) {
  * @throws {Error}
  */
 DeviceManager.prototype.deleteEquipement = function(id) {
-    return this.deleteDevice(id, "deleteEquipment");
-};
-
-/**
- * Generic method: flags a Device (Camera, Controller, Sensor, SensorCore, etc.) as deleted
- * @method deleteDevice
- * @param {String} id: the identifier of the device
- * @return {Object}
- * @throws {Error}
- */
-DeviceManager.prototype.deleteDevice = function(id, caller) {
-    
-    var method = caller ? caller : "deleteDevice";
-    if (!id) {
-        
-        throw {
-            errorCode: "Missing_Parameter",
-            errorDetail: "DeviceManager." + method + ": id cannot be null or empty"
-        };
-    }
-
-    var resp = document.delete(id);
-    if (resp.metadata.status == "failure") {
-        throw resp.metadata;
-    }
-
-    return resp;
-};
-
-/**
- * Generic method: get a device based on id
- * @method getDevice
- * @param {String} id: the device id
- * @param {String} caller: the name of the invoking method
- * @return {Object} document that relates to a specific device
- * @throws {Error}
- */
-DeviceManager.prototype.getDevice = function(id, caller) {
-    
-    var method = caller ? caller : "getDevice";
-    if (!id) {
-        
-        throw {
-            errorCode: "Missing_Parameter",
-            errorDetail: "DeviceManager." +  method + ": id cannot be null or empty"
-        };
-    }
-   
-    var resp = document.get(id);
-    if (resp.metadata.status == "failure") {
-        throw resp.metadata;
-    }
-
-    return resp.result;
-};
-
-/**
- * Generic method to update the peristed data of a device
- * @method updateDevice
- * @param {Object} [dto]: device related data or device instance
- * @param {String} schema: the schema to use when persisting the data
- * @param {String} caller: the caller method
- * @return {Object}
- * @throw {Error}
- */
-DeviceManager.prototype.updateDevice = function(dto, schema, caller) {
-    
-    var method = caller ? caller : "updateDevice";
-    
-    if (!dto) {
-        
-        throw {
-            errorCode: "Missing_Parameter",
-            errorDetail: "DeviceManager." + method + ": dto cannot be null or empty"
-        };
-    }
-    
-    if (!schema) {
-        
-        throw {
-            errorCode: "Missing_Parameter",
-            errorDetail: "DeviceManager.updateDevice: schema cannot be null or empty"
-        };        
-    }
-
-    var fields = JSON.parse(JSON.stringify(dto));
-    fields = util.removeMetaData(fields);
-    fields["meta.schema"] = schema;
-    var resp = document.save(fields);
-    if (resp.metadata.status == "failure") {
-        throw resp.metadata;
-    }
-
-    return resp;
+    return this.deleteObject(id, "deleteEquipment");
 };

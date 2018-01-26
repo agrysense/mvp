@@ -25,9 +25,15 @@ function removeMetaData(doc) {
  * @return {String} YYYY-MM-DD
  */
 function toShortDate(date) {
-     
-    date = date ? date : new Date();console.log(date);
-    var dateStr = date.toISOString();
+    
+    var useDate = null;
+    if (date) {
+        useDate = (date instanceof Date) ? date : new Date(date); 
+    }else {
+        useDate = new Date();
+    }
+    
+    var dateStr = useDate.toISOString();
     dateStr = dateStr.substring(0, dateStr.indexOf("T"));
     return dateStr;
 }

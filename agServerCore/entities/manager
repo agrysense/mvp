@@ -1,0 +1,104 @@
+var document = require("document");
+var util = require("../lib/util");
+
+/**
+ * Generic Manager class that contains utility methods used by all Managers
+ * Should be extended by all concrete Manager classes
+ * @class AbstractManager
+ * @constructor
+ */
+function Manager() {
+}
+
+/**
+ * Generic method: flags an object in the store (Camera, Controller, Sensor, SensorCore, etc.) as deleted
+ * @method deleteObject
+ * @param {String} id: the identifier of the device
+ * @param {String} caller: the name of the invoking method e.g. getActuator
+ * @return {Object}
+ * @throws {Error}
+ */
+Manager.prototype.deleteObject = function(id, caller) {
+    
+    var method = this.constructor.name + "." + (caller ? caller : "deleteObject");
+    if (!id) {
+        
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: method + ": id cannot be null or empty"
+        };
+    }
+
+    var resp = document.delete(id);
+    if (resp.metadata.status == "failure") {
+        throw resp.metadata;
+    }
+
+    return resp;
+};
+
+/**
+ * Generic method: get an object from the store based on its id
+ * @method getObject
+ * @param {String} id: the device id
+ * @param {String} caller: the name of the invoking method e.g. DeviceManager.getActuator
+ * @return {Object} document that relates to a specific object
+ * @throws {Error}
+ */
+Manager.prototype.getObject = function(id, caller) {
+    
+    var method = this.constructor.name + "." + (caller ? caller : "getObject");
+    if (!id) {
+        
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: method + ": id cannot be null or empty"
+        };
+    }
+   
+    var resp = document.get(id);
+    if (resp.metadata.status == "failure") {
+        throw resp.metadata;
+    }
+
+    return resp.result;
+};
+
+/**
+ * Generic method to update an object in the store
+ * @method updateObject
+ * @param {Object} [dto]: object related data or object instance
+ * @param {String} schema: the schema to use when persisting the data
+ * @param {String} caller: the caller method
+ * @return {Object}
+ * @throw {Error}
+ */
+Manager.prototype.updateObject = function(dto, schema, caller) {
+    
+    var method = this.constructor.name + "." + (caller ? caller : "getObject");    
+    if (!dto) {
+        
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: method + ": dto cannot be null or empty"
+        };
+    }
+    
+    if (!schema) {
+        
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: method + " schema cannot be null or empty"
+        };        
+    }
+
+    var fields = JSON.parse(JSON.stringify(dto));
+    fields = util.removeMetaData(fields);
+    fields["meta.schema"] = schema;
+    var resp = document.save(fields);
+    if (resp.metadata.status == "failure") {
+        throw resp.metadata;
+    }
+
+    return resp;
+};
