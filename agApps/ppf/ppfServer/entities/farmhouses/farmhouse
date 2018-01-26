@@ -23,7 +23,7 @@ var width = null;
  * @param {FarmhouseManager} farmhouseManager instance of FarmhouseManager
  */
 function Farmhouse(dto, farmhouseManager) {
-    
+
     componentModule.Component.call(this, dto);
     if (!dto.key) {   
         throw {
@@ -31,14 +31,14 @@ function Farmhouse(dto, farmhouseManager) {
             errorDetail: "Farmhouse: dto.id or dto.key cannot be null or empty"
         };
     }
-    
+
     if (!farmhouseManager) {   
         throw {
             errorCode: "Missing_Parameter",
             errorDetail: "Farmhouse: farmhouseManager cannot be null or undefined"
         };
     }
-    
+
     this.farmhouseManager = farmhouseManager;
     this.deviceManager = this.farmhouseManager.getDeviceManager();
 }
@@ -55,7 +55,7 @@ Farmhouse.prototype.constructor = Farmhouse;
  * @throws {Error}
  */
 Farmhouse.prototype.listControllers = function(dto) {
-    
+
     var searchDto = dto ? dto : {};
     searchDto.structure = this.key;    
     return this.deviceManager.listControllers(searchDto);
@@ -81,17 +81,17 @@ Farmhouse.prototype.getController = function(id) {
  * @throw {Error}
  */
 Farmhouse.prototype.addController = function(dto) {
-    
+
     if (!dto) {
-       
+
         throw {
             errorCode: "Missing_Parameter",
             errorDetail: "Farmhouse.addController: dto cannot be null or undefined"
         };
     }
-        
+
     dto.structure = this.key;
-    return this.deviceManager.update(dto);
+    return this.deviceManager.updateController(dto);
 };
 
 /**
@@ -104,17 +104,10 @@ Farmhouse.prototype.addController = function(dto) {
  * @throw {Error}
  */
 Farmhouse.prototype.listEquipments = function(dto) {
-    
-    if (!dto) {
-       
-        throw {
-            errorCode: "Missing_Parameter",
-            errorDetail: "Farmhouse.addController: dto cannot be null or undefined"
-        };
-    }
-        
-    dto.structure = this.key;
-    return this.deviceManager.update(dto);
+
+    var searchDto =  dto ? JSON.parse(JSON.stringify(dto)) : {};
+    searchDto.structure = this.key;
+    return this.deviceManager.listEquipments(searchDto);
 };
 
 /**
@@ -136,18 +129,18 @@ Farmhouse.prototype.getEquipment = function(id) {
  * @return {Object}
  * @throw {Error}
  */
-Farmhouse.prototype.addEquipement = function(dto) {
-    
+Farmhouse.prototype.addEquipment = function(dto) {
+
     if (!dto) {
-       
+
         throw {
             errorCode: "Missing_Parameter",
             errorDetail: "Farmhouse.addEquipement: dto cannot be null or undefined"
         };
     }
-        
+
     dto.structure = this.key;
-    return this.deviceManager.update(dto);
+    return this.deviceManager.updateEquipment(dto);
 };
 
 /**
@@ -163,46 +156,79 @@ Farmhouse.prototype.addEquipement = function(dto) {
  * @throws {Error}
  */
 Farmhouse.prototype.startCycle = function(dto) {
-    
-    var currentCycle = this.getCurrentCycle();
-    if (currentCycle && !currentCycle.endData) {
-        
+
+    var currentCycle = this.getCurrentCycle(); console.log(JSON.stringify("current cycle " + currentCycle))
+    if (currentCycle && currentCycle.endDate) {
+
         throw {
             errorCode: "Invalid_Action",
             errorDetail: "Farmhouse.startCycle: a cycle (" + currentCycle.key + ") is already ongoing"
         };
     }
+
+    if (!dto || !dto.birdNbrIn) {
+        
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "Farmhouse.startCycle: dto.birdNbrIn has to be specified"
+        };
+    }
     
-    var data = dto ? JSON.parse(JSON.stringify(dto)) : {};
+    var data = JSON.parse(JSON.stringify(dto));
     data.farmhouse = this.key;
-    data.startDate = dto.startDate ? util.toShortDate(dto.startDate) : util.toShortDate();
-    data.currentBirdCount = dto.currentBirdCount ? dto.currentBirdCount : dto.birdNbrIn;
-    data.endBirdCount = dto.endBirdCount ? dto.endBirdCount : dto.birdNbrIn;
-    return this.farmhouseManager.updateCycle(dto);
+    data.startDate = dto && dto.startDate ? util.toShortDate(dto.startDate) : util.toShortDate();
+    data.currentBirdCount = dto && dto.currentBirdCount ? dto.currentBirdCount : this.birdNbrIn;
+    data.endBirdCount = dto && dto.endBirdCount ? dto.endBirdCount : this.birdNbrIn;
+    return this.farmhouseManager.updateCycle(data);
 };
 
 /**
  * Get the current cycle. There should be no other ongoing cycle
  * @method getCycle
  * @return {Object} cycle or null if no cycle is started
+ * @throw {Error}
  */
 Farmhouse.prototype.getCurrentCycle = function() {
-    
+
     var dto = {
-        
-       farmhouse: this.key,
- 		resultsPerPage: 1,
- 		sortExp: "startData<date:DESC>"
+
+        farmhouse: this.key,
+        resultsPerPage: 1,
+        filterExp: " endDate<date> is not null",
+        sortExp: "startDate<date:DESC>"
     };
-    
-    var cycle = null;
+
+    var cycleList = null;
     try {
-        cycle = this.farmhouseManager.listCycles(dto);
+        cycleList = this.farmhouseManager.listCycles(dto);
     }catch(exception){
         log.info("Farmhouse.getCurrentCycle:\n" + JSON.stringify(exception));
     }
-    
-    if (cycle) {
-        return new cycleModule.Cycle(cycle);
+
+    if (cycleList.length > 0) {
+        return new cycleModule.Cycle(cycleList[0]);
+    }else{
+        return null;
     }
 };
+
+/**
+ * Stop the current cycle if a cycle was started. Otherwise, throws an exception 
+ * @method stopCycle
+ * @return {Cycle} the current cycle object that was stopped
+ * @throw {Error}
+ */
+Farmhouse.prototype.stopCycle = function() {
+
+    var currentCycle = this.getCurrentCycle();
+    if (!currentCycle) {
+
+        throw {
+            error: "Invalid_Action",
+            errorDetail: "No cycle was started for this farmhouse: " + this.key
+        };
+    }
+
+    return currentCycle.stop();
+};
+

@@ -1,6 +1,8 @@
 var document = require("document");
 var log = require("log"); log.setLevel("info");
 var componentModule = require("/agServerCore/entities/component");
+var document = require("document");
+var util = require("/agServerCore/lib/util");
 
 /**
  * Defines the Cycle object
@@ -9,8 +11,31 @@ var componentModule = require("/agServerCore/entities/component");
  * @param {Object} [dto] : initialization object. Should be a scriptr.io document that contains cycle data
  */
 function Cycle(dto) {
+    
     componentModule.Component.call(this, dto);
+    this.birdNbrIn = Number(this.birdNbrIn);
+    this.currentBirdCount = Number(this.currentBirdCount);
+    this.endBirdCount = this.endBirdCount ? Number(endBirdCount) : this.endBirdCount;
 }
 
 Cycle.prototype = new componentModule.Component({inheritance: true});
 Cycle.prototype.constructor = Cycle;
+
+/**
+ * End the cycle
+ * @method stop
+ * @return {Object}
+ * @throws {Error}
+ */
+Cycle.prototype.stop = function() {
+  
+    this.endDate = util.toShortDate();
+    this.endBirdCount = this.currentBirdCount;
+    var data = this.toJSONObject();
+    var resp = document.save(data);
+    if (resp.metadata.status == "failure"){
+        throw resp;
+    }
+    
+    return resp;
+};
