@@ -12,6 +12,13 @@ function guid(max) {
     return uid;
 }
 
+function gps() {
+
+    const choice = ["33.853378,35.616584", "33.852520,35.625431", "33.851157,35.619466", "34.032937,35.749176", "34.016917,35.731493"];
+    var location = choice[Math.round(Math.random() * (choice.length - 1))];
+    return location;
+}
+
 function getDocument(key) {
 
     var resp = document.get(key);    
@@ -69,17 +76,23 @@ function deleteDocumentsOfType(schema) {
 }
 
 function getDateAfter(startDate, days) {
-    
-    var date = startDate ? startDate : new Date();
+
+    var date = null;
+    if (startDate) {
+        date = (date instanceof Date) ? startDate : new Date(startDate); 
+    }else {
+        date = new Date();
+    }
+
     var time = date.getTime(); 
     var daysAsTime = days * 24 * 3600 * 1000; 
-    var newTime = time + daysAsTime; c
+    var newTime = time + daysAsTime;
     return toShortDate(new Date(newTime));
 }
 
 function toShortDate(date) {
-    
-    date = date ? date : new Date();console.log(date);
+
+    date = date ? date : new Date();
     var dateStr = date.toISOString();
     dateStr = dateStr.substring(0, dateStr.indexOf("T"));
     return dateStr;

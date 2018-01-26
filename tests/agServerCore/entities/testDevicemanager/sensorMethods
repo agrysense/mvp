@@ -15,20 +15,24 @@ var sensorCore = null; // reference sensor core, linked to the former
 jasmine.describe("Testing the DeviceManager class", function() {
 
     jasmine.beforeAll(function(){
+        
 		deviceManager = new deviceManagerModule.DeviceManager();
-    }); 
-
-    jasmine.beforeEach(function() {
-
+        
         // create a reference controller
         var key = init.createController();
         controller = util.getDocument(key);
         sensorCore = util.findDocumentsByCriteria('apsdb.schema="SensorCore" and controller="' + key + '"');
+    }); 
+
+    jasmine.beforeEach(function() {
+        
     });
 
-    jasmine.it("deviceManager.listSensors() returns an array of 2 Sensor instances", function() {
+    jasmine.it("deviceManager.listSensors() returns an array of n + 1 Sensor instances", function() {
         
-        // create 1 sensor. Attention: the controller already ships with 1 sensor core and 1 sensor
+        var initialSensorList = util.listDocumentsOfType("Sensor");
+        
+        // create 1 sensor. 
         var keys = [];
         for(var i = 0; i < 1; i++) {            
             keys[i] = init.createSensor(controller.key, sensorCore.key);
@@ -38,13 +42,13 @@ jasmine.describe("Testing the DeviceManager class", function() {
 
             var list = deviceManager.listSensors();
             jasmine.expect(list).not.toBeNull(null);
-            jasmine.expect(list.length).toBe(2);
+            jasmine.expect(list.length).toBe(initialSensorList.length + 1);
             jasmine.expect(list[0].constructor.name).toBe("Sensor");
             jasmine.expect(keys.indexOf(list[0].id)).not.toBeNull();
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally {
-            init.cleanup();   
+            
         }
     });
 
@@ -63,7 +67,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally {
-            init.cleanup();   
+             
         }
     });
 
@@ -83,7 +87,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally{  
-            init.cleanup();   
+             
         }
     });
   
@@ -105,7 +109,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally {
-            init.cleanup();   
+               
         }
     });
 
@@ -128,7 +132,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally {
-            init.cleanup();   
+          
         }
     });
  
@@ -137,7 +141,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
     });
 
     jasmine.afterAll(function(){        
-
+		init.cleanup();   
     });
 });
 

@@ -1,0 +1,108 @@
+/**
+ * Test suite of the Farmhouse class.
+ * Note: avoid doing lengthy tests (split them in multiple scripts if this is the case)
+ */
+
+var jasmine = require("/tests/modules/jasmine/boot");
+var farmhouseManagerModule = require("/agApps/ppf/ppfServer/entities/farmhouses/farmhouseManager");
+var farmhouseModule = require("/agApps/ppf/ppfServer/entities/farmhouses/farmhouse");
+var init = require("../init");
+var initCore = require("/tests/agServerCore/entities/init");
+var util = require("/tests/util");
+
+var farmhouse = null; // farmhouse instance under testing
+var farmhouseManager = null;
+var controller = null;
+var farmKey = "";
+
+jasmine.describe("Testing the FarmhouseManager class", function() {
+
+    jasmine.beforeAll(function(){   
+
+        farmhouseManager = new farmhouseManagerModule.FarmhouseManager();  
+        farmKey = init.createFarm();
+        farmhouse = new farmhouseModule.Farmhouse(init.createFarmhouseData(farmKey), farmhouseManager);
+        controller = initCore.createController(farmhouse.key);
+    }); 
+
+    jasmine.beforeEach(function() {		
+
+    });
+
+    jasmine.it("Farmhouse.listControllers() returns an array of n + 1 Controller instances", function() {
+
+        var initialControllerList = util.listDocumentsOfType("Controller");
+        var initialControllerCount = 0;
+        for (var i = 0; i < initialControllerList.length; i++) {
+            initialControllerCount += initialControllerList[i].structure == farmhouse.key ? 1 : 0;
+        }
+
+        var controllerKey = initCore.createController(farmhouse.key); // create a controller and link it to the farmhouse. 
+        try {
+
+            var list = farmhouse.listControllers(); 
+            jasmine.expect(list).not.toBeNull(null);
+            jasmine.expect(list.length).toBe(initialControllerCount + 1); 
+            var foundIndex = -1;
+            for (var i = 0; i < list.length; i++) {
+
+                jasmine.expect(list[i].constructor.name).toBe("Controller");
+                foundIndex = list[i].key == controllerKey ? i : foundIndex;
+                jasmine.expect(list[0].structure).toBe(farmhouse.key);
+            }
+
+            jasmine.expect(foundIndex).not.toBe(-1);
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally{
+
+        }
+    });   
+
+    jasmine.it("Farmhouse.getController() returns the correct instance of Farmhouse", function() {
+
+        var controllerKey = initCore.createController(farmhouse.key);
+        try {
+
+            var controller = farmhouse.getController(controllerKey); 
+            jasmine.expect(controller).not.toBeNull(null);
+            jasmine.expect(controller.constructor.name).toBe("Controller");
+            jasmine.expect(controller.key).toBe(controllerKey);
+            jasmine.expect(controller.structure).toBe(farmhouse.key);
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally{
+
+        }
+    });   
+
+    jasmine.it("Farmhouse.addController() actually adds a controller to the farmhouse", function() {
+
+        var controllerKey = initCore.createController(); // create a controller that will be linked to a random structure id 
+        try {
+
+            var controller = util.getDocument(controllerKey); 
+            var initialControllerList = farmhouse.listControllers();
+            farmhouse.addController(controller); 
+            var addedController = util.getDocument(controllerKey); 
+            var addedControllerList = farmhouse.listControllers(); 
+            jasmine.expect(addedController).not.toBeNull(null);
+            jasmine.expect(addedController.structure).toBe(farmhouse.key);        
+            jasmine.expect(addedControllerList.length).toBe(initialControllerList.length + 1); 
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally{
+
+        }
+    });   
+   
+    jasmine.afterEach(function(){        
+
+    });
+
+    jasmine.afterAll(function(){        
+        init.cleanup();
+    });
+});
+
+jasmine.execute();

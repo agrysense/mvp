@@ -1,0 +1,129 @@
+/**
+ * Test suite of the Farmhouse class.
+ * Note: avoid doing lengthy tests (split them in multiple scripts if this is the case)
+ */
+
+var jasmine = require("/tests/modules/jasmine/boot");
+var farmhouseManagerModule = require("/agApps/ppf/ppfServer/entities/farmhouses/farmhouseManager");
+var farmhouseModule = require("/agApps/ppf/ppfServer/entities/farmhouses/farmhouse");
+var init = require("../init");
+var initCore = require("/tests/agServerCore/entities/init");
+var util = require("/tests/util");
+
+var farmhouse = null; // farmhouse instance under testing
+var farmhouseManager = null;
+var farmKey = "";
+
+jasmine.describe("Testing the FarmhouseManager class", function() {
+
+    jasmine.beforeAll(function(){   
+
+        farmhouseManager = new farmhouseManagerModule.FarmhouseManager();  
+        farmKey = init.createFarm();
+        farmhouse = new farmhouseModule.Farmhouse(init.createFarmhouseData(farmKey), farmhouseManager);
+    }); 
+
+    jasmine.beforeEach(function() {		
+
+    });
+
+    jasmine.it("Farmhouse.listEquipments() returns an array of n + 1 Equipment instances", function() {
+
+        var initialEquipmentList = util.listDocumentsOfType("Equipment");
+        var initialEquipmentCount = 0;
+        for (var i = 0; i < initialEquipmentList.length; i++) {
+            initialEquipmentCount += initialEquipmentCount[i].structure == farmhouse.key ? 1 : 0;
+        }
+
+        var equipmentKey = initCore.createEquipment(farmhouse.key); // create an equipment and link it to the farmhouse. 
+        try {
+
+            var list = farmhouse.listEquipments(); 
+            jasmine.expect(list).not.toBeNull(null);
+            jasmine.expect(list.length).toBe(initialEquipmentCount + 1); 
+            var foundIndex = -1;
+            for (var i = 0; i < list.length; i++) {
+
+                jasmine.expect(list[i].constructor.name).toBe("Equipment");
+                foundIndex = list[i].key == equipmentKey ? i : foundIndex;
+                jasmine.expect(list[0].structure).toBe(farmhouse.key);
+            }
+
+            jasmine.expect(foundIndex).not.toBe(-1);
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally{
+
+        }
+    });   
+
+    jasmine.it("Farmhouse.getEquipment() returns the correct instance of Equipment", function() {
+
+        var equipmentKey = initCore.createEquipment(farmhouse.key);
+        try {
+
+            var equipment = farmhouse.getEquipment(equipmentKey); 
+            jasmine.expect(equipment).not.toBeNull(null);
+            jasmine.expect(equipment.constructor.name).toBe("Equipment");
+            jasmine.expect(equipment.key).toBe(equipmentKey);
+            jasmine.expect(equipment.structure).toBe(farmhouse.key);
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally{
+
+        }
+    });   
+
+    jasmine.it("Farmhouse.addEquipment() actually adds an equipment to the farmhouse", function() {
+
+        var equipmentKey = initCore.createEquipment(); 
+        try {
+
+            var equipment = util.getDocument(equipmentKey); 
+            var initialEquipmentList = farmhouse.listEquipments();
+            farmhouse.addEquipment(equipment); 
+            var addedEquipment = util.getDocument(equipmentKey); 
+            var addedEquipmentList = farmhouse.listEquipments(); 
+            jasmine.expect(addedEquipment).not.toBeNull(null);
+            jasmine.expect(addedEquipment.structure).toBe(farmhouse.key);        
+            jasmine.expect(addedEquipmentList.length).toBe(initialEquipmentList.length + 1); 
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally{
+
+        }
+    });   
+   
+    jasmine.it("FarmhouseManager.updateFarmhouse() actually creates a farmhouse in the store if it did not exist", function() {
+
+        var farmhouseData = init.createFarmhouseData(farmKey);
+        try {
+
+            var list = util.listDocumentsOfType("FarmHouse");
+            farmhouseManager.updateFarmhouse(farmhouseData);          
+            var newList = util.listDocumentsOfType("FarmHouse");
+            jasmine.expect(newList).not.toBeNull(null);          
+            jasmine.expect(newList.length).toBe(list.length + 1);
+            var found = false;
+            for (var i = 0; !found && i < newList.length; i++) {
+                found = newList[i].location == farmhouseData.location
+            }
+
+            jasmine.expect(found).toBe(true);
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally{
+
+        }
+    });   
+    
+    jasmine.afterEach(function(){        
+
+    });
+
+    jasmine.afterAll(function(){        
+        init.cleanup();
+    });
+});
+
+jasmine.execute();

@@ -1,5 +1,5 @@
 /**
- * Test suite of the FarmhoseControoler class.
+ * Test suite of the FarmhouseControler class.
  * Note: avoid doing lengthy tests (split them in multiple scripts if this is the case)
  */
 
@@ -23,10 +23,10 @@ jasmine.describe("Testing the FarmhouseManager class", function() {
         
     });
 
-    jasmine.it("FarmhouseManager.FarmhouseManager() returns an array of n + 1 Farmhouse instancse", function() {
+    jasmine.it("FarmhouseManager.listFarmhouses() returns an array of n + 1 Farmhouse instancse", function() {
 
         var initialFarmhouseCount = util.listDocumentsOfType("FarmHouse").length;
-        farmhouseKey = init.createFarmhouse(farmKey); // create a farmhouse and link it to the farm. 
+        var farmhouseKey = init.createFarmhouse(farmKey); // create a farmhouse and link it to the farm. 
         try {
 
             var list = farmhouseManager.listFarmhouses(); 
@@ -34,6 +34,7 @@ jasmine.describe("Testing the FarmhouseManager class", function() {
             jasmine.expect(list.length).toBe(initialFarmhouseCount + 1); 
             jasmine.expect(list[0].constructor.name).toBe("Farmhouse");
             jasmine.expect(list[0].key).toBe(farmhouseKey);
+            jasmine.expect(list[0].farm).toBe(farmKey);
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally{
@@ -50,6 +51,7 @@ jasmine.describe("Testing the FarmhouseManager class", function() {
             jasmine.expect(farmhouse).not.toBeNull(null);
             jasmine.expect(farmhouse.constructor.name).toBe("Farmhouse");
             jasmine.expect(farmhouse.key).toBe(farmhouseKey);
+            jasmine.expect(farmhouse.farm).toBe(farmKey);
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally{
@@ -105,16 +107,16 @@ jasmine.describe("Testing the FarmhouseManager class", function() {
            
         }
     });   
-    /*
-    jasmine.it("controller.deleteFarm() actually deletes a farm from the store", function() {
+    
+    jasmine.it("FarmhouseManager.deleteFarmhouse() actually deletes a farmhouse from the store", function() {
 
-        var farmKey = init.createFarm();
+        var farmhouseKey = init.createFarmhouse(farmKey);
         try {
 
             try {
           		
-                farmManager.deleteFarm(farmKey);
-                var farm = util.getDocument(farmKey);
+                farmhouseManager.deleteFarm(farmhouseKey);
+                var farmhouse = util.getDocument(farmhouseKey);
                 jasmine.fail(); // if still here, should fail
             }catch(exception){
                 jasmine.expect(true).toBe(true);
@@ -124,7 +126,7 @@ jasmine.describe("Testing the FarmhouseManager class", function() {
         }finally{
             // init.cleanup();
         }
-    });   */
+    });   
 
     jasmine.afterEach(function(){        
         

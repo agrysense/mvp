@@ -1,0 +1,122 @@
+/**
+ * Test suite of the Farmhouse class.
+ * Note: avoid doing lengthy tests (split them in multiple scripts if this is the case)
+ */
+
+var jasmine = require("/tests/modules/jasmine/boot");
+var farmhouseManagerModule = require("/agApps/ppf/ppfServer/entities/farmhouses/farmhouseManager");
+var farmhouseModule = require("/agApps/ppf/ppfServer/entities/farmhouses/farmhouse");
+var init = require("../init");
+var initCore = require("/tests/agServerCore/entities/init");
+var util = require("/tests/util");
+
+var farmhouse = null; // farmhouse instance under testing
+var farmhouseManager = null;
+var farmKey = "";
+
+jasmine.describe("Testing the FarmhouseManager class", function() {
+
+    jasmine.beforeAll(function(){   
+
+        farmhouseManager = new farmhouseManagerModule.FarmhouseManager();  
+        farmKey = init.createFarm();
+        farmhouse = new farmhouseModule.Farmhouse(init.createFarmhouseData(farmKey), farmhouseManager);
+    }); 
+
+    jasmine.beforeEach(function() {		
+        util.deleteDocumentsOfType("Cycle");
+    });
+
+    jasmine.it("Farmhouse.startCycle() start a cycle for the farmhouse", function() {
+
+        var initialCycleList = util.listDocumentsOfType("Cycle");
+        var cycleData = init.createCycleData();
+        try{
+
+            farmhouse.startCycle(cycleData);
+            var updatedCycleList = util.listDocumentsOfType("Cycle");
+            jasmine.expect(updatedCycleList).not.toBeNull(null);
+            jasmine.expect(updatedCycleList.length).toBe(initialCycleList.length + 1); 
+            var cycleMatching = 0;
+            for (var i = 0; i < updatedCycleList.length; i++) {
+                cycleMatching += (updatedCycleList[i].farmhouse == farmhouse.key) ? 1 : cycleMatching;
+            }
+
+            jasmine.expect(cycleMatching).toBe(1);
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally{
+
+        }
+    });   
+
+    jasmine.it("Farmhouse.startCycle() cannot start more than one cycle for the farmhouse", function() {
+
+        var initialCycleList = util.listDocumentsOfType("Cycle");
+        var cycleData = init.createCycleData();
+        try{
+
+            farmhouse.startCycle(cycleData);
+            farmhouse.startCycle(cycleData);
+            jasmine.fail(); // if still here, fail            
+        }catch(exception){
+            if (exception.errorCode && exception.errorCode == "Invalid_Action") {
+                jasmine.expect(true).toBe(true);
+            }else {
+                throw(JSON.stringify(exception));
+            }           
+        }finally{
+
+        }
+    });   
+
+    jasmine.it("Farmhouse.getCurrentCycle() returns the current instance of Cycle for the farmhouse", function() {
+
+        var cycleKey = init.createCycle(farmhouse.key);
+        try {
+
+            var cycle = farmhouse.getCurrentCycle(); 
+            jasmine.expect(cycle).not.toBeNull(null);
+            jasmine.expect(cycle.constructor.name).toBe("Cycle");
+            jasmine.expect(cycle.key).toBe(cycleKey);
+            jasmine.expect(cycle.farmhouse).toBe(farmhouse.key);
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally{
+
+        }
+    });   
+
+    jasmine.it("Farmhouse.stopCycle() actually stops the current cycle", function() {
+
+        var cycleData = init.createCycleData(farmhouse.key);
+        try {
+
+            farmhouse.startCycle(cycleData);
+            farmhouse.stopCycle();
+            var cycle = farmhouse.getCurrentCycle();
+            jasmine.expect(cycle).toBe(null);
+            var cycleList = util.listDocumentsOfType("Cycle");           
+            var cycleMatching = 0;
+            for (var i = 0; i < cycleList.length; i++) {
+                cycleMatching += (cycleList[i].farmhouse == farmhouse.key) ? 1 : cycleMatching;
+            }
+
+            jasmine.expect(cycleMatching).toBe(0);
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally{
+
+        }
+    });   
+
+    jasmine.afterEach(function(){        
+
+    });
+
+    jasmine.afterAll(function(){        
+        init.cleanup();
+    });
+});
+
+jasmine.execute();

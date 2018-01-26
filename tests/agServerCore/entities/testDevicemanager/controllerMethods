@@ -39,7 +39,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally {
-            init.cleanup();   
+           
         }
     });
 
@@ -59,7 +59,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally {
-            init.cleanup();   
+           
         }
     });
 
@@ -81,7 +81,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally {
-            init.cleanup();   
+           
         }
     });
     
@@ -103,7 +103,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally {
-            init.cleanup();   
+              
         }
     });
 
@@ -127,7 +127,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally {
-            init.cleanup();   
+            
         }
     });
 
@@ -136,7 +136,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
     });
 
     jasmine.afterAll(function(){        
-
+		 init.cleanup();   
     });
 });
 

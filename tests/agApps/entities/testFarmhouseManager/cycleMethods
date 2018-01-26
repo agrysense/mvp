@@ -1,0 +1,138 @@
+/**
+ * Test suite of the FarmhoseControoler class.
+ * Note: avoid doing lengthy tests (split them in multiple scripts if this is the case)
+ */
+
+var jasmine = require("/tests/modules/jasmine/boot");
+var farmhouseManagerModule = require("/agApps/ppf/ppfServer/entities/farmhouses/farmhouseManager");
+var cycleModule = require("/agApps/ppf/ppfServer/entities/farmhouses/cycle");
+var init = require("../init");
+var util = require("/tests/util");
+
+var farmhouseManager = null; // farmManager instance under testing
+var farmKey = "";
+var farmhouseKey = "";
+
+jasmine.describe("Testing the FarmhouseManager class", function() {
+
+    jasmine.beforeAll(function(){   
+        
+		farmhouseManager = new farmhouseManagerModule.FarmhouseManager();  
+        farmKey = init.createFarm();
+        farmhouseKey = init.createFarmhouse(farmKey);
+    }); 
+
+    jasmine.beforeEach(function() {		
+        
+    });
+
+    jasmine.it("FarmhouseManager.listCycles() returns an array of n + 1 Farmhouse instancse", function() {
+
+        var initialCyclesCount = util.listDocumentsOfType("Cycle").length;
+        var cycleKey = init.createCycle(farmhouseKey); // create a cycle and link it to the farmhouse. 
+        try {
+
+            var list = farmhouseManager.listCycles(); 
+            jasmine.expect(list).not.toBeNull(null);
+            jasmine.expect(list.length).toBe(initialCyclesCount + 1); 
+            jasmine.expect(list[0].constructor.name).toBe("Cycle");
+            jasmine.expect(list[0].key).toBe(cycleKey);
+            jasmine.expect(list[0].farmhouse).toBe(farmhouseKey);
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally{
+           
+        }
+    });   
+    
+    jasmine.it("FarmhouseManager.getCycle() returns the correct instance of Cycle", function() {
+
+        var cycleKey = init.createCycle(farmhouseKey);
+        try {
+
+            var cycle = farmhouseManager.getCycle(cycleKey); 
+            jasmine.expect(cycle).not.toBeNull(null);
+            jasmine.expect(cycle.constructor.name).toBe("Cycle");
+            jasmine.expect(cycle.key).toBe(cycleKey);
+            jasmine.expect(cycle.farmhouse).toBe(farmhouseKey);
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally{
+            
+        }
+    });   
+    
+    jasmine.it("FarmhouseManager.updateCycle() actually updates a cycle in the store", function() {
+
+        cycleKey = init.createCycle(farmhouseKey);
+        try {
+
+            var cycle = new cycleModule.Cycle(util.getDocument(cycleKey)); 
+            var initialCurrentBirdCount = cycle.currentBirdCount;
+            var newCurrentBirdCount = initialCurrentBirdCount - 10;
+            cycle.currentBirdCount = newCurrentBirdCount;
+            farmhouseManager.updateCycle(cycle);
+            var updatedCycle = new cycleModule.Cycle(util.getDocument(cycleKey));
+            jasmine.expect(updatedCycle).not.toBeNull(null);          
+            jasmine.expect(updatedCycle.key).toBe(cycleKey);
+            jasmine.expect(updatedCycle.currentBirdCount).toBe(newCurrentBirdCount);
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally{
+            
+        }
+    });   
+   
+    jasmine.it("FarmhouseManager.updateCycle() actually creates a cycle in the store if it did not exist", function() {
+
+        var cycleData = init.createCycleData(farmhouseKey);
+        try {
+
+            var list = util.listDocumentsOfType("Cycle");
+            farmhouseManager.updateCycle(cycleData);          
+            var newList = util.listDocumentsOfType("Cycle");
+            jasmine.expect(newList).not.toBeNull(null);          
+            jasmine.expect(newList.length).toBe(list.length + 1);
+            var found = false;
+            for (var i = 0; !found && i < newList.length; i++) {
+                found = newList[i].currentBirdCount == cycleData.currentBirdCount
+            }
+            
+            jasmine.expect(found).toBe(true);
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally{
+           
+        }
+    });   
+    
+    jasmine.it("FarmhouseManager.deleteCycle() actually deletes a cycle from the store", function() {
+
+        var cycleKey = init.createCycle(farmhouseKey);
+        try {
+
+            try {
+          		
+                farmhouseManager.deleteCycle(cycleKey);
+                var cycle = util.getDocument(cycleKey);
+                jasmine.fail(); // if still here, should fail
+            }catch(exception){
+                jasmine.expect(true).toBe(true);
+            }
+        }catch(exception){
+            throw(JSON.stringify(exception));
+        }finally{
+           
+        }
+    });   
+
+    jasmine.afterEach(function(){        
+        
+    });
+    
+     jasmine.afterAll(function(){        
+        init.cleanup();
+    });
+});
+
+jasmine.execute();

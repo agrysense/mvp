@@ -11,6 +11,8 @@ const FARM_KEY_PREFIX = "TEST_FARM_";
 const FARM_NAME_PREFIX = "TEST_FARM_";
 const FARMHOUSE_KEY_PREFIX = "TEST_FARMHOUSE_";
 const FARMHOUSE_NAME_PREFIX = "TEST_FARMHOUSE_";
+const CYCLE_KEY_PREFIX = "TEST_CYCLE_";
+const CYCLE_NAME_PREFIX = "TEST_CYCLE_";
 const MAX_BIRDS = 2000;
 const MIN_BIRDS = 200;
 
@@ -23,7 +25,7 @@ function createFarmData() {
         "company": "acme",
         "name": FARM_NAME_PREFIX + uid,
         "location": "test",
-        "gps": gps(),       
+        "gps": util.gps(),       
         "meta.schema": "Farm"
     };
 
@@ -53,7 +55,7 @@ function createFarmhouseData(farmid, location) {
 
         "key": FARMHOUSE_KEY_PREFIX + uid,
         "name": FARMHOUSE_NAME_PREFIX + uid,
-        "gps": location ? location : gps(),
+        "gps": location ? location : util.gps(),
         "farm": farmid,
 		"description": "some farmhouse",
 		"category": category(),
@@ -80,9 +82,11 @@ function createFarmhouse(farmid, location) {
 function createCycleData(farmhouse) {
     
     var birdCount = Math.round(Math.random()  * (MAX_BIRDS - MIN_BIRDS)) + MIN_BIRDS;
+    var uid = util.guid();
     var data = {
         
-        "key": util.guid(),
+        "key": CYCLE_KEY_PREFIX + uid,
+        "cycleName": CYCLE_NAME_PREFIX + uid,
         "startDate": someDate(),
         "birdNbrIn": birdCount,
         "currentBirdCount": birdCount,
@@ -120,13 +124,6 @@ function cleanup() {
 
 }
 
-function gps() {
-
-    const choice = ["33.853378,35.616584", "33.852520,35.625431", "33.851157,35.619466", "34.032937,35.749176", "34.016917,35.731493"];
-    var location = choice[Math.round(Math.random() * (choice.length - 1))];
-    return location;
-}
-
 function category() {
     
     const choice = ["A", "B", "C", "D", "E"];
@@ -141,5 +138,5 @@ function size() {
 function someDate() {
     
     var days = Math.round(Math.random() * 10);
-    return util.getDateAfter(days);
+    return util.getDateAfter(null, days);
 }

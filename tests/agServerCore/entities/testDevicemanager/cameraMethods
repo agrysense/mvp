@@ -14,19 +14,23 @@ var controller = null; // reference controller
 jasmine.describe("Testing the DeviceManager class", function() {
 
     jasmine.beforeAll(function(){
+        
 		 deviceManager = new deviceManagerModule.DeviceManager();
+        
+        // create a reference controller
+        var key = init.createController();
+        controller = util.getDocument(key);
     }); 
 
     jasmine.beforeEach(function() {
        
-        // create a reference controller
-        var key = init.createController();
-        controller = util.getDocument(key);
     });
 
-    jasmine.it("deviceManager.listCameras() returns an array of 3 Camera instances", function() {
+    jasmine.it("deviceManager.listCameras() returns an array of n + 1 Camera instances", function() {
         
-        // create 1 camera. Attention: the controller already ships with 1 camera
+        var initialList = util.listDocumentsOfType("Camera");
+        
+        // create 1 camera. 
         var keys = [];
         for(var i = 0; i < 1; i++) {            
             keys[i] = init.createCamera(controller.key);
@@ -36,13 +40,13 @@ jasmine.describe("Testing the DeviceManager class", function() {
 
             var list = deviceManager.listCameras();
             jasmine.expect(list).not.toBeNull(null);
-            jasmine.expect(list.length).toBe(2);
+            jasmine.expect(list.length).toBe(initialList.length + 1);
             jasmine.expect(list[0].constructor.name).toBe("Camera");
             jasmine.expect(keys.indexOf(list[0].id)).not.toBeNull();
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally {
-            init.cleanup();   
+              
         }
     });
 
@@ -60,7 +64,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally {
-            init.cleanup();   
+            
         }
     });
 
@@ -80,7 +84,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally{
-            init.cleanup();   
+           
         }
     });
   
@@ -102,7 +106,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally {
-            init.cleanup();   
+           
         }
     });
 
@@ -125,7 +129,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally {
-            init.cleanup();   
+           
         }
     });
 
@@ -134,7 +138,7 @@ jasmine.describe("Testing the DeviceManager class", function() {
     });
 
     jasmine.afterAll(function(){        
-
+		 init.cleanup();   
     });
 });
 
