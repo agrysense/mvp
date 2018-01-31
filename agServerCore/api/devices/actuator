@@ -1,0 +1,83 @@
+/**
+ * Actuator API. Defines CRUD operations to manipulate actuators
+ * When creating a new actuator, send a POST request and pass the actuator's data in the request's body as JSON
+ * When updating an actuator, send a PUT request and pass the actuator's data in the request's body as JSON
+ * When getting a actuator, send a GET request and pass the actuator id at the end of the path (e.g. ".../api/devices/actuator/1234567")
+ * When listing actuators, send a GET request. Optionally, you can pass controller (id), pagNumber and resultsPerPage as parameters
+ * @module actuator
+ */
+
+var util = require("/agServerCore/lib/util");
+var deviceManagerModule = require("/agServerCore/entities/devices/deviceManager");
+var id = request.pathInfo; 
+var method = request.method;
+
+var deviceManager = new deviceManagerModule.DeviceManager();
+
+try {
+    
+    switch(method.toLowerCase()) {
+            
+        case "get": {
+
+            if (id) {
+                return getActuator(id);
+            }else {
+                return listActuators(request.parameters);
+            }
+        };break;
+        case "post": { 
+            
+            var body =  util.parse(request.body ? request.body : request.rawBody);
+            var result = updateActuator(body);
+            return result.document.key;
+        };break;
+        case "put": {
+            return updateActuator(id, request.body);
+        };break;
+        case "post": {
+            return deleteActuator(id);
+        }
+    };
+}catch(exception){
+    return exception;
+}
+
+/**
+ * @function listActuators
+ * @param {Object} [params]
+ * @param {String} [params.controller]: identifier of a controller to which the actuator is related (optional)
+ * @param {Number} [params.pageNumer]: number of the page to return when paginating (optional, defaults to 1)
+ * @param {Number} [params.resultsPerPage]: max number of results in one page (optional, defaults to 50)
+ * @return {Array}
+ */
+function listActuators(params) {
+    return deviceManager.listActuators(params);
+}
+
+/**
+ * @function getActuator
+ * @param {String} id: identifier of the actuator
+ * @return {Object}
+ */
+function getActuator(id) {
+    return deviceManager.getActuator(id);
+}
+
+/**
+ * @function updateActuator
+ * @param {Object} [data]: actuator data
+ * @return {String} the identifier of the actuator
+ */
+function updateActuator(data) {
+    return deviceManager.updateActuator(data);
+}
+
+/**
+ * @function deleteActuator
+ * @param {String} id: identifier of the actuator
+ * @return {Object}
+ */
+function deleteActuator(id) {
+    return deviceManager.deleteActuator(id);
+}

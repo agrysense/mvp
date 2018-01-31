@@ -1,0 +1,83 @@
+/**
+ * Sensor core API. Defines CRUD operations to manipulate sensor cores
+ * When creating a new sensor core, send a POST request and pass the sensor core's data in the request's body as JSON
+ * When updating a sensor core, send a PUT request and pass the sensor core's data in the request's body as JSON
+ * When getting a sensor core, send a GET request and pass the sensor core id at the end of the path (e.g. ".../api/devices/sensorcore/1234567")
+ * When listing sensors cores, send a GET request. Optionally, you can pass controller (id), pagNumber and resultsPerPage as parameters
+ * @module sensorcore
+ */
+
+var util = require("/agServerCore/lib/util");
+var deviceManagerModule = require("/agServerCore/entities/devices/deviceManager");
+var id = request.pathInfo; 
+var method = request.method;
+
+var deviceManager = new deviceManagerModule.DeviceManager();
+
+try {
+    
+    switch(method.toLowerCase()) {
+            
+        case "get": {
+
+            if (id) {
+                return getSensorCore(id);
+            }else {
+                return listSensorCores(request.parameters);
+            }
+        };break;
+        case "post": { 
+            
+            var body =  util.parse(request.body ? request.body : request.rawBody);
+            var result = updateSensorCore(body);
+            return result.document.key;
+        };break;
+        case "put": {
+            return updateSensorCore(id, request.body);
+        };break;
+        case "post": {
+            return deleteSensorCore(id);
+        }
+    };
+}catch(exception){
+    return exception;
+}
+
+/**
+ * @function listSensorCores
+ * @param {Object} [params]
+ * @param {String} [params.controller]: identifier of a controller to which the sensor core is related (optional)
+ * @param {Number} [params.pageNumer]: number of the page to return when paginating (optional, defaults to 1)
+ * @param {Number} [params.resultsPerPage]: max number of results in one page (optional, defaults to 50)
+ * @return {Array}
+ */
+function listSensorCores(params) {
+    return deviceManager.listSensorCores(params);
+}
+
+/**
+ * @function getSensorCore
+ * @param {String} id: identifier of the sensor core
+ * @return {Object}
+ */
+function getSensorCore(id) {
+    return deviceManager.getSensorCore(id);
+}
+
+/**
+ * @function updateSensorCore
+ * @param {Object} [data]: sensor core data
+ * @return {String} the identifier of the sensor core
+ */
+function updateSensorCore(data) {
+    return deviceManager.updateSensorCore(data);
+}
+
+/**
+ * @function deleteSensorCore
+ * @param {String} id: identifier of the sensor core
+ * @return {Object}
+ */
+function deleteSensorCore(data) {
+     return deviceManager.deleteSensorCore(id);
+}

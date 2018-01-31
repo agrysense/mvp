@@ -32,6 +32,8 @@ DeviceManager.prototype.constructor = DeviceManager;
  * @method listControllers
  * @param {Object} [dto]
  * @param {String} [dto.structure]: the identifier of the structure (e.g. farmhouse) where the controllers are deployed, optional
+ * @param {Number} [dto.pageNumber]: specifies the page number when paginating, optional, defaults to 1
+ * @param {Number} [dto.resultsPerPage]: specifies the max number of results per page (>50), optional, defaults to 50
  * @return {JSONArray<Controller>} 
  * @throws {Error}
  */
@@ -170,6 +172,11 @@ DeviceManager.prototype.getCamera = function(id) {
  * @throws {Error}
  */
 DeviceManager.prototype.updateCamera = function(dto) {
+    
+    if (dto.controller) {
+        this._checkIdExists(dto.controller, "controller", "DeviceManager.updateCamera");       
+    }
+    
     return this.updateObject(dto, CAMERA, "updateCamera");
 };
 
@@ -252,6 +259,15 @@ DeviceManager.prototype.getSensor = function(id) {
  * @throws {Error}
  */
 DeviceManager.prototype.updateSensor = function(dto) {
+    
+    if (dto.controller) {
+        this._checkIdExists(dto.controller, "controller", "DeviceManager.updateSensor");       
+    }
+    
+    if (dto.sensor_core) {
+        this._checkIdExists(dto.sensor_core, "sensor_core", "DeviceManager.updateSensor");       
+    }
+    
 	return this.updateObject(dto, SENSOR, "updateSensor");
 };
 
@@ -331,6 +347,11 @@ DeviceManager.prototype.getSensorCore = function(id) {
  * @throws {Error}
  */
 DeviceManager.prototype.updateSensorCore = function(dto) {
+    
+    if (dto.controller) {
+        this._checkIdExists(dto.controller, "controller", "DeviceManager.updateSensorCore");       
+    }
+    
     return this.updateObject(dto, SENSORCORE, "updateSensorCore");
 };
 
@@ -411,6 +432,11 @@ DeviceManager.prototype.getActuator = function(id) {
  * @throws {Error}
  */
 DeviceManager.prototype.updateActuator = function(dto) {
+    
+    if (dto.controller) {
+        this._checkIdExists(dto.controller, "controller", "DeviceManager.updateActuator");       
+    }
+    
     return this.updateObject(dto, ACTUATOR, "updateActuator");
 };
 
@@ -490,6 +516,11 @@ DeviceManager.prototype.getEquipment = function(id) {
  * @throws {Error}
  */
 DeviceManager.prototype.updateEquipment = function(dto) {
+    
+    if (dto.structure) {
+       this._checkIdExists(dto.structure, "structure", "DeviceManager.updateEquipment");       
+    }
+    
     return this.updateObject(dto, EQUIPMENT, "updateEquipment");
 };
 

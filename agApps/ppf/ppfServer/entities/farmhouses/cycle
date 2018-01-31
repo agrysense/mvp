@@ -6,6 +6,7 @@ var util = require("/agServerCore/lib/util");
 
 /**
  * Defines the Cycle object
+ * The key of the Cycle object should be <farmhouskey>_Cycle to make accessing cycles faster
  * @class  
  * @constructor
  * @param {Object} [dto] : initialization object. Should be a scriptr.io document that contains cycle data
@@ -22,18 +23,31 @@ Cycle.prototype = new componentModule.Component({inheritance: true});
 Cycle.prototype.constructor = Cycle;
 
 /**
- * End the cycle
+ * End the cycle. Persists the current cycle into another document before deleting the current cycle.
  * @method stop
  * @return {Object}
  * @throws {Error}
  */
 Cycle.prototype.stop = function() {
   
+    // update then backup the current cycle
     this.endDate = util.toShortDate();
     this.endBirdCount = this.currentBirdCount;
     var data = this.toJSONObject();
+    data["meta.schema"] = "Cycle";
+    data.key = this.key + "_DONE_" + util.toShortDate();
     var resp = document.save(data);
     if (resp.metadata.status == "failure"){
+        
+        log.error("Cycle.stop: problem occured when creating a backup document\n"+  JSON.stringify(resp));
+        throw resp;
+    }
+    
+    // delete current cycle document to allow for the creation of a new one
+    resp = document.delete(this.key);
+    if (resp.metadata.status == "failure"){
+        
+        log.error("Cycle.stop: problem occured when deleting cycle document\n"+  JSON.stringify(resp));
         throw resp;
     }
     

@@ -1,0 +1,83 @@
+/**
+ * Controller API. Defines CRUD operations to manipulate controllers
+ * When creating a new controller, send a POST request and pass the controller's data in the request's body as JSON
+ * When updating a controller, send a PUT request and pass the controller's data in the request's body as JSON
+ * When getting a controller, send a GET request and pass the controller id at the end of the path (e.g. ".../api/devices/controller/1234567")
+ * When listing controllers, send a GET request. Optionally, you can pass structure (id), pagNumber and resultsPerPage as parameters
+ * @module controller
+ */
+
+var util = require("/agServerCore/lib/util");
+var deviceManagerModule = require("/agServerCore/entities/devices/deviceManager");
+var id = request.pathInfo; 
+var method = request.method;
+
+var deviceManager = new deviceManagerModule.DeviceManager();
+
+try {
+    
+    switch(method.toLowerCase()) {
+            
+        case "get": {
+
+            if (id) {
+                return getController(id);
+            }else {
+                return listController(request.parameters);
+            }
+        };break;
+        case "post": { 
+            
+            var body =  util.parse(request.body ? request.body : request.rawBody);
+            var result = updateController(body);
+            return result.document.key;
+        };break;
+        case "put": {
+            return updateController(id, request.body);
+        };break;
+        case "post": {
+            return deleteController(id);
+        }
+    };
+}catch(exception){
+    return exception;
+}
+
+/**
+ * @function listController
+ * @param {Object} [params]
+ * @param {String} [params.structure]: identifier of a structure where the controller is deployed (e.g. farmhouse) (optional)
+ * @param {Number} [params.pageNumer]: number of the page to return when paginating (optional, defaults to 1)
+ * @param {Number} [params.resultsPerPage]: max number of results in one page (optional, defaults to 50)
+ * @return {Array}
+ */
+function listControllers(params) {
+    return deviceManager.listControllers(params);
+}
+
+/**
+ * @function getController
+ * @param {String} id: identifier of the sensor core
+ * @return {Object}
+ */
+function getController(id) {
+    return deviceManager.getController(id);
+}
+
+/**
+ * @function updateController
+ * @param {Object} [data]: controller data
+ * @return {String} the identifier of the sensor core
+ */
+function updateController(data) {
+    return deviceManager.updateController(data);
+}
+
+/**
+ * @function deleteController
+ * @param {String} id: identifier of the controller
+ * @return {Object}
+ */
+function deleteController(data) {
+     return deviceManager.deleteController(id);
+}

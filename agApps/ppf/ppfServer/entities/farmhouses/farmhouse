@@ -39,6 +39,8 @@ function Farmhouse(dto, farmhouseManager) {
         };
     }
 
+    this.cycleKey = this.key + "_Cycle";
+    this.startCycleKey = this.key + "Starting_Cycle";
     this.farmhouseManager = farmhouseManager;
     this.deviceManager = this.farmhouseManager.getDeviceManager();
 }
@@ -157,29 +159,64 @@ Farmhouse.prototype.addEquipment = function(dto) {
  */
 Farmhouse.prototype.startCycle = function(dto) {
 
-    var currentCycle = this.getCurrentCycle(); console.log(JSON.stringify("current cycle " + currentCycle))
-    if (currentCycle && currentCycle.endDate) {
+    var starting = true;
+    try {
 
-        throw {
-            errorCode: "Invalid_Action",
-            errorDetail: "Farmhouse.startCycle: a cycle (" + currentCycle.key + ") is already ongoing"
-        };
-    }
+        // this part is to deal with concurrent threads (checking if starting)
+        var resp = document.create({key: this.startCycleKey}); 
+        if (resp.metadata.status == "failure" &&  resp.metadata.errorCode == "DUPLICATE_DOCUMENT_KEY")   {
+           
+            starting = false;
+            log.error("Famrhouse.startCycle: could not start cycle for farmhouse: " + this.key + "\n" + JSON.stringify(resp));
+            throw {
+                errorCode: "Invalid_Action",
+                errorDetail: "Farmhouse.startCycle: a cycle for (" + this.key + ") is already starting"
+            };
 
-    if (!dto || !dto.birdNbrIn) {
-        
-        throw {
-            errorCode: "Missing_Parameter",
-            errorDetail: "Farmhouse.startCycle: dto.birdNbrIn has to be specified"
-        };
+        }
+
+        if (!dto || !dto.birdNbrIn) {
+
+            throw {
+                errorCode: "Missing_Parameter",
+                errorDetail: "Farmhouse.startCycle: dto.birdNbrIn has to be specified"
+            };
+        }
+
+        // checking if a cycle is already started (try to find if there is a cycle and if that cycle has not ended yet)
+        var currentCycle = this.getCurrentCycle(); 
+        if (currentCycle && !currentCycle.endDate) {
+
+            throw {
+                errorCode: "Invalid_Action",
+                errorDetail: "Farmhouse.startCycle: a cycle (" + currentCycle.key + ") is already ongoing"
+            };
+        }   
+
+        var data = JSON.parse(JSON.stringify(dto));
+        data.key = this.cycleKey;
+        data.farmhouse = this.key;
+        data.startDate = dto && dto.startDate ? util.toShortDate(dto.startDate) : util.toShortDate();
+        data.currentBirdCount = dto && dto.currentBirdCount ? dto.currentBirdCount : this.birdNbrIn;
+        data.endBirdCount = dto && dto.endBirdCount ? dto.endBirdCount : this.birdNbrIn;   
+        var result = this.farmhouseManager.updateCycle(data);
+        if (result.metadata.status == "failure") {
+
+            log.error("Famrhouse.startCycle: could not create cycle for this farmhouse " + this.key + "\n" + JSON.stringify(result));   
+            throw result.metadata;
+        }
+
+        return result;
+    }finally{
+
+        if (starting) {
+            
+            deleteResp = document.delete(this.startCycleKey);
+            if (resp.metadata.status == "failure") {
+                log.error("Famrhouse.startCycle: could not remove startingCycle lock for this farmhouse " + this.key + "\n" + JSON.stringify(resp));   
+            }
+        }
     }
-    
-    var data = JSON.parse(JSON.stringify(dto));
-    data.farmhouse = this.key;
-    data.startDate = dto && dto.startDate ? util.toShortDate(dto.startDate) : util.toShortDate();
-    data.currentBirdCount = dto && dto.currentBirdCount ? dto.currentBirdCount : this.birdNbrIn;
-    data.endBirdCount = dto && dto.endBirdCount ? dto.endBirdCount : this.birdNbrIn;
-    return this.farmhouseManager.updateCycle(data);
 };
 
 /**
@@ -190,24 +227,12 @@ Farmhouse.prototype.startCycle = function(dto) {
  */
 Farmhouse.prototype.getCurrentCycle = function() {
 
-    var dto = {
-
-        farmhouse: this.key,
-        resultsPerPage: 1,
-        filterExp: " endDate<date> is not null",
-        sortExp: "startDate<date:DESC>"
-    };
-
-    var cycleList = null;
     try {
-        cycleList = this.farmhouseManager.listCycles(dto);
-    }catch(exception){
-        log.info("Farmhouse.getCurrentCycle:\n" + JSON.stringify(exception));
-    }
 
-    if (cycleList.length > 0) {
-        return new cycleModule.Cycle(cycleList[0]);
-    }else{
+        var cycle = this.farmhouseManager.getCycle(this.cycleKey);
+        return cycle;
+    }catch(exception) {
+        // if here, means not found
         return null;
     }
 };

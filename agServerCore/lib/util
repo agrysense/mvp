@@ -1,7 +1,7 @@
 function removeMetaData(doc) {
-    
+
     var exclude = ["versionNumber", "creator", "lastModifiedDate", "lastModifiedBy", "creationDate", "schema", "latest", "meta.types", "meta.schema", "rootkey"];
-    
+
     var newDoc = {};
     if (doc) {
 
@@ -16,7 +16,7 @@ function removeMetaData(doc) {
             }        
         }
     }
-    
+
     return newDoc;
 }
 
@@ -25,15 +25,41 @@ function removeMetaData(doc) {
  * @return {String} YYYY-MM-DD
  */
 function toShortDate(date) {
-    
+
     var useDate = null;
     if (date) {
         useDate = (date instanceof Date) ? date : new Date(date); 
     }else {
         useDate = new Date();
     }
-    
+
     var dateStr = useDate.toISOString();
     dateStr = dateStr.substring(0, dateStr.indexOf("T"));
     return dateStr;
+}
+
+function parse(data) {
+
+    var obj = data;
+    var error = {
+
+        status: "failure",
+        errorCode: "Missing_Parameter",
+        errorDetail: "You need to send the data in the request's body as a JSON object"
+    };
+
+    if (!data) {
+        throw error;       
+    }
+
+    if (typeof(data) == "string") {
+
+        try {
+            obj = JSON.parse(request.rawBody);
+        }catch(exception){
+            throw error;
+        }
+    }
+
+    return obj;
 }

@@ -100,5 +100,27 @@ Manager.prototype.updateObject = function(dto, schema, caller) {
         throw resp.metadata;
     }
 
-    return resp;
+    return resp.result;
+};
+
+/*
+ * Generic method to check the existence of a given document with the provided key
+ * Will throw an exception if not found
+ * @param {String} id: the document key
+ * @param {String} field: the name of the "FK" field (e.g "controller" in an instance of "Camera")
+ * @param {String} method: the name of the invoking function
+ */
+Manager.prototype._checkIdExists = function(id, field, method) {
+    
+    // check if a document with the provided id exists
+    try {
+        this.getObject(id);
+    }catch(exception) {
+
+        log.error(method + "\n" + JSON.stringify(exception));
+        throw {
+            errorCode: "Entity_Not_Found",
+            errorDetail: method + " the following " + field + " does not exist " + id
+        };
+    }
 };

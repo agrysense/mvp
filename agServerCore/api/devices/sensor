@@ -1,0 +1,83 @@
+/**
+ * Camera API. Defines CRUD operations to manipulate sensors
+ * When creating a new sensor, send a POST request and pass the sensor's data in the request's body as JSON
+ * When updating a sensor, send a PUT request and pass the sensor's data in the request's body as JSON
+ * When getting a sensor, send a GET request and pass the sensor id at the end of the path (e.g. ".../api/devices/sensor/1234567")
+ * When listing sensors, send a GET request. Optionally, you can pass controller (id), pagNumber and resultsPerPage as parameters
+ * @module sensor
+ */
+
+var util = require("/agServerCore/lib/util");
+var deviceManagerModule = require("/agServerCore/entities/devices/deviceManager");
+var id = request.pathInfo; 
+var method = request.method;
+
+var deviceManager = new deviceManagerModule.DeviceManager();
+
+try {
+    
+    switch(method.toLowerCase()) {
+            
+        case "get": {
+
+            if (id) {
+                return getSensor(id);
+            }else {
+                return listSensors(request.parameters);
+            }
+        };break;
+        case "post": { 
+            
+            var body =  util.parse(request.body ? request.body : request.rawBody);
+            var result = updateSensor(body);
+            return result.document.key;
+        };break;
+        case "put": {
+            return updateSensor(id, request.body);
+        };break;
+        case "post": {
+            return deleteSensor(id);
+        }
+    };
+}catch(exception){
+    return exception;
+}
+
+/**
+ * @function listSensors
+ * @param {Object} [params]
+ * @param {String} [params.controller]: identifier of a controller to which the sensor is related (optional)
+ * @param {Number} [params.pageNumer]: number of the page to return when paginating (optional, defaults to 1)
+ * @param {Number} [params.resultsPerPage]: max number of results in one page (optional, defaults to 50)
+ * @return {Array}
+ */
+function listSensors(params) {
+    return deviceManager.listSensors(params);
+}
+
+/**
+ * @function getSensor
+ * @param {String} id: identifier of the sensor 
+ * @return {Object}
+ */
+function getSensor(id) {
+    return deviceManager.getSensor(id);
+}
+
+/**
+ * @function updateSensor
+ * @param {Object} [data]: sensor data
+ * @return {String} the identifier of the sensor core
+ */
+function updateSensor(data) {
+    return deviceManager.updateSensor(data);
+}
+
+/**
+ * @function deleteSensor
+ * @param {String} id: identifier of the sensor
+ * @return {Object}
+ */
+function deleteSensor(data) {
+     return deviceManager.deleteSensor(id);
+}

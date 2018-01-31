@@ -133,6 +133,24 @@ FarmManager.prototype.deleteFarm = function(farmid) {
         };
     }
     
+    // check if this farm has related data (farm houses, etc.)
+    var check = document.query({query: 'structure = "' + farmid + '" or farm="' + farmid + '"', field:'key'});
+    if (check.metadata.status == "failure") {
+        
+         throw {
+            errorCode: "Internal_Error",
+            errorDetail: "FarmManager.deleteFarm: check failed\n" + JSON.stringify(check)
+        };
+    }
+    
+    if (check.result.documents.length > 0) {
+        
+        throw {
+            errorCode: "Invalid_Action",
+            errorDetail: "FarmManager.deleteFarm: cannot delete a farm that has documents related to it"
+        };
+    }
+    
     var resp = document.delete(dto.key);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;

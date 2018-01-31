@@ -1,0 +1,82 @@
+/**
+ * Farm API. Defines CRUD operations to manipulate Farms
+ * When creating a new Farm, send a POST request and pass the farm's data in the request's body as JSON
+ * When updating a Farm, send a PUT request and pass the farm's data in the request's body as JSON
+ * When getting a farm, send a GET request and pass the farm id at the end of the path (e.g. ".../api/farm/1234567")
+ * When listing farms, send a GET request. Optionally, you can pagNumber and resultsPerPage as parameters
+ * @module farm
+ */
+
+var util = require("/agServerCore/lib/util");
+var farmManagerModule = require("/agApps/ppf/ppfServer/entities/farms/farmManager");
+var id = request.pathInfo; 
+var method = request.method;
+
+var farmManager = new farmManagerModule.FarmManager();
+
+try {
+    
+    switch(method.toLowerCase()) {
+            
+        case "get": {
+
+            if (id) {
+                return getFarm(id);
+            }else {
+                return listFarms(request.parameters);
+            }
+        };break;
+        case "post": { 
+            
+            var body =  util.parse(request.body ? request.body : request.rawBody);
+            var result = updateFarm(body);
+            return result.document.key;
+        };break;
+        case "put": {
+            return updateFarm(id, request.body);
+        };break;
+        case "post": {
+            return deleteFarm(id);
+        }
+    };
+}catch(exception){
+    return exception;
+}
+
+/**
+ * @function listFarms
+ * @param {Object} [params]
+ * @param {Number} [params.pageNumer]: number of the page to return when paginating (optional, defaults to 1)
+ * @param {Number} [params.resultsPerPage]: max number of results in one page (optional, defaults to 50)
+ * @return {Array}
+ */
+function listFarms(params) {
+    return farmManager.listFarms(params);
+}
+
+/**
+ * @function getFarm
+ * @param {String} id: identifier of the farm
+ * @return {Object}
+ */
+function getFarm(id) {
+    return farmManager.getFarm(id);
+}
+
+/**
+ * @function updateFarm
+ * @param {Object} [data]: farm data
+ * @return {String} the identifier of the sensor core
+ */
+function updateFarm(data) {
+    return farmManager.updateFarm(data);
+}
+
+/**
+ * @function deleteFarm
+ * @param {String} id: identifier of the farm
+ * @return {Object}
+ */
+function deleteFarm(id) {
+    return farmManager.deleteFarm(id);
+}

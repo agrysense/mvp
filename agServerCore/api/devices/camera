@@ -1,0 +1,83 @@
+/**
+ * Camera API. Defines CRUD operations to manipulate cameras
+ * When creating a new camera, send a POST request and pass the camera's data in the request's body as JSON
+ * When updating a camera, send a PUT request and pass the camera's data in the request's body as JSON
+ * When getting a camera, send a GET request and pass the camera id at the end of the path (e.g. ".../api/devices/camera/1234567")
+ * When listing cameras, send a GET request. Optionally, you can pass controller (id), pagNumber and resultsPerPage as parameters
+ * @module camera
+ */
+
+var util = require("/agServerCore/lib/util");
+var deviceManagerModule = require("/agServerCore/entities/devices/deviceManager");
+var id = request.pathInfo; 
+var method = request.method;
+
+var deviceManager = new deviceManagerModule.DeviceManager();
+
+try {
+    
+    switch(method.toLowerCase()) {
+            
+        case "get": {
+
+            if (id) {
+                return getCamera(id);
+            }else {
+                return listCameras(request.parameters);
+            }
+        };break;
+        case "post": { 
+            
+            var body =  util.parse(request.body ? request.body : request.rawBody);
+            var result = updateCamera(body);
+            return result.document.key;
+        };break;
+        case "put": {
+            return updateCamera(id, request.body);
+        };break;
+        case "post": {
+            return deleteCamera(id);
+        }
+    };
+}catch(exception){
+    return exception;
+}
+
+/**
+ * @function listCameras
+ * @param {Object} [params]
+ * @param {String} [params.controller]: identifier of the controller to which the camera is related (optional)
+ * @param {Number} [params.pageNumer]: number of the page to return when paginating (optional, defaults to 1)
+ * @param {Number} [params.resultsPerPage]: max number of results in one page (optional, defaults to 50)
+ * @return {Array}
+ */
+function listCameras(params) {
+    return deviceManager.listCameras(params);
+}
+
+/**
+ * @function getCamera
+ * @param {String} id: identifier of the camera
+ * @return {Object}
+ */
+function getCamera(id) {
+    return deviceManager.getCamera(id);
+}
+
+/**
+ * @function updateCamera
+ * @param {Object} [data]: camera data
+ * @return {String} the identifier of the camera
+ */
+function updateCamera(data) {
+    return deviceManager.updateSensorCore(data);
+}
+
+/**
+ * @function deleteCamera
+ * @param {String} id: identifier of the camera
+ * @return {Object}
+ */
+function deleteCamera(id) {
+    return deviceManager.deleteCamera(id);
+}

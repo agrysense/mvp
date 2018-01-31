@@ -99,6 +99,11 @@ FarmhouseManager.prototype.getFarmhouse = function(id) {
  * @throws {Error}
  */
 FarmhouseManager.prototype.updateFarmhouse = function(dto) {
+    
+    if (dto.farm) {
+       this._checkIdExists(dto.farm, "farm", "FarmhouseManager.updateFarmhouse");       
+    }
+    
     return this.updateObject(dto, FARMHOUSE, "updateFarmhouse");
 };
 
@@ -115,7 +120,7 @@ FarmhouseManager.prototype.deleteFarmhouse = function(id) {
 
 /**
  * @method listCycles
- * @param {String} [dto.farmhouse]: optional, filter by farmhouses related to this farm (key)
+ * @param {String} [dto.farmhouse]: optional, filter by farmhouse (key)
  * @param {Number} [dto.resultsPerPage]: how many results to return per call (optional, defaults to 50)
  * @param {Number} [dto.pageNumber]: the page number in case there are more than one pages of results (optional, defaults to 1)
  * @param {String} [dto.filterExp]: optional, a filter expression, e.g. "fieldX<numeric> = 123"
@@ -127,62 +132,45 @@ FarmhouseManager.prototype.listCycles = function(dto) {
 
     var queryParam = {
 
-        "apsdb.query": 'apsdb.schema="' + CYCLE + '"',
-        "apsdb.queryFields": "*",
-        "apsdb.count": "true",
-        "apsdb.lock": "true",
-        "apsdb.resultsPerPage": "" + ((!dto || !dto.resultsPerPage) ? 50 : dto.resultsPerPage),
-        "apsdb.pageNumber": "" + ((!dto || !dto.pageNumber) ? 1 : dto.pageNumber)
+        "query": 'apsdb.schema="' + CYCLE + '"',
+        "queryFields": "*",
+        "count": "true",
+        "resultsPerPage": "" + ((!dto || !dto.resultsPerPage) ? 50 : dto.resultsPerPage),
+        "pageNumber": "" + ((!dto || !dto.pageNumber) ? 1 : dto.pageNumber)
     };
-	
-    log.info(JSON.stringify(queryParam))
-    
+
     if (dto && dto.farmhouse) {
-        queryParam["apsdb.query"] += ' and farmhouse="'+ dto.farmhouse + '"';
+        queryParam["query"] += ' and farmhouse="'+ dto.farmhouse + '"';
     }
-    
+
     if (dto && dto.filterExp) {
-        queryParam["apsdb.query"] += ' and ' + dto.filterExp;
+        queryParam["query"] += ' and ' + dto.filterExp;
     }
-    
+
     if (dto && dto.sortExp) {
-        queryParam["apsdb.sort"] = dto.sortExp;
+        queryParam["sort"] = dto.sortExp;
     }
 
     var transaction = null;
     var result = [];
-    try {
-        
-        transaction = apsdb.beginTransaction();
-        //var resp = document.query(queryParam);  
-        var resp = apsdb.callApi("Query", queryParam, null);
-        if (resp.metadata.status == "failure") {
-            throw resp.metadata;
-        }
 
-        if (!resp.result.documents){
-            throw {
-                errorCode: "Entity_Not_Found",
-                errorDetail: "FarmManager.listCycles: could not find cycles"
-            };
-        }
-
-
-        for (var i=0; i < resp.result.documents.length; i++) {
-            result.push(new cycleModule.Cycle(resp.result.documents[i]));
-        }
-	
-        transaction.commit();
-    	return result;
-    }catch(exception){
-        
-        log.error("Error while querying cycles\n" + JSON.stringify(exception));
-        if (transaction){
-            transaction.rollback();
-        }
-        
-        throw exception;
+    var resp = document.query(queryParam);  
+    if (resp.metadata.status == "failure") {
+        throw resp.metadata;
     }
+
+    if (!resp.result.documents){
+        throw {
+            errorCode: "Entity_Not_Found",
+            errorDetail: "FarmManager.listCycles: could not find cycles"
+        };
+    }
+
+    for (var i=0; i < resp.result.documents.length; i++) {
+        result.push(new cycleModule.Cycle(resp.result.documents[i]));
+    }
+
+    return result;
 };
 
 /**
@@ -205,6 +193,11 @@ FarmhouseManager.prototype.getCycle = function(id) {
  * @throws {Error}
  */
 FarmhouseManager.prototype.updateCycle = function(dto) {
+    
+    if (dto.farmhouse) {
+       this._checkIdExists(dto.farm, "farmhouse", "FarmhouseManager.updateCycle");       
+    }
+    
     return this.updateObject(dto, CYCLE, "updateCycle");
 };
 

@@ -1,0 +1,153 @@
+/**
+ * FarmHouse API. Defines CRUD operations to manipulate farmhouses
+ * When creating a new farmhouse, send a POST request and pass the farmhouse's data in the request's body as JSON (../api/farmhouse)
+ * When updating a farmhouse, send a PUT request and pass the farmhouse's data in the request's body as JSON (.../api/farmhouse/123456)
+ * When getting a farmhouse, send a GET request and pass the farmhouse id at the end of the path (e.g. ".../api/farmhouse/123456")
+ * When listing farmhouses, send a GET request. Optionally, you can pass farm (id), pagNumber and resultsPerPage as parameters
+ * To list the cycles of a farmhouse, send a GET request to "../api/id/cycle"
+ * To get a specific cycle, send a GET request to "../api/farmhouse/id/cycle/cycleid"
+ * To start a cycle, send a PUT request to "../api/farmhouse/id/cycle"
+ * To update a cycle, send a PUT request to "../id/farmhouse/id/cycle/cycleid"  + cycle data in JSON body
+ * To stop a cycle, send a DELETE request to "../api/farmhouse/id/cycle/cycleid"
+ * @module farmhouse
+ */
+
+var util = require("/agServerCore/lib/util");
+var farmhouseManagerModule = require("/agApps/ppf/ppfServer/entities/farmhouse/farmhouseManager");
+
+var pathInfo = request.pathInfo.split("/");
+var id = pathInfo.length > 0 ? pathInfo[0] : null;
+var cycleReq = pathInfo.length > 1 && pathInfo[1] == "cycle" ? true : false;
+var cycleId = pathInfo.length > 2 ? pathInfo[2] : null; 
+
+var method = request.method;
+
+var farmhouseManager = new farmhouseManagerModule.FarmhouseManager();
+
+try {
+
+    switch(method.toLowerCase()) {
+
+        case "get": {
+			resolveGet();
+        };break;
+        case "post": { 
+			
+            var body =  util.parse(request.body ? request.body : request.rawBody);
+            var result = updateFarmhouse(body);
+            return result.document.key;
+        };break;
+        case "put": {
+            
+            var body =  util.parse(request.body ? request.body : request.rawBody);
+            return resolvePut(body);
+            return updateFarmhouse(id, request.body);
+        };break;
+        case "post": {
+            return deleteFarmhouse(id);
+        }
+    };
+}catch(exception){
+    return exception;
+}
+
+
+function resolveGet() {
+
+    if (!id) {
+        return listFarmhouses(request.parameters);
+    }
+    
+    if (id && !cycleReq) {
+         return getFarmhouse(id);
+    }
+    
+    if (cycleReq && !cycleId) {
+        return listCycles(id);
+    }
+    
+    if (cycleReq && cycleId) {
+        return getCycle(cycleId); 
+    }
+}
+
+function resolvePut(body) {
+
+    if (!id) {
+        return listFarmhouses(request.parameters);
+    }
+    
+    if (isGetFarmhouse) {
+         return getFarmhouse(id);
+    }
+    
+    if (isListCycles) {
+        return listCycles(id);
+    }
+    
+    if (isGetCycle) {
+        return getCycle(cycleId); 
+    }
+}
+
+function resolvePut() {
+
+}
+
+function resolveDelete() {
+
+}
+
+/**
+ * @function listFarmhouses
+ * @param {Object} [params]
+ * @param {Number} [params.pageNumer]: number of the page to return when paginating (optional, defaults to 1)
+ * @param {Number} [params.resultsPerPage]: max number of results in one page (optional, defaults to 50)
+ * @return {Array}
+ */
+function listFarmhouses(params) {
+    return farmhouseManager.listFarmhouses(params);
+}
+
+/**
+ * @function getFarmhouse
+ * @param {String} id: identifier of the farmhouse
+ * @return {Object}
+ */
+function getFarmhouse(id) {
+    return farmhouseManager.getFarmhouse(id);
+}
+
+/**
+ * @function updateFarmhouse
+ * @param {Object} [data]: farmhouse data
+ * @return {String} the identifier of the sensor core
+ */
+function updateFarmhouse(data) {
+    return farmhouseManager.updateFarmhouse(data);
+}
+
+/**
+ * @function deleteFarmhouse
+ * @param {String} id: identifier of the farm
+ * @return {Object}
+ */
+function deleteFarmhouse(id) {
+    return farmhouseManager.deleteFarmhouse(id);
+}
+
+/**
+ * @function listCycles
+ * @param {String} farmhouseid: the identifier of the farmhouse
+ */
+function listCycles(farmhouseid) {
+    return farmhouseManager.listCycles({farmhouse:farmhouseid});
+}
+
+/**
+ * @function getCycle
+ * @param {String} cycleid: the identifier of the cycle
+ */
+function getCycle(cycleid) {
+    return farmhouseManager.getCycle(cycleid);
+}
