@@ -37,3 +37,5 @@ When testing, you should make sure to proceed in the following order:
 - Run the delete test of the controller
 - Run the delete test of the farmhouse
 - Run the delete test of the farm
+
+**Important**: use the documents keys obtained at each step when you need to refer to other documents
