@@ -83,14 +83,15 @@ jasmine.describe("Testing the FarmhouseManager class", function() {
         }
     });   
    
-    jasmine.it("FarmhouseManager.updateCycle() actually creates a cycle in the store if it did not exist", function() {
+    jasmine.it("FarmhouseManager.updateCycle() does not creates a new cycle in the store if it did not exist", function() {
 
         var cycleData = init.createCycleData(farmhouseKey);
+        delete cycleData.key;
         try {
 
-            var list = util.listDocumentsOfType("Cycle");
+            var list = util.listDocumentsOfType("Cycle");console.log(JSON.stringify(list));
             farmhouseManager.updateCycle(cycleData);          
-            var newList = util.listDocumentsOfType("Cycle");
+            var newList = util.listDocumentsOfType("Cycle");console.log(JSON.stringify(newList));
             jasmine.expect(newList).not.toBeNull(null);          
             jasmine.expect(newList.length).toBe(list.length + 1);
             var found = false;

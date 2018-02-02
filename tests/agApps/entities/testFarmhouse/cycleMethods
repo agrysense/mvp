@@ -20,7 +20,9 @@ jasmine.describe("Testing the FarmhouseManager class", function() {
 
         farmhouseManager = new farmhouseManagerModule.FarmhouseManager();  
         farmKey = init.createFarm();
-        farmhouse = new farmhouseModule.Farmhouse(init.createFarmhouseData(farmKey), farmhouseManager);
+        var farmhouseKey = init.createFarmhouse(farmKey);
+        var farmhouseDoc = util.getDocument(farmhouseKey);
+        farmhouse = new farmhouseModule.Farmhouse(farmhouseDoc, farmhouseManager);
     }); 
 
     jasmine.beforeEach(function() {		
@@ -72,13 +74,14 @@ jasmine.describe("Testing the FarmhouseManager class", function() {
 
     jasmine.it("Farmhouse.getCurrentCycle() returns the current instance of Cycle for the farmhouse", function() {
 
-        var cycleKey = init.createCycle(farmhouse.key);
+        var cycleData = init.createCycleData(farmhouse.key);
         try {
 
+            farmhouse.startCycle(cycleData);
             var cycle = farmhouse.getCurrentCycle(); 
             jasmine.expect(cycle).not.toBeNull(null);
             jasmine.expect(cycle.constructor.name).toBe("Cycle");
-            jasmine.expect(cycle.key).toBe(cycleKey);
+            jasmine.expect(cycle.key).toBe(cycleData.key);
             jasmine.expect(cycle.farmhouse).toBe(farmhouse.key);
         }catch(exception){
             throw(JSON.stringify(exception));
@@ -96,17 +99,21 @@ jasmine.describe("Testing the FarmhouseManager class", function() {
             farmhouse.stopCycle();
             var cycle = farmhouse.getCurrentCycle();
             jasmine.expect(cycle).toBe(null);
-            var cycleList = util.listDocumentsOfType("Cycle");           
-            var cycleMatching = 0;
-            for (var i = 0; i < cycleList.length; i++) {
-                cycleMatching += (cycleList[i].farmhouse == farmhouse.key) ? 1 : cycleMatching;
+            var cycleList = util.listDocumentsOfType("Cycle");
+            try {
+                
+                document.get(cycleData.key);
+                jasmine.fail()
+            }catch(exception){
+                jasmine.expect(true).toBe(true);
             }
-
-            jasmine.expect(cycleMatching).toBe(0);
+            
+            var backedupCyclesList = util.listDocumentsOfType("Cycle");
+            jasmine.expect(backedupCyclesList.length).toBe(1); // one backup document created
         }catch(exception){
             throw(JSON.stringify(exception));
         }finally{
-
+			
         }
     });   
 

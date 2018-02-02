@@ -13,6 +13,8 @@ const FARMHOUSE_KEY_PREFIX = "TEST_FARMHOUSE_";
 const FARMHOUSE_NAME_PREFIX = "TEST_FARMHOUSE_";
 const CYCLE_KEY_PREFIX = "TEST_CYCLE_";
 const CYCLE_NAME_PREFIX = "TEST_CYCLE_";
+const EQUIPMENT_KEY_PREFIX = "TEST_EQUIPMENT_";
+const EQUIPMENT_NAME_PREFIX = "TEST_EQUIPMENT_";
 const MAX_BIRDS = 2000;
 const MIN_BIRDS = 200;
 
@@ -85,7 +87,8 @@ function createCycleData(farmhouse) {
     var uid = util.guid();
     var data = {
         
-        "key": CYCLE_KEY_PREFIX + uid,
+        //key": CYCLE_KEY_PREFIX + uid,
+        "key": farmhouse + "_Cycle",
         "cycleName": CYCLE_NAME_PREFIX + uid,
         "startDate": someDate(),
         "birdNbrIn": birdCount,
@@ -108,6 +111,33 @@ function createCycle(farmhouse) {
     return data.key;
 }
 
+function createEquipmentData(farmhouse) {
+   
+    var data = {
+        
+        key: EQUIPMENT_KEY_PREFIX + util.guid(),
+        type: someEquipment(),
+        howMany: Math.round(Math.random() * 5 + 1),
+        dateAdded: util.toShortDate(),
+        location: util.gps(),
+        structure: farmhouse ? farmhouse : "",
+        "meta.schema": "Equipment"
+    };
+    
+    return data;
+}
+
+function createEquipment(farmhouse) {
+    
+    var data = createEquipmentData(farmhouse);
+    var resp = document.save(data);    
+    if (resp.metadata.status == "failure") {
+        throw(JSON.stringify(resp.metadata));
+    }
+
+    return data.key;
+} 
+
 // Caution: should be called after every test suite to make sure there aren't too many documents to delete
 function cleanup() {
 
@@ -119,6 +149,9 @@ function cleanup() {
     
      // delete all cycles
     util.deleteDocumentsOfType("Cycle");
+    
+    // delete all equipments
+    util.deleteDocumentsOfType("Equipment");
     
     initCore.cleanup();
 
@@ -139,4 +172,11 @@ function someDate() {
     
     var days = Math.round(Math.random() * 10);
     return util.getDateAfter(null, days);
+}
+
+function someEquipment() {
+    
+    var types = ["X", "Y", "Z", "T", "U", "V"];
+    var type = types[Math.round(Math.random() * (types.length - 1))];
+    return type;
 }

@@ -68,7 +68,7 @@ jasmine.describe("Testing the FarmhouseManager class", function() {
             var initialLocation = farmhouse.location;
             var newLocation = "";
             do{
-                newLocation = init.gps();
+                newLocation = util.gps();
             }while(newLocation ==  farmhouse.location);
             
             farmhouse.location = newLocation;
