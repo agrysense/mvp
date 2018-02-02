@@ -1,5 +1,5 @@
 /**
- * Camera API. Defines CRUD operations to manipulate sensors
+ * Sensor API. Defines CRUD operations to manipulate sensors
  * When creating a new sensor, send a POST request and pass the sensor's data in the request's body as JSON
  * When updating a sensor, send a PUT request and pass the sensor's data in the request's body as JSON
  * When getting a sensor, send a GET request and pass the sensor id at the end of the path (e.g. ".../api/devices/sensor/1234567")

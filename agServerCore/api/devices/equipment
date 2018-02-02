@@ -1,0 +1,95 @@
+/**
+ * Equipment API. Defines CRUD operations to manipulate equipments
+ * When creating a new equipment, send a POST request and pass the equipment's data in the request's body as JSON
+ * When updating a equipment, send a PUT request and pass the sensor's data in the request's body as JSON
+ * When getting a equipment, send a GET request and pass the sensor id at the end of the path (e.g. ".../api/devices/sensor/1234567")
+ * When listing equipment, send a GET request. Optionally, you can pass structure (id), pagNumber and resultsPerPage as parameters
+ * @module sensor
+ */
+
+var util = require("/agServerCore/lib/util");
+var deviceManagerModule = require("/agServerCore/entities/devices/deviceManager");
+var id = request.pathInfo; 
+var method = request.method;
+
+var deviceManager = new deviceManagerModule.DeviceManager();
+
+try {
+    
+    switch(method.toLowerCase()) {
+            
+        case "get": {
+
+            if (id) {
+                return getEquipment(id);
+            }else {
+                return listEquipments(request.parameters);
+            }
+        };break;
+        case "post": { 
+            
+            var body =  util.parse(request.body ? request.body : request.rawBody);
+            var result = createEquipment(body);
+            return result;
+        };break;
+        case "put": {
+            return updateEquipment(id, request.body);
+        };break;
+        case "delete": {
+            return deleteEquipment(id);
+        }
+    };
+}catch(exception){
+    return exception;
+}
+
+/**
+ * @function listEquipments
+ * @param {Object} [params]
+ * @param {String} [params.controller]: identifier of a controller to which the sensor is related (optional)
+ * @param {Number} [params.pageNumer]: number of the page to return when paginating (optional, defaults to 1)
+ * @param {Number} [params.resultsPerPage]: max number of results in one page (optional, defaults to 50)
+ * @return {Array}
+ */
+function listEquipments(params) {
+    return deviceManager.listEquipments(params);
+}
+
+/**
+ * @function getEquipment
+ * @param {String} id: identifier of the equipment 
+ * @return {Object}
+ */
+function getEquipment(id) {
+    return deviceManager.getEquipment(id);
+}
+
+/**
+ * @function createEquipment
+ * @param {Object} [data]: sensor data
+ * @return {Object} {key: the identifier of the equipment, version: document version}
+ */
+function createEquipment(data) {
+    return deviceManager.createEquipment(data);
+}
+
+/**
+ * @function updateEquipment
+ * @param {String} id: the identifier of the equipment
+ * @param {Object} [data]: sensor data
+ * @return {Object} {key: the identifier of the equipment, version: document version}
+ */
+function updateEquipment(id, data) {
+    
+    data.key = id;
+    return deviceManager.updateSensor(data);
+}
+
+/**
+ * @function deleteEquipment
+ * @param {String} id: identifier of the equipment
+ * @return {Object}
+ */
+function deleteEquipment(data) {
+     return deviceManager.deleteEquipment(id);
+}
