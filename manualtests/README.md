@@ -1,6 +1,6 @@
 **About**
 
-This folder contains the definitions of manual tests that were created in Postman, gathered in a Postman collection the exported as a JSON file. 
+This folder contains the definitions of manual tests that were created in Postman, gathered in a Postman collection then exported as a JSON file. 
 You can import them back to Postman to re-execute them. Note that you will have to change the different document keys that are used in the test file, as described in the below.
 
 **Importing the test file to Postman**
