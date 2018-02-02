@@ -29,13 +29,12 @@ try {
         case "post": { 
             
             var body =  util.parse(request.body ? request.body : request.rawBody);
-            var result = updateActuator(body);
-            return result.document.key;
+            return createActuator(body);
         };break;
         case "put": {
             return updateActuator(id, request.body);
         };break;
-        case "post": {
+        case "delete": {
             return deleteActuator(id);
         }
     };
@@ -65,11 +64,23 @@ function getActuator(id) {
 }
 
 /**
- * @function updateActuator
+ * @function createActuator
  * @param {Object} [data]: actuator data
  * @return {String} the identifier of the actuator
  */
-function updateActuator(data) {
+function createActuator(data) {
+    return deviceManager.updateActuator(data);
+}
+
+/**
+ * @function updateActuator
+ * @param {String} id: the identifier of the actuator
+ * @param {Object} [data]: actuator data
+ * @return {String} the identifier of the actuator
+ */
+function updateActuator(id, data) {
+    
+    data.key = id;
     return deviceManager.updateActuator(data);
 }
 

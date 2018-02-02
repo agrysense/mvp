@@ -78,10 +78,10 @@ DeviceManager.prototype.listControllers = function(dto) {
  * @throws {Error}
  */
 DeviceManager.prototype.getController = function(controllerid) {
-	
+
     var doc = this.getObject(controllerid, "getController");
     return new controllerModule.Controller(doc, this);
-}
+};
 
 /**
  * updates a Controller object. If it doesn't exist, the method creates it
@@ -91,7 +91,7 @@ DeviceManager.prototype.getController = function(controllerid) {
  * @throws {Error}
  */
 DeviceManager.prototype.updateController = function(dto) {
-	return this.updateObject(dto, CONTROLLER, "updateController");
+    return this.updateObject(dto, CONTROLLER, "updateController");
 };
 
 /**
@@ -102,8 +102,8 @@ DeviceManager.prototype.updateController = function(dto) {
  * @throws {Error}
  */
 DeviceManager.prototype.deleteController = function(controllerid) {
-    this.deleteObject(controllerid, "deleteController");
-}
+    return this.deleteObject(controllerid, "deleteController");
+};
 
 /**
  * lists available cameras according to the given search criteria
@@ -159,7 +159,7 @@ DeviceManager.prototype.listCameras = function(dto) {
  * @throws {Error}
  */
 DeviceManager.prototype.getCamera = function(id) {
-	
+
     var doc = this.getObject(id, "getCamera");
     return new cameraModule.Camera(doc);
 };
@@ -172,11 +172,11 @@ DeviceManager.prototype.getCamera = function(id) {
  * @throws {Error}
  */
 DeviceManager.prototype.updateCamera = function(dto) {
-    
+
     if (dto.controller) {
         this._checkIdExists(dto.controller, "controller", "DeviceManager.updateCamera");       
     }
-    
+
     return this.updateObject(dto, CAMERA, "updateCamera");
 };
 
@@ -189,7 +189,7 @@ DeviceManager.prototype.updateCamera = function(dto) {
  * @throws {Error}
  */
 DeviceManager.prototype.deleteCamera = function(id) {
-    this.deleteObject(id, "deleteCamera");
+    return this.deleteObject(id, "deleteCamera");
 };
 
 /**
@@ -197,6 +197,7 @@ DeviceManager.prototype.deleteCamera = function(id) {
  * @method listSensors
  * @param {Object} [dto] optional search criteria and pagination
  * @param {String} [dto.controller]: the identifier of the controller to which pertains the sensors (optional)
+ * @param {String} [dto.sensor_core]: the identifier of the sensor_core to which pertains the sensors (optional)
  * @param {Number} [dto.resultsPerPage]: how many results to return per call (optional, defaults to 50)
  * @param {Number} [dto.pageNumber]: the page number in case there are more than one pages of results (optional, defaults to 1)
  * @return {JSONArray<Sensor>} 
@@ -206,16 +207,20 @@ DeviceManager.prototype.listSensors = function(dto) {
 
     dto = dto ? dto : {};
     var queryParam = {
-       
+
         query: 'apsdb.schema="' + SENSOR + '"',
         fields: "*",
         count: true,
         resultsPerPage: (!dto || !dto.resultsPerPage) ? 50 : dto.resultsPerPage,
         pageNumber: (!dto || !dto.pageNumber) ? 1 : dto.pageNumber
     };
-    
+
     if (dto.controller) {
-         queryParam.query += ' and controller="'+ dto.controller + '"';
+        queryParam.query += ' and controller="'+ dto.controller + '"';
+    }
+    
+    if (dto.sensor_core) {
+        queryParam.query += ' and sensor_core="'+ dto.sensor_core + '"';
     }
 
     var resp = document.query(queryParam);
@@ -246,8 +251,8 @@ DeviceManager.prototype.listSensors = function(dto) {
  * @throws {Error}
  */
 DeviceManager.prototype.getSensor = function(id) {
-    
-	var doc = this.getObject(id, "getSensor");
+
+    var doc = this.getObject(id, "getSensor");
     return new sensorModule.Sensor(doc);
 };
 
@@ -259,16 +264,25 @@ DeviceManager.prototype.getSensor = function(id) {
  * @throws {Error}
  */
 DeviceManager.prototype.updateSensor = function(dto) {
-    
+
     if (dto.controller) {
         this._checkIdExists(dto.controller, "controller", "DeviceManager.updateSensor");       
     }
-    
+
     if (dto.sensor_core) {
         this._checkIdExists(dto.sensor_core, "sensor_core", "DeviceManager.updateSensor");       
     }
-    
-	return this.updateObject(dto, SENSOR, "updateSensor");
+
+    if (!dto.key && !dto.controller && !dto.sensor_core) {
+
+        throw {
+
+            errorCode: "Invalid_Parameter",
+            errorDetail: "DeviceManager.updateSensor: you need to pass dto.controller or dto.sensor_core if creating a new sensor"
+        };
+    }
+
+    return this.updateObject(dto, SENSOR, "updateSensor");
 };
 
 /**
@@ -279,7 +293,7 @@ DeviceManager.prototype.updateSensor = function(dto) {
  * @throws {Error}
  */
 DeviceManager.prototype.deleteSensor = function(id) {
-     this.deleteObject(id, "deleteSensor");
+    return this.deleteObject(id, "deleteSensor");
 };
 
 /**
@@ -293,9 +307,9 @@ DeviceManager.prototype.deleteSensor = function(id) {
  * @throws {Error}
  */
 DeviceManager.prototype.listSensorCores = function(dto) {
-    
+
     var queryParam = {
-        
+
         query: 'apsdb.schema="' + SENSORCORE + '"',
         fields: "*",
         count: true,
@@ -306,13 +320,14 @@ DeviceManager.prototype.listSensorCores = function(dto) {
     if (dto && dto.controller) {
         queryParam.query += ' and controller="'+ dto.controller + '"';
     }
-    
+
     var resp = document.query(queryParam);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
 
     if (!resp.result.documents){
+
         throw {
             errorCode: "Entity_Not_Found",
             errorDetail: "DeviceManager.listSensorCores: could not find sensorcores"
@@ -334,7 +349,7 @@ DeviceManager.prototype.listSensorCores = function(dto) {
  * @throws {Error}
  */
 DeviceManager.prototype.getSensorCore = function(id) {
-    
+
     var doc = this.getObject(id, "getSensorCore");
     return new sensorCoreModule.SensorCore(doc);
 };
@@ -347,11 +362,11 @@ DeviceManager.prototype.getSensorCore = function(id) {
  * @throws {Error}
  */
 DeviceManager.prototype.updateSensorCore = function(dto) {
-    
+
     if (dto.controller) {
         this._checkIdExists(dto.controller, "controller", "DeviceManager.updateSensorCore");       
     }
-    
+
     return this.updateObject(dto, SENSORCORE, "updateSensorCore");
 };
 
@@ -377,16 +392,16 @@ DeviceManager.prototype.deleteSensorCore = function(id) {
  * @throws {Error}
  */
 DeviceManager.prototype.listActuators = function(dto) {
-    
+
     var queryParam = {
-        
+
         query: 'apsdb.schema="' + ACTUATOR + '"',
         fields: "*",
         count: true,
         resultsPerPage: (!dto || !dto.resultsPerPage) ? 50 : dto.resultsPerPage,
         pageNumber: (!dto || !dto.pageNumber) ? 1 : dto.pageNumber
     };
-    
+
     if (dto && dto.controller) {        
         queryParam.query += ' and controller="'+ dto.controller + '"'; 
     }
@@ -407,7 +422,7 @@ DeviceManager.prototype.listActuators = function(dto) {
     for (var i=0; i < resp.result.documents.length; i++) {
         result.push(new actuatorModule.Actuator(resp.result.documents[i]));
     }
-    
+
     return result;
 };
 
@@ -419,8 +434,8 @@ DeviceManager.prototype.listActuators = function(dto) {
  * @throws {Error}
  */
 DeviceManager.prototype.getActuator = function(id) {
-    
-	var doc = this.getObject(id, "getActuator");
+
+    var doc = this.getObject(id, "getActuator");
     return new actuatorModule.Actuator(doc);
 };
 
@@ -432,11 +447,11 @@ DeviceManager.prototype.getActuator = function(id) {
  * @throws {Error}
  */
 DeviceManager.prototype.updateActuator = function(dto) {
-    
+
     if (dto.controller) {
         this._checkIdExists(dto.controller, "controller", "DeviceManager.updateActuator");       
     }
-    
+
     return this.updateObject(dto, ACTUATOR, "updateActuator");
 };
 
@@ -462,16 +477,16 @@ DeviceManager.prototype.deleteActuator = function(id) {
  * @throws {Error}
  */
 DeviceManager.prototype.listEquipments = function(dto) {
-    
+
     var queryParam = {
-        
+
         query: 'apsdb.schema="' + EQUIPMENT + '"',
         fields: "*",
         count: true,
         resultsPerPage: (!dto || !dto.resultsPerPage) ? 50 : dto.resultsPerPage,
         pageNumber: (!dto || !dto.pageNumber) ? 1 : dto.pageNumber
     };
-    
+
     if (dto && dto.structure) {        
         queryParam.query += ' and structure="'+ dto.structure + '"'; 
     }
@@ -482,7 +497,7 @@ DeviceManager.prototype.listEquipments = function(dto) {
     }
 
     if (!resp.result.documents){
-        
+
         throw {
             errorCode: "Entity_Not_Found",
             errorDetail: "DeviceManager.listEquipments: could not find equipments"
@@ -493,7 +508,7 @@ DeviceManager.prototype.listEquipments = function(dto) {
     for (var i=0; i < resp.result.documents.length; i++) {
         result.push(new equipmentModule.Equipment(resp.result.documents[i]));
     }
-    
+
     return result;
 };
 
@@ -516,11 +531,11 @@ DeviceManager.prototype.getEquipment = function(id) {
  * @throws {Error}
  */
 DeviceManager.prototype.updateEquipment = function(dto) {
-    
+
     if (dto.structure) {
-       this._checkIdExists(dto.structure, "structure", "DeviceManager.updateEquipment");       
+        this._checkIdExists(dto.structure, "structure", "DeviceManager.updateEquipment");       
     }
-    
+
     return this.updateObject(dto, EQUIPMENT, "updateEquipment");
 };
 

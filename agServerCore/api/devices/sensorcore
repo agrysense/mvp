@@ -29,8 +29,7 @@ try {
         case "post": { 
             
             var body =  util.parse(request.body ? request.body : request.rawBody);
-            var result = updateSensorCore(body);
-            return result.document.key;
+            return createSensorCore(body);
         };break;
         case "put": {
             return updateSensorCore(id, request.body);
@@ -65,11 +64,21 @@ function getSensorCore(id) {
 }
 
 /**
- * @function updateSensorCore
+ * @function createSensorCore
  * @param {Object} [data]: sensor core data
- * @return {String} the identifier of the sensor core
+ * @return {Object} {key: the identifier of the sensor core, version: document version}
  */
-function updateSensorCore(data) {
+function createSensorCore(data) {
+    return deviceManager.updateSensorCore(data);
+}
+
+/**
+ * @function updateSensorCore
+ * @param {String} id: the identifier of the sensor core
+ * @param {Object} [data]: sensor core data
+ * @return {Object} {key: the identifier of the sensor core, version: document version}
+ */
+function updateSensorCore(id, data) {
     return deviceManager.updateSensorCore(data);
 }
 

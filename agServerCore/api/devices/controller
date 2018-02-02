@@ -15,28 +15,33 @@ var method = request.method;
 var deviceManager = new deviceManagerModule.DeviceManager();
 
 try {
-    
+
     switch(method.toLowerCase()) {
-            
+
         case "get": {
 
             if (id) {
                 return getController(id);
             }else {
-                return listController(request.parameters);
+                return listControllers(request.parameters);
             }
         };break;
         case "post": { 
-            
+
             var body =  util.parse(request.body ? request.body : request.rawBody);
-            var result = updateController(body);
-            return result.document.key;
+            var result = createController(body);
+            return result;
         };break;
         case "put": {
             return updateController(id, request.body);
         };break;
-        case "post": {
+        case "delete": {
             return deleteController(id);
+        };break;
+        default: throw {
+
+            errorCode: "Invalid_Method",
+            errorDetail: method + " is not supported by the API"
         }
     };
 }catch(exception){
@@ -44,7 +49,7 @@ try {
 }
 
 /**
- * @function listController
+ * @function listControllers
  * @param {Object} [params]
  * @param {String} [params.structure]: identifier of a structure where the controller is deployed (e.g. farmhouse) (optional)
  * @param {Number} [params.pageNumer]: number of the page to return when paginating (optional, defaults to 1)
@@ -65,11 +70,22 @@ function getController(id) {
 }
 
 /**
+ * @function createController
+ * @param {Object} [data]: controller data
+ * @return {Object} {key: the identifier of the controller, version: document version}
+ */
+function createController(data) {
+    return deviceManager.updateController(data);
+}
+
+/**
  * @function updateController
  * @param {Object} [data]: controller data
- * @return {String} the identifier of the sensor core
+ * @return {Object} {key: the identifier of the controller, version: document version}
  */
-function updateController(data) {
+function updateController(id, data) {
+
+    data.key = id;
     return deviceManager.updateController(data);
 }
 
@@ -78,6 +94,6 @@ function updateController(data) {
  * @param {String} id: identifier of the controller
  * @return {Object}
  */
-function deleteController(data) {
-     return deviceManager.deleteController(id);
+function deleteController(id) {
+    return deviceManager.deleteController(id);
 }

@@ -29,13 +29,13 @@ try {
         case "post": { 
             
             var body =  util.parse(request.body ? request.body : request.rawBody);
-            var result = updateSensor(body);
-            return result.document.key;
+            var result = createSensor(body);
+            return result;
         };break;
         case "put": {
             return updateSensor(id, request.body);
         };break;
-        case "post": {
+        case "delete": {
             return deleteSensor(id);
         }
     };
@@ -65,11 +65,23 @@ function getSensor(id) {
 }
 
 /**
- * @function updateSensor
+ * @function createSensor
  * @param {Object} [data]: sensor data
- * @return {String} the identifier of the sensor core
+ * @return {Object} {key: the identifier of the sensor, version: document version}
  */
-function updateSensor(data) {
+function createSensor(data) {
+    return deviceManager.updateSensor(data);
+}
+
+/**
+ * @function updateSensor
+ * @param {String} id: the identifier of the sensor
+ * @param {Object} [data]: sensor data
+ * @return {Object} {key: the identifier of the sensor, version: document version}
+ */
+function updateSensor(id, data) {
+    
+    data.key = id;
     return deviceManager.updateSensor(data);
 }
 

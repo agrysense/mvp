@@ -29,13 +29,13 @@ try {
         case "post": { 
             
             var body =  util.parse(request.body ? request.body : request.rawBody);
-            var result = updateCamera(body);
-            return result.document.key;
+            var result = createCamera(body);
+            return result;
         };break;
         case "put": {
             return updateCamera(id, request.body);
         };break;
-        case "post": {
+        case "delete": {
             return deleteCamera(id);
         }
     };
@@ -65,12 +65,24 @@ function getCamera(id) {
 }
 
 /**
- * @function updateCamera
+ * @function createCamera
  * @param {Object} [data]: camera data
- * @return {String} the identifier of the camera
+* @return {Object} {key: the identifier of the camera, version: document version}
  */
-function updateCamera(data) {
-    return deviceManager.updateSensorCore(data);
+function createCamera(data) {
+    return deviceManager.updateCamera(data);
+}
+
+/**
+ * @function updateCamera
+ * @param {String} id: the identifier of the camera
+ * @param {Object} [data]: camera data
+ * @return {Object} {key: the identifier of the camera, version: document version}
+ */
+function updateCamera(id, data) {
+    
+    data.key = id;
+    return deviceManager.updateCamera(data);
 }
 
 /**

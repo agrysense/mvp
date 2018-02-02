@@ -34,7 +34,7 @@ Manager.prototype.deleteObject = function(id, caller) {
         throw resp.metadata;
     }
 
-    return resp;
+    return resp.metadata;
 };
 
 /**
@@ -100,7 +100,7 @@ Manager.prototype.updateObject = function(dto, schema, caller) {
         throw resp.metadata;
     }
 
-    return resp.result;
+    return resp.result.document;
 };
 
 /*
