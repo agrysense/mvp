@@ -1,0 +1,1120 @@
+{
+	"variables": [],
+	"info": {
+		"name": "agrysense manual tests",
+		"_postman_id": "b37238fa-f0ba-9c8a-e9ab-a38d1801a8ed",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "farm",
+			"description": "",
+			"item": [
+				{
+					"name": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farm/0725D7D519102E30C7ACF9109842AA21",
+					"request": {
+						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farm/0725D7D519102E30C7ACF9109842AA21",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \n\t\"company\": \"Test_ACME\",\n\t\"name\": \"Test_ACME\",\n\t\"location\": \"44,0123:77,345\",\n\t\"gps\": \"false\",\n\t\"phone\": \"0427919\"\n}"
+						},
+						"description": "Update farm"
+					},
+					"response": []
+				},
+				{
+					"name": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farm/0725D7D519102E30C7ACF9109842AA21",
+					"request": {
+						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farm/0725D7D519102E30C7ACF9109842AA21",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "Get farm by id"
+					},
+					"response": []
+				},
+				{
+					"name": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farm",
+					"request": {
+						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farm",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "List farms"
+					},
+					"response": []
+				},
+				{
+					"name": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farm",
+					"request": {
+						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farm",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \n\t\"company\": \"Test_ACME\",\n\t\"name\": \"Test_ACME\",\n\t\"location\": \"44,0123:77,345\",\n\t\"gps\": \"false\",\n\t\"phone\": \"0427919\"\n}"
+						},
+						"description": "Create a new farm"
+					},
+					"response": []
+				},
+				{
+					"name": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farm",
+					"request": {
+						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farm/A20EE35936B71A46D1A22E52658B1033",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \n\t\"company\": \"Test_ACME\",\n\t\"name\": \"Test_ACME\",\n\t\"location\": \"44,0123:77,345\",\n\t\"gps\": \"false\",\n\t\"phone\": \"0427919\"\n}"
+						},
+						"description": "Delete a farm"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "farmhouse",
+			"description": "",
+			"item": [
+				{
+					"name": "Create farmhouse with invalid farm reference",
+					"request": {
+						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"farm\": \"22222\",\n\t\"name\": \"TEST_ACME_HOUSE\",\n\t\"location\": \"44,001:77,002\",\n\t\"gps\": \"false\",\n\t\"description\": \"test\",\n\t\"category\": \"A\",\n\t\"length\": 100,\n\t\"width\": 20,\n\t\"capacity\":1000,\n\t\"layers\": 1,\n\t\"lines\": 2,\n\t\"height\": 5,\n\t\"hangarType\": \"H\"\n}"
+						},
+						"description": "Create a new farmhouse with invalid farm reference"
+					},
+					"response": []
+				},
+				{
+					"name": "Create farmhouse",
+					"request": {
+						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"farm\": \"0725D7D519102E30C7ACF9109842AA21\",\n\t\"name\": \"TEST_ACME_HOUSE\",\n\t\"location\": \"44,001:77,002\",\n\t\"gps\": \"false\",\n\t\"description\": \"test\",\n\t\"category\": \"A\",\n\t\"length\": 100,\n\t\"width\": 20,\n\t\"capacity\":1000,\n\t\"layers\": 1,\n\t\"lines\": 2,\n\t\"height\": 5,\n\t\"hangarType\": \"H\"\n}"
+						},
+						"description": "Create farmhouse with valid farm reference"
+					},
+					"response": []
+				},
+				{
+					"name": "Update a farmhouse",
+					"request": {
+						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse/BBD9FF9E99D85D7B06A78AE9DEAA97C3",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"farm\": \"0725D7D519102E30C7ACF9109842AA21\",\n\t\"name\": \"TEST_ACME_HOUSE\",\n\t\"location\": \"44,001:77,002\",\n\t\"gps\": \"false\",\n\t\"description\": \"test\",\n\t\"category\": \"A\",\n\t\"length\": 120,\n\t\"width\": 20,\n\t\"capacity\":1000,\n\t\"layers\": 1,\n\t\"lines\": 2,\n\t\"height\": 5,\n\t\"hangarType\": \"H\"\n}"
+						},
+						"description": "Update a farmhouse "
+					},
+					"response": []
+				},
+				{
+					"name": "Get farmhouse by id",
+					"request": {
+						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse/BBD9FF9E99D85D7B06A78AE9DEAA97C3",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"farm\": \"0725D7D519102E30C7ACF9109842AA21\",\n\t\"name\": \"TEST_ACME_HOUSE\",\n\t\"location\": \"44,001:77,002\",\n\t\"gps\": \"false\",\n\t\"description\": \"test\",\n\t\"category\": \"A\",\n\t\"length\": 120,\n\t\"width\": 20,\n\t\"capacity\":1000,\n\t\"layers\": 1,\n\t\"lines\": 2,\n\t\"height\": 5,\n\t\"hangarType\": \"H\"\n}"
+						},
+						"description": "Get a farmhouse by id"
+					},
+					"response": []
+				},
+				{
+					"name": "List farmhouses",
+					"request": {
+						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"farm\": \"0725D7D519102E30C7ACF9109842AA21\",\n\t\"name\": \"TEST_ACME_HOUSE\",\n\t\"location\": \"44,001:77,002\",\n\t\"gps\": \"false\",\n\t\"description\": \"test\",\n\t\"category\": \"A\",\n\t\"length\": 120,\n\t\"width\": 20,\n\t\"capacity\":1000,\n\t\"layers\": 1,\n\t\"lines\": 2,\n\t\"height\": 5,\n\t\"hangarType\": \"H\"\n}"
+						},
+						"description": "List farmhouses"
+					},
+					"response": []
+				},
+				{
+					"name": "Start a cycle",
+					"request": {
+						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse/BBD9FF9E99D85D7B06A78AE9DEAA97C3/cycle",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"cycleName\": \"bicycle\",\n    \"birdNbrIn\": 1000\n}"
+						},
+						"description": "Start a cycle"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a farmhouse",
+					"request": {
+						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse/BBD9FF9E99D85D7B06A78AE9DEAA97C3",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "Delete farmhouse"
+					},
+					"response": []
+				},
+				{
+					"name": "Stop a cycle",
+					"request": {
+						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse/F0F975C11A8A2DD8AB0BCBDB00DFE38F/cycle",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "Stop a cycle"
+					},
+					"response": []
+				},
+				{
+					"name": "List farmhouses by farm id",
+					"request": {
+						"url": {
+							"raw": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse?farm=7CC7AB46A3F8A5AE32778C1EECC79753",
+							"protocol": "https",
+							"host": [
+								"api",
+								"scriptrapps",
+								"io"
+							],
+							"path": [
+								"agApps",
+								"ppf",
+								"ppfServer",
+								"api",
+								"farmhouse"
+							],
+							"query": [
+								{
+									"key": "farm",
+									"value": "7CC7AB46A3F8A5AE32778C1EECC79753",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"farm\": \"0725D7D519102E30C7ACF9109842AA21\",\n\t\"name\": \"TEST_ACME_HOUSE\",\n\t\"location\": \"44,001:77,002\",\n\t\"gps\": \"false\",\n\t\"description\": \"test\",\n\t\"category\": \"A\",\n\t\"length\": 120,\n\t\"width\": 20,\n\t\"capacity\":1000,\n\t\"layers\": 1,\n\t\"lines\": 2,\n\t\"height\": 5,\n\t\"hangarType\": \"H\"\n}"
+						},
+						"description": "List farmhouses by farm id"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "controller",
+			"description": "",
+			"item": [
+				{
+					"name": "Create controller",
+					"request": {
+						"url": "https://api.scriptrapps.io/agServerCore/api/devices/controller",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\n{\n \"name\": \"Controller1\",\n \"structure\": \"F0F975C11A8A2DD8AB0BCBDB00DFE38F\",\n \"software_version\": \"1.0\",\n \"speaker\": false,\n \"microphone\": false,\n \"camera\": true,\n \"ip_address\": \"110.67.89.218\",\n \"mac_address\": \"AA:BB:CC:DD:EE\",\n \"api_link\": \"/api/controller\",\n \"security_code\": \"abc123\",\n \"hash\": \"zxsef\",\n \"blockChain\": \"none\",\n \"isAccessPoint\": true,\n \"isRouter\": true,\n \"isRepeater\": false,\n \"compProtocol\": \"mqtt\",\n \"hasEyes\": true,\n \"hasVoice\": false,\n \"hasEars\": false\n }"
+						},
+						"description": "Create a controller"
+					},
+					"response": []
+				},
+				{
+					"name": "Update a controller",
+					"request": {
+						"url": "https://api.scriptrapps.io/agServerCore/api/devices/controller/6B6287A724A5302249B5D02A3B8F3708",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\n{\n \"name\": \"Controller1\",\n \"structure\": \"F0F975C11A8A2DD8AB0BCBDB00DFE38F\",\n \"software_version\": \"1.0\",\n \"speaker\": true,\n \"microphone\": false,\n \"camera\": true,\n \"ip_address\": \"110.67.89.218\",\n \"mac_address\": \"AA:BB:CC:DD:EE\",\n \"api_link\": \"/api/controller\",\n \"security_code\": \"abc123\",\n \"hash\": \"zxsef\",\n \"blockChain\": \"none\",\n \"isAccessPoint\": true,\n \"isRouter\": true,\n \"isRepeater\": false,\n \"compProtocol\": \"mqtt\",\n \"hasEyes\": true,\n \"hasVoice\": true,\n \"hasEars\": false\n }"
+						},
+						"description": "Update a controller"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a controller",
+					"request": {
+						"url": "https://api.scriptrapps.io/agServerCore/api/devices/controller/6B6287A724A5302249B5D02A3B8F3708",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\n{\n \"name\": \"Controller1\",\n \"structure\": \"F0F975C11A8A2DD8AB0BCBDB00DFE38F\",\n \"software_version\": \"1.0\",\n \"speaker\": true,\n \"microphone\": false,\n \"camera\": true,\n \"ip_address\": \"110.67.89.218\",\n \"mac_address\": \"AA:BB:CC:DD:EE\",\n \"api_link\": \"/api/controller\",\n \"security_code\": \"abc123\",\n \"hash\": \"zxsef\",\n \"blockChain\": \"none\",\n \"isAccessPoint\": true,\n \"isRouter\": true,\n \"isRepeater\": false,\n \"compProtocol\": \"mqtt\",\n \"hasEyes\": true,\n \"hasVoice\": true,\n \"hasEars\": false\n }"
+						},
+						"description": "Delete a controller"
+					},
+					"response": []
+				},
+				{
+					"name": "Get controller by id",
+					"request": {
+						"url": "https://api.scriptrapps.io/agServerCore/api/devices/controller/B5618EB8D123B956F1A4DEF5CA58347E",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\n{\n \"name\": \"Controller1\",\n \"structure\": \"F0F975C11A8A2DD8AB0BCBDB00DFE38F\",\n \"software_version\": \"1.0\",\n \"speaker\": true,\n \"microphone\": false,\n \"camera\": true,\n \"ip_address\": \"110.67.89.218\",\n \"mac_address\": \"AA:BB:CC:DD:EE\",\n \"api_link\": \"/api/controller\",\n \"security_code\": \"abc123\",\n \"hash\": \"zxsef\",\n \"blockChain\": \"none\",\n \"isAccessPoint\": true,\n \"isRouter\": true,\n \"isRepeater\": false,\n \"compProtocol\": \"mqtt\",\n \"hasEyes\": true,\n \"hasVoice\": true,\n \"hasEars\": false\n }"
+						},
+						"description": "Get a controller by id"
+					},
+					"response": []
+				},
+				{
+					"name": "List controllers",
+					"request": {
+						"url": "https://api.scriptrapps.io/agServerCore/api/devices/controller",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\n{\n \"name\": \"Controller1\",\n \"structure\": \"F0F975C11A8A2DD8AB0BCBDB00DFE38F\",\n \"software_version\": \"1.0\",\n \"speaker\": true,\n \"microphone\": false,\n \"camera\": true,\n \"ip_address\": \"110.67.89.218\",\n \"mac_address\": \"AA:BB:CC:DD:EE\",\n \"api_link\": \"/api/controller\",\n \"security_code\": \"abc123\",\n \"hash\": \"zxsef\",\n \"blockChain\": \"none\",\n \"isAccessPoint\": true,\n \"isRouter\": true,\n \"isRepeater\": false,\n \"compProtocol\": \"mqtt\",\n \"hasEyes\": true,\n \"hasVoice\": true,\n \"hasEars\": false\n }"
+						},
+						"description": "List controllers"
+					},
+					"response": []
+				},
+				{
+					"name": "List controllers filtered by structure",
+					"request": {
+						"url": {
+							"raw": "https://api.scriptrapps.io/agServerCore/api/devices/controller?structure=F0F975C11A8A2DD8AB0BCBDB00DFE38F",
+							"protocol": "https",
+							"host": [
+								"api",
+								"scriptrapps",
+								"io"
+							],
+							"path": [
+								"agServerCore",
+								"api",
+								"devices",
+								"controller"
+							],
+							"query": [
+								{
+									"key": "structure",
+									"value": "F0F975C11A8A2DD8AB0BCBDB00DFE38F",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\n{\n \"name\": \"Controller1\",\n \"structure\": \"F0F975C11A8A2DD8AB0BCBDB00DFE38F\",\n \"software_version\": \"1.0\",\n \"speaker\": true,\n \"microphone\": false,\n \"camera\": true,\n \"ip_address\": \"110.67.89.218\",\n \"mac_address\": \"AA:BB:CC:DD:EE\",\n \"api_link\": \"/api/controller\",\n \"security_code\": \"abc123\",\n \"hash\": \"zxsef\",\n \"blockChain\": \"none\",\n \"isAccessPoint\": true,\n \"isRouter\": true,\n \"isRepeater\": false,\n \"compProtocol\": \"mqtt\",\n \"hasEyes\": true,\n \"hasVoice\": true,\n \"hasEars\": false\n }"
+						},
+						"description": "List controllers by structure id"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "sensorcore",
+			"description": "",
+			"item": [
+				{
+					"name": "https://agrysense.scriptrapps.io/agServerCore/api/devices/sensorcore/F988E7D8242AD95C2EEBE530BDA19A38",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/sensorcore/F988E7D8242AD95C2EEBE530BDA19A38",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "https://agrysense.scriptrapps.io/agServerCore/api/devices/sensorcore",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/sensorcore",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "https://agrysense.scriptrapps.io/agServerCore/api/devices/sensorcore",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/sensorcore",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"controller\": \"B5618EB8D123B956F1A4DEF5CA58347E\",\n  \"embedded\": \"false\",\n  \"mac_address\": \"00:11:22:33:44:55\",\n  \"hash\": \"12sdhukreo\"\n}"
+						},
+						"description": "Create a sensor core"
+					},
+					"response": []
+				},
+				{
+					"name": "https://agrysense.scriptrapps.io/agServerCore/api/devices/sensorcore",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/sensorcore/E06A5AB556C003992983FF0CC8F02BCF",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"controller\": \"B5618EB8D123B956F1A4DEF5CA58347E\",\n  \"embedded\": \"true\",\n  \"mac_address\": \"00:11:22:33:44:55\",\n  \"hash\": \"12sdhukreo\"\n}"
+						},
+						"description": "Update a sensor core"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "sensor",
+			"description": "",
+			"item": [
+				{
+					"name": "Create sensor",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/sensor",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \t\"sensor_type\": \"temperature\",\n \t\"sensor_core\": \"TEST_SENSORCORE_x6dxeyk0kim7vsd\",\n \t\"port\": \"5544\",\n \t\"name\": \"temp1\",\n\t\"isCentral\": false\n}"
+						},
+						"description": "Create a sensor"
+					},
+					"response": []
+				},
+				{
+					"name": "Update sensor",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/sensor/E236E5B22C1BAA337874C202103CF6AA",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \t\"sensor_type\": \"temperature\",\n \t\"sensor_core\": \"TEST_SENSORCORE_x6dxeyk0kim7vsd\",\n \t\"port\": \"5545\",\n \t\"name\": \"temp1\",\n\t\"isCentral\": false\n}"
+						},
+						"description": "Update a sensor"
+					},
+					"response": []
+				},
+				{
+					"name": "Get sensor by id",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/sensor/E236E5B22C1BAA337874C202103CF6AA",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \t\"sensor_type\": \"temperature\",\n \t\"sensor_core\": \"TEST_SENSORCORE_x6dxeyk0kim7vsd\",\n \t\"port\": \"5545\",\n \t\"name\": \"temp1\",\n\t\"isCentral\": false\n}"
+						},
+						"description": "Get a sensor by id"
+					},
+					"response": []
+				},
+				{
+					"name": "List sensors",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/sensor",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \t\"sensor_type\": \"temperature\",\n \t\"sensor_core\": \"TEST_SENSORCORE_x6dxeyk0kim7vsd\",\n \t\"port\": \"5545\",\n \t\"name\": \"temp1\",\n\t\"isCentral\": false\n}"
+						},
+						"description": "List sensors"
+					},
+					"response": []
+				},
+				{
+					"name": "List sensors filtered by sensor_core",
+					"request": {
+						"url": {
+							"raw": "https://agrysense.scriptrapps.io/agServerCore/api/devices/sensor?sensor_core=TEST_SENSORCORE_x6dxeyk0kim7vsd",
+							"protocol": "https",
+							"host": [
+								"agrysense",
+								"scriptrapps",
+								"io"
+							],
+							"path": [
+								"agServerCore",
+								"api",
+								"devices",
+								"sensor"
+							],
+							"query": [
+								{
+									"key": "sensor_core",
+									"value": "TEST_SENSORCORE_x6dxeyk0kim7vsd",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \t\"sensor_type\": \"temperature\",\n \t\"sensor_core\": \"TEST_SENSORCORE_x6dxeyk0kim7vsd\",\n \t\"port\": \"5545\",\n \t\"name\": \"temp1\",\n\t\"isCentral\": false\n}"
+						},
+						"description": "List sensors filteed by sensor_core"
+					},
+					"response": []
+				},
+				{
+					"name": "List sensors filtered by controller",
+					"request": {
+						"url": {
+							"raw": "https://agrysense.scriptrapps.io/agServerCore/api/devices/sensor?controller=TEST_CONTROLLER_6fwdujxyswhzk27",
+							"protocol": "https",
+							"host": [
+								"agrysense",
+								"scriptrapps",
+								"io"
+							],
+							"path": [
+								"agServerCore",
+								"api",
+								"devices",
+								"sensor"
+							],
+							"query": [
+								{
+									"key": "controller",
+									"value": "TEST_CONTROLLER_6fwdujxyswhzk27",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \t\"sensor_type\": \"temperature\",\n \t\"sensor_core\": \"TEST_SENSORCORE_x6dxeyk0kim7vsd\",\n \t\"port\": \"5545\",\n \t\"name\": \"temp1\",\n\t\"isCentral\": false\n}"
+						},
+						"description": "List sensors filteed by controller"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete sensor",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/sensor/E236E5B22C1BAA337874C202103CF6AA",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \t\"sensor_type\": \"temperature\",\n \t\"sensor_core\": \"TEST_SENSORCORE_x6dxeyk0kim7vsd\",\n \t\"port\": \"5545\",\n \t\"name\": \"temp1\",\n\t\"isCentral\": false\n}"
+						},
+						"description": "Delete sensor"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "camera",
+			"description": "",
+			"item": [
+				{
+					"name": "Create camera",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/camera",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \t\"name\": \"camera1\",\n \t\"controller\": \"90155776A8D092CEF55BCF9D661D5E2A\",\n\t\"embedded\": false,\n\t\"third_party\": false,\n\t\"vendor\": \"campro\",\n\t\"model\": \"zweer234\"\n}"
+						},
+						"description": "Create a camera"
+					},
+					"response": []
+				},
+				{
+					"name": "Update camera",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/camera/8BEAB9E864F51D5BC2037062CD4F0C14",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \t\"name\": \"camera_hall\",\n \t\"controller\": \"90155776A8D092CEF55BCF9D661D5E2A\",\n\t\"embedded\": false,\n\t\"third_party\": false,\n\t\"vendor\": \"campro\",\n\t\"model\": \"zweer234\"\n}"
+						},
+						"description": "Update a camera"
+					},
+					"response": []
+				},
+				{
+					"name": "List cameras",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/camera",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \t\"sensor_type\": \"temperature\",\n \t\"sensor_core\": \"TEST_SENSORCORE_x6dxeyk0kim7vsd\",\n \t\"port\": \"5545\",\n \t\"name\": \"temp1\",\n\t\"isCentral\": false\n}"
+						},
+						"description": "List cameras"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete camera",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/camera/8BEAB9E864F51D5BC2037062CD4F0C14",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \t\"sensor_type\": \"temperature\",\n \t\"sensor_core\": \"TEST_SENSORCORE_x6dxeyk0kim7vsd\",\n \t\"port\": \"5545\",\n \t\"name\": \"temp1\",\n\t\"isCentral\": false\n}"
+						},
+						"description": "Delete sensor"
+					},
+					"response": []
+				},
+				{
+					"name": "Get camera",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/camera/8BEAB9E864F51D5BC2037062CD4F0C14",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \t\"sensor_type\": \"temperature\",\n \t\"sensor_core\": \"TEST_SENSORCORE_x6dxeyk0kim7vsd\",\n \t\"port\": \"5545\",\n \t\"name\": \"temp1\",\n\t\"isCentral\": false\n}"
+						},
+						"description": "Get camera by id"
+					},
+					"response": []
+				},
+				{
+					"name": "List cameras filtered by controller",
+					"request": {
+						"url": {
+							"raw": "https://agrysense.scriptrapps.io/agServerCore/api/devices/camera?controller=90155776A8D092CEF55BCF9D661D5E2A",
+							"protocol": "https",
+							"host": [
+								"agrysense",
+								"scriptrapps",
+								"io"
+							],
+							"path": [
+								"agServerCore",
+								"api",
+								"devices",
+								"camera"
+							],
+							"query": [
+								{
+									"key": "controller",
+									"value": "90155776A8D092CEF55BCF9D661D5E2A",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \t\"sensor_type\": \"temperature\",\n \t\"sensor_core\": \"TEST_SENSORCORE_x6dxeyk0kim7vsd\",\n \t\"port\": \"5545\",\n \t\"name\": \"temp1\",\n\t\"isCentral\": false\n}"
+						},
+						"description": "List cameras fitlered by controller"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "actuators",
+			"description": "",
+			"item": [
+				{
+					"name": "Create an actuator",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/actuator",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\n{\n\t\"controller\": \"90155776A8D092CEF55BCF9D661D5E2A\",\n\t\"device_type\": \"pump\",\n\t\"ip_address\": \"110.67.89.218\",\n\t\"mac_address\": \"AA:BB:CC:DD:EE\",\n\t\"hash\": \"zxsef\",\n\t\"blockChain\": \"none\",\n\t\"compProtocol\": \"ws\",\t\t\n\t\"firmwareVersion\": \"1.0\",\n\t\"server\": \"com.server.thing\",\n    \"structure\": \"F0F975C11A8A2DD8AB0BCBDB00DFE38F\",\n\t\"isProgressive\": false,\n\t\"isOnOff\": true,\n\t\"isThreePhase\": false, \n\t\"equipment\": \"\",\n\t\"totalPower\": 2400\n }"
+						},
+						"description": "Create an actuator"
+					},
+					"response": []
+				},
+				{
+					"name": "Update an actuator",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/actuator/4BA2A6016BA86D3FEE7289D18FDFACDC",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\n{\n\t\"controller\": \"90155776A8D092CEF55BCF9D661D5E2A\",\n\t\"device_type\": \"pump\",\n\t\"ip_address\": \"110.67.89.218\",\n\t\"mac_address\": \"AA:BB:CC:DD:EE\",\n\t\"hash\": \"zxsef\",\n\t\"blockChain\": \"none\",\n\t\"compProtocol\": \"mqtt\",\t\t\n\t\"firmwareVersion\": \"1.0\",\n\t\"server\": \"com.server.thing\",\n    \"structure\": \"F0F975C11A8A2DD8AB0BCBDB00DFE38F\",\n\t\"isProgressive\": false,\n\t\"isOnOff\": true,\n\t\"isThreePhase\": false, \n\t\"equipment\": \"\",\n\t\"totalPower\": 2400\n }"
+						},
+						"description": "Update an actuator"
+					},
+					"response": []
+				},
+				{
+					"name": "List actuators",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/actuator",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \t\"sensor_type\": \"temperature\",\n \t\"sensor_core\": \"TEST_SENSORCORE_x6dxeyk0kim7vsd\",\n \t\"port\": \"5545\",\n \t\"name\": \"temp1\",\n\t\"isCentral\": false\n}"
+						},
+						"description": "List actuators"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete an actuator",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/camera/4BA2A6016BA86D3FEE7289D18FDFACDC",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \t\"sensor_type\": \"temperature\",\n \t\"sensor_core\": \"TEST_SENSORCORE_x6dxeyk0kim7vsd\",\n \t\"port\": \"5545\",\n \t\"name\": \"temp1\",\n\t\"isCentral\": false\n}"
+						},
+						"description": "Delete an actuator"
+					},
+					"response": []
+				},
+				{
+					"name": "Get actuator by id",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/actuator/4BA2A6016BA86D3FEE7289D18FDFACDC",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \t\"sensor_type\": \"temperature\",\n \t\"sensor_core\": \"TEST_SENSORCORE_x6dxeyk0kim7vsd\",\n \t\"port\": \"5545\",\n \t\"name\": \"temp1\",\n\t\"isCentral\": false\n}"
+						},
+						"description": "Get camera by id"
+					},
+					"response": []
+				},
+				{
+					"name": "List actuators filtered by controller",
+					"request": {
+						"url": {
+							"raw": "https://agrysense.scriptrapps.io/agServerCore/api/devices/actuator?controller=90155776A8D092CEF55BCF9D661D5E2A",
+							"protocol": "https",
+							"host": [
+								"agrysense",
+								"scriptrapps",
+								"io"
+							],
+							"path": [
+								"agServerCore",
+								"api",
+								"devices",
+								"actuator"
+							],
+							"query": [
+								{
+									"key": "controller",
+									"value": "90155776A8D092CEF55BCF9D661D5E2A",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \t\"sensor_type\": \"temperature\",\n \t\"sensor_core\": \"TEST_SENSORCORE_x6dxeyk0kim7vsd\",\n \t\"port\": \"5545\",\n \t\"name\": \"temp1\",\n\t\"isCentral\": false\n}"
+						},
+						"description": "List cameras fitlered by controller"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
