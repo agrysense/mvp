@@ -15,9 +15,9 @@ var method = request.method;
 var farmManager = new farmManagerModule.FarmManager();
 
 try {
-    
+
     switch(method.toLowerCase()) {
-            
+
         case "get": {
 
             if (id) {
@@ -27,16 +27,21 @@ try {
             }
         };break;
         case "post": { 
-            
+
             var body =  util.parse(request.body ? request.body : request.rawBody);
-            var result = updateFarm(body);
-            return result.document.key;
+            var result = createFarm(body); 
+            return result;
         };break;
         case "put": {
             return updateFarm(id, request.body);
         };break;
-        case "post": {
+        case "delete": {
             return deleteFarm(id);
+        };break;
+        default: throw {
+
+            errorCode: "Invalid_Method",
+            errorDetail: method + " is not supported by the API"
         }
     };
 }catch(exception){
@@ -64,11 +69,22 @@ function getFarm(id) {
 }
 
 /**
+ * @function createFarm
+ * @param {Object} [data]: farm data
+ * @return {Object} {key: the identifier of the farm, version: document version}
+ */
+function createFarm(data) {
+    return farmManager.updateFarm(data);
+}
+
+/**
  * @function updateFarm
  * @param {Object} [data]: farm data
- * @return {String} the identifier of the sensor core
+ * @return {Object} {key: the identifier of the farm, version: document version}
  */
 function updateFarm(data) {
+
+    data.key = id;
     return farmManager.updateFarm(data);
 }
 

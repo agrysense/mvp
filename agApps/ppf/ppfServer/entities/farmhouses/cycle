@@ -16,7 +16,7 @@ function Cycle(dto) {
     componentModule.Component.call(this, dto);
     this.birdNbrIn = Number(this.birdNbrIn);
     this.currentBirdCount = Number(this.currentBirdCount);
-    this.endBirdCount = this.endBirdCount ? Number(endBirdCount) : this.endBirdCount;
+    this.endBirdCount = this.endBirdCount ? Number(this.endBirdCount) : -1;
 }
 
 Cycle.prototype = new componentModule.Component({inheritance: true});
@@ -29,7 +29,7 @@ Cycle.prototype.constructor = Cycle;
  * @throws {Error}
  */
 Cycle.prototype.stop = function() {
-  
+ 
     // update then backup the current cycle
     this.endDate = util.toShortDate();
     this.endBirdCount = this.currentBirdCount;

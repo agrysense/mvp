@@ -2,6 +2,7 @@ var document = require("document");
 var log = require("log"); log.setLevel("info");
 var farmModule = require("./farm");
 var farmhouseManagerModule = require("../farmhouses/farmhouseManager");
+var managerModule = require("/agServerCore/entities/manager");
 var util = require("/agServerCore/lib/util");
 
 const FARM = "Farm";
@@ -14,6 +15,9 @@ const FARM = "Farm";
 var FarmManager = function() {
     this.farmhouseManager = new farmhouseManagerModule.FarmhouseManager();
 };
+
+FarmManager.prototype = new managerModule.Manager();
+FarmManager.prototype.constructor = FarmManager;
 
 /**
  * lists all available farms
@@ -65,27 +69,10 @@ FarmManager.prototype.getFarm = function(farmid) {
             errorCode: "Missing_Parameter",
             errorDetail: "FarmManager.getFarm: farmid cannot be null or empty"
         };
-    }
+    }    
     
-    var queryParam = {
-        query: 'key="'+ farmid + '" and apsdb.schema="' + FARM + '"',
-        fields:"*"
-    };
-    
-    var resp = document.query(queryParam);
-    if (resp.metadata.status == "failure") {
-        throw resp.metadata;
-    }
-    
-    if (!resp.result.documents[0]){
-        
-        throw {
-            errorCode: "Entity_Not_Found",
-            errorDetail: "FarmManager.getFarm: could not find farm with id " + dto.farmid
-        };
-    }
-    
-    return new farmModule.Farm(resp.result.documents[0], this.farmhouseManager);
+    var doc = this.getObject(id); 
+    return new farmModule.Farm(doc);
 };
 
 /**
@@ -96,25 +83,8 @@ FarmManager.prototype.getFarm = function(farmid) {
  * @throws {Error}
  */
 FarmManager.prototype.updateFarm = function(dto) {
-   
-    if (!dto) {
-        
-        throw {
-            errorCode: "Missing_Parameter",
-            errorDetail: "FarmManager.deleteFarm: dto cannot be null or undefined"
-        };
-    }
-    
-    var fields = JSON.parse(JSON.stringify(dto));
-    fields = util.removeMetaData(fields); 
-    fields["meta.schema"] = FARM; 
-    var resp = document.save(fields);
-    if (resp.metadata.status == "failure") {
-        throw resp.metadata;
-    }
-    
-    return resp;
-}
+    return this.updateObject(dto, FARM, "updateFarm");
+};
 
 /**
  * flag a Farm as deleted
@@ -134,7 +104,7 @@ FarmManager.prototype.deleteFarm = function(farmid) {
     }
     
     // check if this farm has related data (farm houses, etc.)
-    var check = document.query({query: 'structure = "' + farmid + '" or farm="' + farmid + '"', field:'key'});
+    var check = document.query({query: 'structure = "' + farmid + '" or farm="' + farmid + '"', fields:'key'});
     if (check.metadata.status == "failure") {
         
          throw {
@@ -151,12 +121,12 @@ FarmManager.prototype.deleteFarm = function(farmid) {
         };
     }
     
-    var resp = document.delete(dto.key);
+    var resp = document.delete(farmid);
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
     
-    return resp;
+    return resp.metadata;
 }
 
 /*

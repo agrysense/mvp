@@ -159,13 +159,21 @@ Farmhouse.prototype.addEquipment = function(dto) {
  */
 Farmhouse.prototype.startCycle = function(dto) {
 
+    if (!dto) {
+
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "Farmhouse.startCycle: dto can be nul or undefined"
+        };
+    }    
+
     var starting = true;
     try {
 
         // this part is to deal with concurrent threads (checking if starting)
         var resp = document.create({key: this.startCycleKey}); 
         if (resp.metadata.status == "failure" &&  resp.metadata.errorCode == "DUPLICATE_DOCUMENT_KEY")   {
-           
+
             starting = false;
             log.error("Famrhouse.startCycle: could not start cycle for farmhouse: " + this.key + "\n" + JSON.stringify(resp));
             throw {
@@ -197,20 +205,13 @@ Farmhouse.prototype.startCycle = function(dto) {
         data.key = this.cycleKey;
         data.farmhouse = this.key;
         data.startDate = dto && dto.startDate ? util.toShortDate(dto.startDate) : util.toShortDate();
-        data.currentBirdCount = dto && dto.currentBirdCount ? dto.currentBirdCount : this.birdNbrIn;
-        data.endBirdCount = dto && dto.endBirdCount ? dto.endBirdCount : this.birdNbrIn;   
-        var result = this.farmhouseManager.updateCycle(data);
-        if (result.metadata.status == "failure") {
-
-            log.error("Famrhouse.startCycle: could not create cycle for this farmhouse " + this.key + "\n" + JSON.stringify(result));   
-            throw result.metadata;
-        }
-
-        return result;
+        data.currentBirdCount = dto && dto.currentBirdCount ? dto.currentBirdCount : dto.birdNbrIn;
+        data.endBirdCount = dto && dto.endBirdCount ? dto.endBirdCount : -1;   
+        return this.farmhouseManager.updateCycle(data);
     }finally{
 
         if (starting) {
-            
+
             deleteResp = document.delete(this.startCycleKey);
             if (resp.metadata.status == "failure") {
                 log.error("Famrhouse.startCycle: could not remove startingCycle lock for this farmhouse " + this.key + "\n" + JSON.stringify(resp));   
@@ -229,12 +230,36 @@ Farmhouse.prototype.getCurrentCycle = function() {
 
     try {
 
-        var cycle = this.farmhouseManager.getCycle(this.cycleKey);
+        var cycle = this.farmhouseManager.getCycle(this.cycleKey); 
         return cycle;
     }catch(exception) {
         // if here, means not found
+        log.error(JSON.stringify(exception))
         return null;
     }
+};
+
+/**
+ * UpdateCycle the current cycle.
+ * @method updateCycle
+ * @param {Object} [dto]: cycle data
+ * @return {Object} cycle or null if no cycle is started
+ * @throw {Error}
+ */
+Farmhouse.prototype.updateCycle = function(dto) {
+
+    if (!dto) {
+
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "Farmhouse.updateCycle: dto can be nul or undefined"
+        };
+    }
+
+    var data = JSON.parse(JSON.stringify(dto));
+    data.farmhouse = this.key;
+    var cycle = this.farmhouseManager.updateCycle(data);
+    return cycle;
 };
 
 /**
@@ -244,8 +269,8 @@ Farmhouse.prototype.getCurrentCycle = function() {
  * @throw {Error}
  */
 Farmhouse.prototype.stopCycle = function() {
-
-    var currentCycle = this.getCurrentCycle();
+ 
+    var currentCycle = this.getCurrentCycle();  
     if (!currentCycle) {
 
         throw {

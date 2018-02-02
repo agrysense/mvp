@@ -8,14 +8,14 @@
  * To get a specific cycle, send a GET request to "../api/farmhouse/id/cycle/cycleid"
  * To start a cycle, send a PUT request to "../api/farmhouse/id/cycle"
  * To update a cycle, send a PUT request to "../id/farmhouse/id/cycle/cycleid"  + cycle data in JSON body
- * To stop a cycle, send a DELETE request to "../api/farmhouse/id/cycle/cycleid"
+ * To stop the current cycle, send a DELETE request to "../api/farmhouse/id/cycle"
  * @module farmhouse
  */
 
 var util = require("/agServerCore/lib/util");
-var farmhouseManagerModule = require("/agApps/ppf/ppfServer/entities/farmhouse/farmhouseManager");
+var farmhouseManagerModule = require("/agApps/ppf/ppfServer/entities/farmhouses/farmhouseManager");
 
-var pathInfo = request.pathInfo.split("/");
+var pathInfo = request.pathInfo ? request.pathInfo.split("/") : "";
 var id = pathInfo.length > 0 ? pathInfo[0] : null;
 var cycleReq = pathInfo.length > 1 && pathInfo[1] == "cycle" ? true : false;
 var cycleId = pathInfo.length > 2 ? pathInfo[2] : null; 
@@ -29,22 +29,25 @@ try {
     switch(method.toLowerCase()) {
 
         case "get": {
-			resolveGet();
+            return resolveGet();
         };break;
         case "post": { 
-			
+
             var body =  util.parse(request.body ? request.body : request.rawBody);
-            var result = updateFarmhouse(body);
-            return result.document.key;
+            return createFarmhouse(body);
         };break;
         case "put": {
-            
+
             var body =  util.parse(request.body ? request.body : request.rawBody);
             return resolvePut(body);
-            return updateFarmhouse(id, request.body);
         };break;
-        case "post": {
-            return deleteFarmhouse(id);
+        case "delete": {
+            return resolveDelete();
+        };break;
+        default: throw {
+
+            errorCode: "Invalid_Method",
+            errorDetail: method + " is not supported by the API"
         }
     };
 }catch(exception){
@@ -57,15 +60,15 @@ function resolveGet() {
     if (!id) {
         return listFarmhouses(request.parameters);
     }
-    
+
     if (id && !cycleReq) {
-         return getFarmhouse(id);
+        return getFarmhouse(id);
     }
-    
+
     if (cycleReq && !cycleId) {
         return listCycles(id);
     }
-    
+
     if (cycleReq && cycleId) {
         return getCycle(cycleId); 
     }
@@ -74,33 +77,37 @@ function resolveGet() {
 function resolvePut(body) {
 
     if (!id) {
-        return listFarmhouses(request.parameters);
+        return createFarmhouse(body);
     }
-    
-    if (isGetFarmhouse) {
-         return getFarmhouse(id);
-    }
-    
-    if (isListCycles) {
-        return listCycles(id);
-    }
-    
-    if (isGetCycle) {
-        return getCycle(cycleId); 
-    }
-}
 
-function resolvePut() {
+    if (id && !cycleReq) {
+        return updateFarmhouse(id, body);
+    }
 
+    if (cycleReq && !cycleId) {
+        return startCycle(id, body);
+    }
+
+    if (cycleReq && cycleId) {
+        return updateCycle(id, cycleId, body); 
+    }
 }
 
 function resolveDelete() {
 
+    if (id && !cycleReq) {
+        return deleteFarmhouse(id);
+    }
+
+    if (cycleReq) {
+        return stopCycle(id);
+    }    
 }
 
 /**
  * @function listFarmhouses
  * @param {Object} [params]
+ * @param {String} [params.farm]: the identifier of a farm (optional, when passed, only list the farmhouses of this farm)
  * @param {Number} [params.pageNumer]: number of the page to return when paginating (optional, defaults to 1)
  * @param {Number} [params.resultsPerPage]: max number of results in one page (optional, defaults to 50)
  * @return {Array}
@@ -119,11 +126,22 @@ function getFarmhouse(id) {
 }
 
 /**
+ * @function createFarmhouse
+ * @param {Object} [data]: farmhouse data
+ * @return {Object} {key: the identifier of the farm house, version: document version}
+ */
+function createFarmhouse(data) {
+    return farmhouseManager.updateFarmhouse(data);
+}
+
+/**
  * @function updateFarmhouse
  * @param {Object} [data]: farmhouse data
- * @return {String} the identifier of the sensor core
+ * @return {Object} {key: the identifier of the farmhouse, version: document version}
  */
-function updateFarmhouse(data) {
+function updateFarmhouse(id, data) {
+
+    data.key = id;
     return farmhouseManager.updateFarmhouse(data);
 }
 
@@ -150,4 +168,41 @@ function listCycles(farmhouseid) {
  */
 function getCycle(cycleid) {
     return farmhouseManager.getCycle(cycleid);
+}
+
+/**
+ * @function startCycle
+ * @param {String} {id}: farmhouse id
+ * @return {String} identifier of the cycle
+ */
+function startCycle(id, data) {
+
+    var farmhouse = getFarmhouse(id);
+    data.farmhouse = id;
+    return farmhouse.startCycle(data);
+}
+
+/**
+ * @function updateCycle
+ * @param {String} {id}: farmhouse id
+ * @param {String} {cycleId}: cycle id
+ * @param {Object} [data]: cycle data
+ * @return {String} the identifier of the cycle
+ */
+function updateCycle(id, cycleId, data) {
+
+    var farmhouse = getFarmhouse(id);
+    data.key = cycleId;
+    return farmhouse.updateCycle(data);
+}
+
+/**
+ * @function startCycle
+ * @param {String} {id}: farmhouse id
+ * @return {String} identifier of the cycle
+ */
+function stopCycle(id) {
+
+    var farmhouse = getFarmhouse(id);
+    return farmhouse.stopCycle();
 }

@@ -37,7 +37,7 @@ FarmhouseManager.prototype.getDeviceManager = function() {
  * lists all available farms
  * @method listFarmhouses
  * @param {Object} [dto] : contains optional filtering criteria
- * @param {String} [dto.farmhouse]: optional, filter by farmhouses related to this farm (key)
+ * @param {String} [dto.farm]: optional, filter by farmhouses related to this farm (key)
  * @param {Number} [dto.resultsPerPage]: how many results to return per call (optional, defaults to 50)
  * @param {Number} [dto.pageNumber]: the page number in case there are more than one pages of results (optional, defaults to 1)
  * @return {JSONArray<Farmhouse>} 
@@ -54,8 +54,8 @@ FarmhouseManager.prototype.listFarmhouses = function(dto) {
         pageNumber: (!dto || !dto.pageNumber) ? 1 : dto.pageNumber
     };
 
-    if (dto && dto.farmhouse) {
-        queryParam.query += '& farmhouse="'+ dto.farm + '"';
+    if (dto && dto.farm) {
+        queryParam.query += ' and farm="'+ dto.farm + '"';
     }
 
     var resp = document.query(queryParam);
@@ -87,7 +87,7 @@ FarmhouseManager.prototype.listFarmhouses = function(dto) {
  */
 FarmhouseManager.prototype.getFarmhouse = function(id) {
 
-    var doc = this.getObject(id);
+    var doc = this.getObject(id); 
     return new farmhouseModule.Farmhouse(doc, this);
 }
 
@@ -115,7 +115,27 @@ FarmhouseManager.prototype.updateFarmhouse = function(dto) {
  * @throws {Error}
  */
 FarmhouseManager.prototype.deleteFarmhouse = function(id) {
-    return this.deleteObject(id);
+    
+    // check if this farmhouse has related data (controllers, sensors, etc.) other than cycles
+    var check = document.query({query: 'structure = "' + id + '" and apsdb.schema != "Cycle"', fields:"key"});
+    if (check.metadata.status == "failure") {
+        
+         throw {
+            errorCode: "Internal_Error",
+            errorDetail: "FarmhouseManager.deleteFarmhouse: check failed\n" + JSON.stringify(check)
+        };
+    }
+    
+    if (check.result.documents.length > 0) {
+        
+        throw {
+            errorCode: "Invalid_Action",
+            errorDetail: "FarmhouseManager.deleteFarmhouse: cannot delete a farmhouse that has documents related to it"
+        };
+    }
+    
+    var resp = this.deleteObject(id);
+    return resp.metadata;
 };
 
 /**
@@ -181,7 +201,7 @@ FarmhouseManager.prototype.listCycles = function(dto) {
  */
 FarmhouseManager.prototype.getCycle = function(id) {
 
-    var doc = this.getObject(id);
+    var doc = this.getObject(id); 
     return new cycleModule.Cycle(doc);
 };
 
@@ -193,9 +213,9 @@ FarmhouseManager.prototype.getCycle = function(id) {
  * @throws {Error}
  */
 FarmhouseManager.prototype.updateCycle = function(dto) {
-    
+   
     if (dto.farmhouse) {
-       this._checkIdExists(dto.farm, "farmhouse", "FarmhouseManager.updateCycle");       
+       this._checkIdExists(dto.farmhouse, "farmhouse", "FarmhouseManager.updateCycle");       
     }
     
     return this.updateObject(dto, CYCLE, "updateCycle");
