@@ -153,7 +153,7 @@ FarmhouseManager.prototype.listCycles = function(dto) {
     var queryParam = {
 
         "query": 'apsdb.schema="' + CYCLE + '"',
-        "queryFields": "*",
+        "fields": "*",
         "count": "true",
         "resultsPerPage": "" + ((!dto || !dto.resultsPerPage) ? 50 : dto.resultsPerPage),
         "pageNumber": "" + ((!dto || !dto.pageNumber) ? 1 : dto.pageNumber)
@@ -170,8 +170,7 @@ FarmhouseManager.prototype.listCycles = function(dto) {
     if (dto && dto.sortExp) {
         queryParam["sort"] = dto.sortExp;
     }
-
-    var transaction = null;
+    
     var result = [];
 
     var resp = document.query(queryParam);  

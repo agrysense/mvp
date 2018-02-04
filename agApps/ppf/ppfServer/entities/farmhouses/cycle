@@ -4,6 +4,8 @@ var componentModule = require("/agServerCore/entities/component");
 var document = require("document");
 var util = require("/agServerCore/lib/util");
 
+const CYCLE_VALUE = "CycleValue";
+
 /**
  * Defines the Cycle object
  * The key of the Cycle object should be <farmhouskey>_Cycle to make accessing cycles faster
@@ -12,7 +14,7 @@ var util = require("/agServerCore/lib/util");
  * @param {Object} [dto] : initialization object. Should be a scriptr.io document that contains cycle data
  */
 function Cycle(dto) {
-    
+
     componentModule.Component.call(this, dto);
     this.birdNbrIn = Number(this.birdNbrIn);
     this.currentBirdCount = Number(this.currentBirdCount);
@@ -29,7 +31,7 @@ Cycle.prototype.constructor = Cycle;
  * @throws {Error}
  */
 Cycle.prototype.stop = function() {
- 
+
     // update then backup the current cycle
     this.endDate = util.toShortDate();
     this.endBirdCount = this.currentBirdCount;
@@ -38,18 +40,106 @@ Cycle.prototype.stop = function() {
     data.key = this.key + "_DONE_" + util.toShortDate();
     var resp = document.save(data);
     if (resp.metadata.status == "failure"){
-        
+
         log.error("Cycle.stop: problem occured when creating a backup document\n"+  JSON.stringify(resp));
         throw resp;
     }
-    
+
     // delete current cycle document to allow for the creation of a new one
     resp = document.delete(this.key);
     if (resp.metadata.status == "failure"){
-        
+
         log.error("Cycle.stop: problem occured when deleting cycle document\n"+  JSON.stringify(resp));
         throw resp;
     }
-    
+
     return resp;
+};
+
+/**
+ * Attach a measurement to this cycle
+ * @method saveValue
+ * @param {Object} [dto]
+ * @param {String} [dto.type]: the type of measure
+ * @param {Number} [dto.value]: the measured value
+ * @param {Date} [dto.time]: the time at which the value was measure
+ * @param {String} [dto.sensor]: id of the sensor used 
+ * @param {String} [dto.fhCycle]: id of the corresponding cycle
+ * @return {Object}
+ * @throws {Error}
+ */
+Cycle.prototype.saveValue = function(dto) {
+
+    if (!dto || !dto.sensor) {
+
+        throw {
+
+            errorCode: "Missing_Parameter",
+            errorDetail: "Cycle.saveValue: dto and dto.sensor cannot be null or empty"
+        };
+    }
+
+    // check if sensor exists
+    var resp = document.get(dto.sensor);
+    if (resp.metadata.status == "failure") {
+
+        log.error(JSON.stringify(resp));
+        throw {
+
+            errorCode: "Entity_Not_Found",
+            errorDetail: "Cycle.saveValue: the sensor " + dto.sensor + " does not exist"
+        };
+    }
+
+    var data = JSON.parse(JSON.stringify(dto));
+    data.fhCycle = this.key;
+    resp = document.save(data);
+    if (resp.metadata.status == "failure") {
+
+        log.error(JSON.stringify(resp));
+        throw resp.metadata;
+    }
+    
+    return resp.result;
+};
+
+/**
+ * @method listValues
+ * @param {String} [dto.sensor]: optional, filter by sensor (key)
+ * @param {Number} [dto.resultsPerPage]: how many results to return per call (optional, defaults to 50)
+ * @param {Number} [dto.pageNumber]: the page number in case there are more than one pages of results (optional, defaults to 1)
+ * @param {String} [dto.filterExp]: optional, a filter expression, e.g. "fieldX<numeric> = 123"
+ * @param {String} [dto.sortExp]: optional, sort expression, e.g "startDate<date> > '2018-01-01'"
+ * @return {Array<Cycle>}
+ * @throw {Error}
+ */
+Cycle.prototype.listValues = function(dto) {
+  
+        var queryParam = {
+
+        "query": 'apsdb.schema="' + CYCLE_VALUE + '" and key="' + this.key + '"',
+        "fields": "*",
+        "count": "true",
+        "resultsPerPage": "" + ((!dto || !dto.resultsPerPage) ? 50 : dto.resultsPerPage),
+        "pageNumber": "" + ((!dto || !dto.pageNumber) ? 1 : dto.pageNumber)
+    };
+
+    if (dto && dto.sensor) {
+        queryParam["query"] += ' and sensor="'+ dto.sensor + '"';
+    }
+
+    if (dto && dto.filterExp) {
+        queryParam["query"] += ' and ' + dto.filterExp;
+    }
+
+    if (dto && dto.sortExp) {
+        queryParam["sort"] = dto.sortExp;
+    }
+    
+    var resp = document.query(queryParam);  
+    if (resp.metadata.status == "failure") {
+        throw resp.metadata;
+    }
+    
+    return resp.result;
 };
