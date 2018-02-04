@@ -1115,6 +1115,165 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "equipment",
+			"description": "",
+			"item": [
+				{
+					"name": "Create equipment",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/actuator",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\n{\n\t\"controller\": \"90155776A8D092CEF55BCF9D661D5E2A\",\n\t\"device_type\": \"pump\",\n\t\"ip_address\": \"110.67.89.218\",\n\t\"mac_address\": \"AA:BB:CC:DD:EE\",\n\t\"hash\": \"zxsef\",\n\t\"blockChain\": \"none\",\n\t\"compProtocol\": \"ws\",\t\t\n\t\"firmwareVersion\": \"1.0\",\n\t\"server\": \"com.server.thing\",\n    \"structure\": \"F0F975C11A8A2DD8AB0BCBDB00DFE38F\",\n\t\"isProgressive\": false,\n\t\"isOnOff\": true,\n\t\"isThreePhase\": false, \n\t\"equipment\": \"\",\n\t\"totalPower\": 2400\n }"
+						},
+						"description": "Create an actuator"
+					},
+					"response": []
+				},
+				{
+					"name": "Update an actuator",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/equipment/7AB40A47C8FC65AD7AFB5BF37ECB2311",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\n{\n\t\"type\": \"bike\",\n\t\"howMany\": 3,\n\t\"dateAdded\": \"2018-02-01\",\n\t\"location\": \"40.234,-70.567\",\n\t\"blockChain\": \"none\",\n    \"structure\": \"F0F975C11A8A2DD8AB0BCBDB00DFE38F\"\n }"
+						},
+						"description": "Update an actuator"
+					},
+					"response": []
+				},
+				{
+					"name": "List equipments",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/actuator",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \t\"sensor_type\": \"temperature\",\n \t\"sensor_core\": \"TEST_SENSORCORE_x6dxeyk0kim7vsd\",\n \t\"port\": \"5545\",\n \t\"name\": \"temp1\",\n\t\"isCentral\": false\n}"
+						},
+						"description": "List equipments"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete an actuator",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/camera/4BA2A6016BA86D3FEE7289D18FDFACDC",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \t\"sensor_type\": \"temperature\",\n \t\"sensor_core\": \"TEST_SENSORCORE_x6dxeyk0kim7vsd\",\n \t\"port\": \"5545\",\n \t\"name\": \"temp1\",\n\t\"isCentral\": false\n}"
+						},
+						"description": "Delete an actuator"
+					},
+					"response": []
+				},
+				{
+					"name": "Get equipment by id",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/equipment/08143FD05CBCA9B62F80F7D11D9A581C",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \t\"sensor_type\": \"temperature\",\n \t\"sensor_core\": \"TEST_SENSORCORE_x6dxeyk0kim7vsd\",\n \t\"port\": \"5545\",\n \t\"name\": \"temp1\",\n\t\"isCentral\": false\n}"
+						},
+						"description": "Get equipment by id"
+					},
+					"response": []
+				},
+				{
+					"name": "List equipment filtered by structure",
+					"request": {
+						"url": {
+							"raw": "https://agrysense.scriptrapps.io/agServerCore/api/devices/equipment?structure=EA3CBEE2CCCCBA7D8C1589C5A9CAA0F1",
+							"protocol": "https",
+							"host": [
+								"agrysense",
+								"scriptrapps",
+								"io"
+							],
+							"path": [
+								"agServerCore",
+								"api",
+								"devices",
+								"equipment"
+							],
+							"query": [
+								{
+									"key": "structure",
+									"value": "EA3CBEE2CCCCBA7D8C1589C5A9CAA0F1",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \t\"sensor_type\": \"temperature\",\n \t\"sensor_core\": \"TEST_SENSORCORE_x6dxeyk0kim7vsd\",\n \t\"port\": \"5545\",\n \t\"name\": \"temp1\",\n\t\"isCentral\": false\n}"
+						},
+						"description": "List cameras fitlered by controller"
+					},
+					"response": []
+				}
+			]
 		}
 	]
 }
