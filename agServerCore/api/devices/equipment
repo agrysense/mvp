@@ -70,7 +70,7 @@ function getEquipment(id) {
  * @return {Object} {key: the identifier of the equipment, version: document version}
  */
 function createEquipment(data) {
-    return deviceManager.createEquipment(data);
+    return deviceManager.updateEquipment(data);
 }
 
 /**
@@ -82,7 +82,7 @@ function createEquipment(data) {
 function updateEquipment(id, data) {
     
     data.key = id;
-    return deviceManager.updateSensor(data);
+    return deviceManager.updateEquipment(data);
 }
 
 /**

@@ -547,6 +547,6 @@ DeviceManager.prototype.updateEquipment = function(dto) {
  * @return {Object}
  * @throws {Error}
  */
-DeviceManager.prototype.deleteEquipement = function(id) {
+DeviceManager.prototype.deleteEquipment = function(id) {
     return this.deleteObject(id, "deleteEquipment");
 };
