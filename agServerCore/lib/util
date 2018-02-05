@@ -1,3 +1,9 @@
+/**
+ * Removes scriptr.io's metadata from a document
+ * @function removeMetaData
+ * @param {Object} doc: scriptr.io document
+ * @return {Object}
+ */
 function removeMetaData(doc) {
 
     var exclude = ["versionNumber", "creator", "lastModifiedDate", "lastModifiedBy", "creationDate", "schema", "latest", "meta.types", "meta.schema", "rootkey"];
@@ -21,6 +27,7 @@ function removeMetaData(doc) {
 }
 
 /**
+ * @function toShortDate
  * @param {Date} date. If not provided, uses current date
  * @return {String} YYYY-MM-DD
  */
@@ -62,4 +69,23 @@ function parse(data) {
     }
 
     return obj;
+}
+
+/**
+ * @function toLongDate
+ * @param {Date} date, if not provided defaults to current date
+ * @return {String} YYYY-MM-DDTHH:mm:ss
+ */
+function toLongDate(date) {
+    
+    var useDate = null;
+    if (date) {
+        useDate = (date instanceof Date) ? date : new Date(date); 
+    }else {
+        useDate = new Date();
+    }
+
+    var dateStr = useDate.toISOString();
+    dateStr = dateStr.substring(0, dateStr.indexOf("."));
+    return dateStr + "+0000";
 }

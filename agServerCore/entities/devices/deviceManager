@@ -463,7 +463,7 @@ DeviceManager.prototype.updateActuator = function(dto) {
  * @throws {Error}
  */
 DeviceManager.prototype.deleteActuator = function(id) {
-    this.deleteObject(id, "deleteActuator");
+    return this.deleteObject(id, "deleteActuator");
 };
 
 /**
