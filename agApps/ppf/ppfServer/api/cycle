@@ -1,0 +1,111 @@
+/**
+ * Cycle API. Defines CRUD operations to manipulate cycle values (not cycle!)
+ * When adding a new cycle value, send a POST request and pass the data in the request's body as JSON
+ * the request should be sent to "../api/cycle/cycleid/value"
+ * When listing cycle values, send a GET request. Optionally, you can sensorid, pagNumber and resultsPerPage as parameters
+ * the request should be sent to "../api/cycle/cyclid/value"
+ * When deleting a cycle value, send a DELETE request 
+ * the request should be sent to ".../api/cycle/cycleid/value/cyclevalueid"
+ * @module cycle
+ */
+
+var util = require("/agServerCore/lib/util");
+var farmhouseManagerModule = require("/agApps/ppf/ppfServer/entities/farmhouses/farmhouseManager");
+
+var pathInfo = request.pathInfo ? request.pathInfo.split("/") : "";
+var id = pathInfo.length > 0 ? pathInfo[0] : null;
+var valueReq = pathInfo.length > 1 && pathInfo[1] == "value" ? true : false;
+var cycleValueId = pathInfo.length > 2 ? pathInfo[2] : null; 
+
+var method = request.method;
+
+var farmhouseManager = new farmhouseManagerModule.FarmhouseManager();
+
+try {
+
+    switch(method.toLowerCase()) {
+
+        case "get": {
+            return resolveGet();
+        };break;
+        case "post": { 
+
+            var body =  util.parse(request.body ? request.body : request.rawBody);
+            return createCycleValue(id, body);
+        };break;        
+        case "delete": {
+            return resolveDelete();
+        };break;
+        default: throw {
+
+            errorCode: "Invalid_Method",
+            errorDetail: method + " is not supported by the API"
+        }
+    };
+}catch(exception){
+    return exception;
+}
+
+
+function resolveGet() {
+
+    if (!id || ! valueReq) {
+        
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "You should specify the id of the corresponding cycle and use /value in the request path"
+        };
+    }
+
+    return listCycleValues(id, request.parameters);
+}
+
+function resolveDelete() {
+
+    if (!id || ! valueReq) {
+        
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "You should specify the id of the corresponding cycle and use /value in the request path"
+        };
+    }
+    
+    return deleteCycleValue(id);
+}
+
+/**
+ * @function listCycleValues
+ * @param {String} id: the cycle id
+ * @param {Object} [params]
+ * @param {Number} [params.pageNumer]: number of the page to return when paginating (optional, defaults to 1)
+ * @param {Number} [params.resultsPerPage]: max number of results in one page (optional, defaults to 50)
+ * @return {Array}
+ */
+function listCycleValues(id, params) {
+    
+    var cycle = farmhouseManager.getCycle(id);
+    return cycle.listValues(params);
+}
+
+/**
+ * @function createCycleValue
+ * @param {String} id: the cycle id 
+ * @param {Object} [data]: cycle value data
+ * @return {Object} {key: the identifier of the cycle value, version: document version}
+ */
+function createCycleValue(id, data) {
+   
+    var cycle = farmhouseManager.getCycle(id); 
+    return cycle.saveValue(data);
+}
+
+/**
+ * @function deleteCycleValue
+ * @param {String} id: identifier of the cycle value
+ * @return {Object}
+ */
+function deleteCycleValue(id) {
+   
+    var cycle = farmhouseManager.getCycle(id);
+    return cycle.deleteCycleValue(data);
+}

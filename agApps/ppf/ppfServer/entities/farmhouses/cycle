@@ -92,14 +92,21 @@ Cycle.prototype.saveValue = function(dto) {
     }
 
     var data = JSON.parse(JSON.stringify(dto));
+    data["meta.schema"] = CYCLE_VALUE;
     data.fhCycle = this.key;
+    if (!data.time) {
+    	data.time = util.toLongDate();    
+    }else {
+        data.time = util.toLongDate(data.time);
+    }
+    
     resp = document.save(data);
     if (resp.metadata.status == "failure") {
 
         log.error(JSON.stringify(resp));
         throw resp.metadata;
     }
-    
+
     return resp.result;
 };
 
@@ -114,14 +121,14 @@ Cycle.prototype.saveValue = function(dto) {
  * @throw {Error}
  */
 Cycle.prototype.listValues = function(dto) {
-  
-        var queryParam = {
 
-        "query": 'apsdb.schema="' + CYCLE_VALUE + '" and key="' + this.key + '"',
-        "fields": "*",
-        "count": "true",
-        "resultsPerPage": "" + ((!dto || !dto.resultsPerPage) ? 50 : dto.resultsPerPage),
-        "pageNumber": "" + ((!dto || !dto.pageNumber) ? 1 : dto.pageNumber)
+    var queryParam = {
+
+        query: 'apsdb.schema="' + CYCLE_VALUE + '" and fhCycle="' + this.key + '"',
+        fields: "*",
+        count : "true",
+        resultsPerPage: "" + ((!dto || !dto.resultsPerPage) ? 50 : dto.resultsPerPage),
+        pageNumber: "" + ((!dto || !dto.pageNumber) ? 1 : dto.pageNumber)
     };
 
     if (dto && dto.sensor) {
@@ -135,11 +142,36 @@ Cycle.prototype.listValues = function(dto) {
     if (dto && dto.sortExp) {
         queryParam["sort"] = dto.sortExp;
     }
-    
+
     var resp = document.query(queryParam);  
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
+
+    return resp.result;
+};
+
+/**
+ * @method deleteValue
+ * @param {String} id: the value's id
+ * @return {Object}
+ * @throw {Error}
+ */
+Cycle.prototype.deleteValues = function(id) {
+
+    if (!id) {
+
+        throw {
+
+            errorCode: "Missing_Parameter",
+            errorDetail: "Cycle.deleteValue: id cannot be null or empty"
+        };
+    }
     
+     var resp = document.delete(id);  
+    if (resp.metadata.status == "failure") {
+        throw resp.metadata;
+    }
+
     return resp.result;
 };
