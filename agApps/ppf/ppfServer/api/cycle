@@ -70,7 +70,7 @@ function resolveDelete() {
         };
     }
     
-    return deleteCycleValue(id);
+    return deleteCycleValue(id, valueReq);
 }
 
 /**
@@ -107,5 +107,5 @@ function createCycleValue(id, data) {
 function deleteCycleValue(id) {
    
     var cycle = farmhouseManager.getCycle(id);
-    return cycle.deleteCycleValue(data);
+    return cycle.deleteValue(valueReq);
 }
