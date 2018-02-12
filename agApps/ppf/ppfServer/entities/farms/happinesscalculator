@@ -1,0 +1,139 @@
+var log = require("log"); log.setLevel("info");
+var document = require("document");
+
+/**
+ * Absrtract class that defines the contract of Happiness index calculators, to be extended by concrete child classes.
+ * The name of the concrete class to use shoud be specified in the config file. 
+ * Child classes can leverage the saveHappinessIndex() and saveGlobalHappiness() methods to persist the corresponding values
+ * @class HappinessCalculator
+ * @constructor
+ */
+function HappinessCalculator(dto) {
+
+    if (dto && dto.inheritance) {
+        return;
+    }
+
+    if (dto && dto.farmManager) {
+        this.farmManager = dto.farmManager;
+    }else {
+        
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: this.constructor.name  + " dto.farmManager is mandatory"
+        };
+    }
+}
+
+/**
+ * Calculate the happiness index of a given farm
+ * @method calculateHappiness
+ * @param {String} farmid: the identifier of the farm of which we need to calculate the happiness index
+ * @return {Number} happiness index
+ * @throws {Error}
+ */
+HappinessCalculator.prototype.calculateHappiness = function(farmid) {
+
+    throw {
+        errorCode: "Not_Implemented"
+    };
+};
+
+/**
+ * Calculate the global happiness index accross all farms
+ * @method calculateGlobalHappiness
+ * @return {Number} global happiness index
+ * @throws {Error}
+ */
+HappinessCalculator.prototype.calculateGlobalHappiness = function() {
+
+    // Default implementation
+    var farmList = this.farmManager.listFarms();
+    var avgIndex = 0;
+    for (var i = 0; i < farmList.length; i++) {
+        
+        var index = this.calculateHappiness(farmList[i].key);
+        avgIndex = (avgIndex + index) / (i + 1);
+    }
+    
+    return avgIndex;
+};
+
+/**
+ * Calculate the happiness index of a given farm
+ * @method calculateHappiness
+ * @param {String} farmid: the identifier of the farm of which we need to calculate the happiness index
+ * @return {Number} happiness index
+ * @throws {Error}
+ */
+HappinessCalculator.prototype.calculateHappiness = function(farmid) {
+
+    throw {
+        errorCode: "Not_Implemented"  
+    };
+};
+
+/**
+ * save the happiness index of a given farm
+ * @method saveHappinessIndex
+ * @return {String} document key
+ * @throws {Error}
+ */
+HappinessCalculator.prototype.saveHappinessIndex = function(farmid, index) {
+
+    if (!index || !farmid) {
+
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "HappinessCalculator.saveHappinessIndex: famrid and index cannot be null or empty"
+        };
+    }
+
+    var fields = {
+
+        "structure": farmid,
+        "value": index,
+        "meta.schema": "HappinessIndex"
+    };
+
+    var resp = document.save(fields);
+    if (resp.metadata.status == "failure") {
+
+        log.error("HappinessCalculator.saveHappinessIndex: error occurred while saving happinex index for " + farmid + "\n" + JSON.stringify(resp));
+        throw resp.metadata;
+    }
+
+    return resp.result.key;
+};
+
+/**
+ * save the global happiness index of accross farms
+ * @method saveGlobalHappinessIndex
+ * @return {String} document key
+ * @throws {Error}
+ */
+HappinessCalculator.prototype.saveGlobalHappinessIndex = function(index) {
+
+    if (!index || !farmid) {
+
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: "HappinessCalculator.saveGlobalHappinessIndex: index cannot be null or empty"
+        };
+    }
+
+    var fields = {
+
+        "value": index,
+        "meta.schema": "GlobalHappinessIndex"
+    };
+
+    var resp = document.save(fields);
+    if (resp.metadata.status == "failure") {
+
+        log.error("HappinessCalculator.saveGlobalHappinessIndex: error occurred while saving global happinex index " + farmid + "\n" + JSON.stringify(resp));
+        throw resp.metadata;
+    }
+
+    return resp.result.key;
+};

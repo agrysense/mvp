@@ -129,119 +129,37 @@ FarmManager.prototype.deleteFarm = function(farmid) {
     return resp.metadata;
 }
 
-/*
-var farm1 = {
-    "0" : [
-        { 
-            "id": {"value": "farm001"},
-            "lat" : {"value": "33.854337"}, 
-            "long" :{"value": "35.608358"}, 
-            "location": {"value": "Deir Al Kalaa"},
-            "manager": {"value": "Jamil Helou"},
-            "phone": {"value": "04876345"},
-            "type": {"value": "Poultry"}
-        }
-    ], 
-    "source" : "simulator",
-    "order" : [ "0" ]
+/**
+ * Calculates the happiness index of a given farm (delegates this work to some implementation of HappinessCalculator)
+ * @method calculateHappiness  
+ * @param {String} farmid
+ * @return {Number} farm's happiness index 
+ * @throws {Error}
+ */
+FarmManager.prototype.calculateHappiness = function(farmid) {    
+   return this._getHappinessCalculator().calculateHappiness(farmid);
 };
 
-farm1[0][0].happyness = {
-    "value": calculateHappyness(farm1[0][0].id.value)
+/**
+ * Calculates the global happiness index (delegates this work to some implementation of HappinessCalculator)
+ * @method calculateGlobalHappiness
+ * @return {Number} global happiness index 
+ * @throws {Error}
+ */
+FarmManager.prototype.calculateGlobalHappiness = function() {
+    return this._getHappinessCalculator().calculateGlobalHappiness();
 };
 
-farm1[0][0].bounce = {
-    "value": farm1[0][0].happyness.value < 60 ? "true" : "false"
-};
-
-farm1[0][0].feed = {
-    "value": getFeed()
-};
-
-farm1[0][0].water = {
-    "value": getWater()
-};
-
-farm1[0][0].energy = {
-    "value": getEnergy()
-};
-
-var farm2 = {
-
-    "0": [
-        {
-            "id": {"value": "farm002"},
-            "lat": {"value": "34.098630"}, 
-            "long": {"value":"35.719914"}, 
-            "location": {"value": "Zebdine"},
-            "manager": {"value": "Fahim Majzoub"},
-            "phone": {"value": "06123456"},
-            "type": {"value": "Poultry"}
-         
-        }
-    ], 
-    "source" : "simulator",
-    "order" : [ "0" ]
-};
-
-farm2[0][0].happyness = {
-    "value": calculateHappyness(farm1[0][0].id.value)
-};
-
-farm2[0][0].bounce = {
-    "value": farm1[0][0].happyness.value < 60 ? "true" : "false"
-};
-
-farm2[0][0].feed = {
-    "value": getFeed()
-};
-
-farm2[0][0].water = {
-    "value": getWater()
-};
-
-farm2[0][0].energy = {
-    "value": getEnergy()
-};
-
-
-var farms = {
-    "farm1": farm1,
-    "farm2": farm2
-};
-
-function getFarm(id) {
-    return farms[id][0][0];
-}
-
-function listFarms() {
-    return farms;
-}
-
-*/
-
-function calculateHappyness(farm) {    
-    var happynessIndex = Math.round(Math.random() * 25) + 75;
-    return happynessIndex;
-}
-
-function calculateGlobalHappyness() {
-    var total = 0;
-    for (var farm in farms) {
-        total += calculateHappyness(farm);
-    }
+FarmManager.prototype._getHappinessCalculator = function() {   
     
-    return Math.round(total / Object.keys(farms).length);
-}
-
-function getFeed() {
-   return Math.round(Math.random() * 50) + 50;
-}
-
-function getWater() {
-    return Math.round(Math.random() * 50) + 50;
-}
-
-function getEnergy() {
-    return Math.round(Math.random() * 60) + 40;
-}
+    if (!this.happinessCalculator) {
+        
+        var config = require("/agApps/ppf/config");
+        var moduleName = config.happinessIndexCalculator.path; 
+        var moduleInstance = require(moduleName);
+        var className = config.happinessIndexCalculator.clazz; 
+        this.happinessCalculator = new moduleInstance[className]({"farmManager": this});
+    }
+  
+    return this.happinessCalculator;
+};

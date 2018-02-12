@@ -1,0 +1,28 @@
+var happinesscalculator = require("./happinesscalculator");
+
+/**
+ * dummy happiness index calculator
+ * @class DummyCalculator
+ * @constructor
+ */
+
+function DummyCalculator(dto) {
+    happinesscalculator.HappinessCalculator.call(this, dto);
+}
+
+DummyCalculator.prototype = new happinesscalculator.HappinessCalculator({inheritance:true});
+DummyCalculator.prototype.constructor = DummyCalculator;
+
+/**
+ * Calculate the happiness index of a given farm
+ * @method calculateHappiness
+ * @param {String} farmid: the identifier of the farm of which we need to calculate the happiness index
+ * @return {Number} happiness index
+ * @throws {Error}
+ */
+DummyCalculator.prototype.calculateHappiness = function(farmid) {    
+    
+    var happinessIndex = Math.round(Math.random() * 25) + 75;
+    this.saveHappinessIndex(farmid, happinessIndex);
+    return happinessIndex;
+}

@@ -4,11 +4,12 @@
  * When updating a farmhouse, send a PUT request and pass the farmhouse's data in the request's body as JSON (.../api/farmhouse/123456)
  * When getting a farmhouse, send a GET request and pass the farmhouse id at the end of the path (e.g. ".../api/farmhouse/123456")
  * When listing farmhouses, send a GET request. Optionally, you can pass farm (id), pagNumber and resultsPerPage as parameters
- * To list the cycles of a farmhouse, send a GET request to "../api/id/cycle"
- * To get a specific cycle, send a GET request to "../api/farmhouse/id/cycle/cycleid"
- * To start a cycle, send a PUT request to "../api/farmhouse/id/cycle"
- * To update a cycle, send a PUT request to "../id/farmhouse/id/cycle/cycleid"  + cycle data in JSON body
- * To stop the current cycle, send a DELETE request to "../api/farmhouse/id/cycle"
+ * When deleting a farmhouse, send a DELETE request and pass the farmhouse id at the end of the path (e.g. ".../api/farmhouse/1234567")
+ * To list the cycles of a farmhouse, send a GET request to "../api/farmhouse/farmhouse_id/cycle"
+ * To get a specific cycle, send a GET request to "../api/farmhouse/farmhouse_id/cycle/cycleid"
+ * To start a cycle, send a PUT request to "../api/farmhouse/farmhouse_id/cycle"
+ * To update a cycle, send a PUT request to "../id/farmhouse/farmhouse_id/cycle/cycleid"  + cycle data in JSON body
+ * To stop the current cycle, send a DELETE request to "../api/farmhouse/farmhouse_id/cycle"
  * @module farmhouse
  */
 

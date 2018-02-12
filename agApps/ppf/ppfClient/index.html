@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>My HTML File</title>
+        <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.min.css">
+        <!-- font awesome.css -->
+        <script src="https://use.fontawesome.com/3d61d6959e.js"></script>
+        <link href="//fonts.googleapis.com/css?family=Josefin+Sans|Montserrat" rel="stylesheet">
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>	
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+
+
+        <link rel="stylesheet" href="/UIComponents/layout/frontend/components/menu/menu.css">
+        <link rel="stylesheet" href="/UIComponents/examples/app/css/dashboard.css">
+
+
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular-route.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-animate.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-sanitize.js"></script>
+        <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-2.4.0.js"></script>
+
+        <script src="/UIComponents/layout/frontend/components/module.js"></script>
+        <script src="/UIComponents/layout/frontend/components/menu/menu.js"></script>
+
+        <script src="/UIComponents/layout/frontend/components/header/header.js"></script>
+        <link rel="stylesheet" href="/UIComponents/layout/frontend/components/header/header.css">
+
+        <!-- JQUERY Material  To use jQuery, simply ensure it is loaded before the angular.js file. -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <script src="//code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js" ></script>
+
+        <script src="/agClientCore/login/widgets/authorization.js" ></script>
+
+        <!-- Add this -->
+        <link rel="stylesheet" href="/agApps/ppf/ppfClient/css/style.css">
+
+
+        <script type="text/javascript"> 
+            var authorization  = $.scriptr.authorization(
+                {
+                    onTokenValid: function(){ 
+                    
+                    }, 
+                    loginPage:"/agClientCore/login/html/login.html"}
+            );
+        </script>
+
+        <script>
+            var underscore = angular.module('underscore', []);
+            underscore.factory('_', ['$window', function($window) {		
+                return $window._; // assumes underscore has already been loaded on the page		
+            }]);
+
+            // App
+            var myApp = angular.module('myApp', ["Layout"]);
+            var routingItems = {
+                "params": [
+                    {"route": "main", "template": "/agApps/ppf/ppfClient/main_holder.html"},
+                    {"route": "farm", "template": "/agApps/ppf/ppfClient/farm_holder.html"},                    
+                    {"route": "logout", "template": "/agApps/ppf/ppfClient/logout.html"}               
+                ]
+            };            
+
+            myApp
+                .constant("menuItemsJson",  {
+                "mainMenu": "col1",
+                "col1": [
+                    {"id":"1", "iconClass":"fa fa-dashboard", "label": "Main Dashboard", "route":"#/main", "active":"true"},
+                    {"id":"2", "iconClass":"fa fa-cogs", "label": "Farm", "route": "#/farm","active":"false"},                    
+                ]
+            }).constant("routingJson", routingItems)
+                .config(
+                function($routeProvider, routingJson){
+                    for(var i = 0; i < routingJson.params.length; i++){
+                        $routeProvider
+                            .when("/", {
+                            templateUrl : "/agApps/ppf/ppfClient/main_holder.html"
+                        })
+                            .when("/" + routingJson.params[i].route,
+                                  {
+                            templateUrl: routingJson.params[i].template
+                        })
+                    }
+                });
+
+            // Controller
+            myApp.controller('testCtrl', function($scope, menuItemsJson) {
+                var vm = this 
+                vm.menuItems = menuItemsJson
+                vm.user = {login: (atob(document.cookie.split("=")[1]).split(":")[1])};
+            });
+        </script>
+    </head>
+
+    <body ng-app="myApp">  
+        <div ng-controller="testCtrl as vm">
+            <main>      
+                <header-top 
+
+                            user="vm.user" 
+                            header-items='{
+                                          "items": [],
+                                          "subitems": [],                      
+                                          "appname": "AgrySense",
+                                          "logout": {"icon": "fa fa-sign-out", "label": "Logout", "route":"#/logout"},     
+                                          "logo": ""
+                                          }'>
+                </header-top>
+                <!-- menu items can also be passed as a json object directly here -->
+                <menu class="menu-wrap" menu-items="vm.menuItems"></menu>                      
+                <section>
+                    <div class="page-content">
+                        <ng-view></ng-view>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </body>
+
+</html>

@@ -1,0 +1,28 @@
+/*
+ * Additional styling for index.html
+ */
+.iframe-size {
+    width: 100%; 
+    height: calc(100vh - 45px);
+}
+
+.appname {
+ 	color: #000000;
+    font-family: verdana;
+    font-size: 22px;
+}
+
+.side-bar {
+    background-color: #FFFFFF;
+}
+
+.side-bar .nav>li>a {color: #000000; border-radius: 0;}
+.side-bar .nav>li.active>a { background-color: rgba(129,247,190, 0.7);}
+
+header {
+    background-color: #FFFFFF
+}
+
+/*
+ * End additional styling for index.html
+ */

@@ -112,7 +112,7 @@ $.widget( "scriptr.loginWidget", {
         var parameters = {"id" : login, "password" : password ,"expiry" : "" + this.expiry,"auth_token":this.anonymousToken};
         $.ajax({
 				type: "POST",
-				url: "https://"+ document.location.hostname + "/happiness/login/login",
+				url: "https://"+ document.location.hostname + "/agClientCore/login/login",
 				data: parameters,
           		dataType: 'json',
 				success: jQuery.proxy(function(data) {

@@ -1,7 +1,12 @@
 var log = require("log"); log.setLevel("info");
-var farmManager = require("../entities/farms/farmManager");
+var farmManagerModule = require("../entities/farms/farmManager");
 
-
-var happyness = farmManager.calculateGlobalHappyness();
-publish("responseChannel", {"id": "global_happyness", "result": happyness});
-return happyness;
+try {
+    
+    var farmManager = new farmManagerModule.FarmManager();
+    var happiness = farmManager.calculateGlobalHappiness();
+    publish("responseChannel", {"id": "global_happyness", "result": happiness});
+    return happiness;
+}catch(exception){
+    return exception;
+}

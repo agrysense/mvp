@@ -1,0 +1,13 @@
+/**
+ * Configuration file of the ppf application
+ * @module config
+ */
+
+/**
+ * Name of the class to use to calculate happiness indexes
+ */
+const happinessIndexCalculator = {
+    
+    path: "/agApps/ppf/ppfServer/entities/farms/dummycalculator",
+    clazz: "DummyCalculator"
+};

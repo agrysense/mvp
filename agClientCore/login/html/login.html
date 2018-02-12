@@ -16,6 +16,8 @@
 
       	<script src="../widgets/login.js"> </script>
         <script src="../widgets/authorization.js"> </script>
+        
+        <script src="/agClientCore/config.js"></script>
 
 		<link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type ='text/css' />
       	<link href='https://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.3/css/bootstrapValidator.min.css' rel='stylesheet' type ='text/css' />
@@ -56,7 +58,7 @@
     
       
       <script type="text/javascript">
-        $('#loginForm').loginWidget({redirectTarget:"../../view/index.html",expiry:3,anonymousToken:"SkZFMEVBMzJBMQ==" });
+        $('#loginForm').loginWidget({redirectTarget:redirectTarget,expiry:3,anonymousToken:"SkZFMEVBMzJBMQ==" });
       </script>
 	</body>
 </html>
