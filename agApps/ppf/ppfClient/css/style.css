@@ -1,10 +1,18 @@
 /*
  * Additional styling for index.html
  */
+
+body {
+    background-color: #FFFFFF;
+    overflow: auto;
+}
+
 .iframe-size {
     width: 100%; 
-    height: calc(100vh - 45px);
+    height: calc(100vh - 55px);
 }
+
+.logo {background: #FFFFFF;}
 
 .appname {
  	color: #000000;
@@ -14,6 +22,7 @@
 
 .side-bar {
     background-color: #FFFFFF;
+    margin-top:25px;
 }
 
 .side-bar .nav>li>a {color: #000000; border-radius: 0;}

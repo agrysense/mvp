@@ -13,6 +13,10 @@ var farmManagerModule = require("/agApps/ppf/ppfServer/entities/farms/farmManage
 var id = request.pathInfo; 
 var method = request.method;
 
+// specific parameter sent by a map. used to format the data as expected by the latter
+var isMap = request.parameters.body ? JSON.parse(request.parameters.body) : false; 
+isMap = typeof(isMap) == "string" ? JSON.parse(isMap).map :  isMap.map; log.info(isMap);
+
 var farmManager = new farmManagerModule.FarmManager();
 
 try {
@@ -24,7 +28,13 @@ try {
             if (id) {
                 return getFarm(id);
             }else {
-                return listFarms(request.parameters);
+
+                var list = listFarms(request.parameters);
+                if (isMap) {
+                    return _formatForMap(list);
+                }
+
+                return list;
             }
         };break;
         case "post": { 
@@ -96,4 +106,35 @@ function updateFarm(data) {
  */
 function deleteFarm(id) {
     return farmManager.deleteFarm(id);
+}
+
+/**
+ * this function is used whenever a map component invokes the api
+ */
+function _formatForMap(list) {
+
+    var out = {
+        0: {
+            1: [],
+            source : "ppf",
+            order : [ "1" ] 
+        }
+    };
+
+    for (var i = 0; i < list.length; i++) {
+
+        var latlong = list[i].location.split(":");
+        var obj = {
+
+            lat: {value: latlong[0].replace(/,/, ".")},
+            long: {value: latlong[1].replace(/,/, ".")},
+            name: {value: list[i].name},
+            phone: {value: list[i].phone},
+            company: {value: list[i].company}
+        };  
+
+        out["0"]["1"].push(obj);
+    }   
+
+    return out;
 }

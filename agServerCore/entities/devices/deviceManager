@@ -300,7 +300,8 @@ DeviceManager.prototype.deleteSensor = function(id) {
  * lists all available sensorcores
  * @method listSensorCores
  * @param {Object} [dto] optional search criteria and pagination
- * @param {String} [dto.controller]: the identifier of the controller under a sensor core (optional)
+ * @param {String} [dto.controller]: the identifier of the controller that controls the sensor core is (optional)
+ * @param {String} [dto.structure]: the identifier of the structure under which the sensor core is deployed (optional)
  * @param {Number} [dto.resultsPerPage]: how many results to return per call (optional, defaults to 50)
  * @param {Number} [dto.pageNumber]: the page number in case there are more than one pages of results (optional, defaults to 1)
  * @return {JSONArray<SensorCore>} 
@@ -319,6 +320,10 @@ DeviceManager.prototype.listSensorCores = function(dto) {
 
     if (dto && dto.controller) {
         queryParam.query += ' and controller="'+ dto.controller + '"';
+    }
+    
+     if (dto && dto.structure) {
+        queryParam.query += ' and structure="'+ dto.structure + '"';
     }
 
     var resp = document.query(queryParam);

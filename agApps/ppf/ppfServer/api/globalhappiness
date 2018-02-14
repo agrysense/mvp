@@ -1,12 +1,24 @@
 var log = require("log"); log.setLevel("info");
 var farmManagerModule = require("../entities/farms/farmManager");
 
+var option = request.pathInfo; 
 try {
-    
+
     var farmManager = new farmManagerModule.FarmManager();
-    var happiness = farmManager.calculateGlobalHappiness();
-    publish("responseChannel", {"id": "global_happyness", "result": happiness});
-    return happiness;
+    var happiness = 0;
+    var list = [];
+    happiness = farmManager.calculateGlobalHappiness();
+    if (option && option == "current") {       
+        var resp = publish("responseChannel", {"id": "global_happiness", "result": happiness});
+    }
+
+    var list = farmManager.listGlobalHappiness();
+    resp = publish("responseChannel", {"id": "global_happiness_list", "result": list});
+    if (option && option == "current") {
+        return happiness;    
+    }else {
+        return list;  
+    }
 }catch(exception){
     return exception;
 }

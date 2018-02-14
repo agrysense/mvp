@@ -56,6 +56,7 @@ HappinessCalculator.prototype.calculateGlobalHappiness = function() {
         avgIndex = (avgIndex + index) / (i + 1);
     }
     
+    this.saveGlobalHappinessIndex(avgIndex);
     return avgIndex;
 };
 
@@ -114,7 +115,7 @@ HappinessCalculator.prototype.saveHappinessIndex = function(farmid, index) {
  */
 HappinessCalculator.prototype.saveGlobalHappinessIndex = function(index) {
 
-    if (!index || !farmid) {
+    if (!index) {
 
         throw {
             errorCode: "Missing_Parameter",
@@ -136,4 +137,40 @@ HappinessCalculator.prototype.saveGlobalHappinessIndex = function(index) {
     }
 
     return resp.result.key;
+};
+
+/**
+ * Returns historical values of persisted Global happiness index. Default implementation.
+ * @param {Object} [dto]
+ * @param {Number} [dto.pageNumber]: optional, specifies the page to return. Defaults to 1.
+ * @param {Number} [dto.resultsPerPage]: optional, specifies how many results to return per page. Defaults to 50.
+ * @method listGlobalHappinessIndexes
+ * @return {Object} {documents, count)
+ * @throws {Error}
+ */
+HappinessCalculator.prototype.listGlobalHappinessIndexes = function(dto) {
+       
+    var queryParams = {
+        
+        query: 'apsdb.schema = "GlobalHappinessIndex"',
+        fields: "value, apsdb.creationTime",
+        count: true
+    };
+    
+    if (dto && dto.pageNumber) {
+        queryParams.pageNumber = dto.pageNumber;
+    }
+    
+    if (dto && dto.resultsPerPage) {
+        queryParams.resultsPerPage = dto.resultsPerPage;
+    }
+    
+    var resp = document.query(queryParams);
+    if (resp.metadata.status == "failure") {
+        
+        log.error("HappinessCalculator.prototype.listGlobalHappinessIndexes: error occured while reading\n" + JSON.stringify(resp));
+        throw resp.metadata;
+    }
+    
+    return resp.result;
 };

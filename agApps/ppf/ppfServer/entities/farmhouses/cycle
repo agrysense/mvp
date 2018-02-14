@@ -172,6 +172,6 @@ Cycle.prototype.deleteValue = function(id) {
     if (resp.metadata.status == "failure") {
         throw resp.metadata;
     }
-console.log(JSON.stringify(resp))
+
     return resp.result;
 };

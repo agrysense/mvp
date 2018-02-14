@@ -72,7 +72,7 @@ Controller.prototype.addCamera = function(obj) {
 };
 
 /**
- * lists all available sensors under this farm
+ * lists all available sensors under this controller
  * 
  * @method listSensors
  * @param {Object} [dto] optional search criteria and pagination

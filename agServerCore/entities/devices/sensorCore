@@ -15,3 +15,18 @@ function SensorCore(dto) {
 
 SensorCore.prototype = new componentModule.Component({inheritance: true});
 SensorCore.prototype.constructor = SensorCore;
+
+/**
+ * lists all available sensors under this sensor core
+ * 
+ * @method listSensors
+ * @param {Object} [dto] optional search criteria and pagination
+ * @return {JSONArray<Sensor>}
+ * @throws {Error}
+ */
+SensorCore.prototype.listSensors = function(dto) {
+
+    var searchDto =  dto ? JSON.parse(JSON.stringify(dto)) : {};
+    searchDto.controller = this.id;
+    return this.deviceManager.listSensors(searchDto);
+};

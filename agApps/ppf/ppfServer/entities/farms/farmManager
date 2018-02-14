@@ -150,6 +150,18 @@ FarmManager.prototype.calculateGlobalHappiness = function() {
     return this._getHappinessCalculator().calculateGlobalHappiness();
 };
 
+/**
+ * Returns the list of global happiness measurements 
+ * @method listGlobalHappiness
+ * @return {Array} array of measurments
+ * @throws {Error}
+ */
+FarmManager.prototype.listGlobalHappiness = function() {
+    
+    var resp = this._getHappinessCalculator().listGlobalHappinessIndexes();
+    return resp.documents;
+};
+
 FarmManager.prototype._getHappinessCalculator = function() {   
     
     if (!this.happinessCalculator) {

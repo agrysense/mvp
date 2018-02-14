@@ -282,3 +282,119 @@ Farmhouse.prototype.stopCycle = function() {
     return currentCycle.stop();
 };
 
+/**
+ * Stop the current cycle if a cycle was started. Otherwise, throws an exception 
+ * @method stopCycle
+ * @return {Cycle} the current cycle object that was stopped
+ * @throw {Error}
+ */
+Farmhouse.prototype.getCurrentValueOf = function() {
+ 
+    var currentCycle = this.getCurrentCycle();  
+    if (!currentCycle) {
+
+        throw {
+            error: "Invalid_Action",
+            errorDetail: "No cycle was started for this farmhouse: " + this.key
+        };
+    }
+
+    return currentCycle.stop();
+};
+
+
+/**
+ * List all controllers under this farmhouse
+ * @method listControllers
+ * @param {Object} [dto]: optional parameters
+ * @param {Number} [dto.pageNumber]: specifies the page number when paginating, optional, defaults to 1
+ * @param {Number} [dto.resultsPerPage]: specifies the max number of results per page (>50), optional, defaults to 50
+ * @return {JSONArray<Controller>} 
+ * @throws {Error}
+ */
+Farmhouse.prototype.listControllers = function(dto) {
+    
+ 	var searchDto = {};
+    if (dto) {
+        searchDto = JSON.parse(JSON.stringify(dto));
+    }
+    
+    searchDto.structure = this.key;    
+    return this.deviceManager.listControllers(searchDto);
+};
+
+/**
+ * List all sensor cores under this farmhouse and not under a controller
+ * @method listSensorCores
+ * @param {Object} [dto]: optional parameters
+ * @param {Number} [dto.pageNumber]: specifies the page number when paginating, optional, defaults to 1
+ * @param {Number} [dto.resultsPerPage]: specifies the max number of results per page (>50), optional, defaults to 50
+ * @return {JSONArray<SensorCore>} 
+ * @throws {Error}
+ */
+Farmhouse.prototype.listSensorCores = function() {
+    
+    var searchDto = {};
+    if (dto) {
+        searchDto = JSON.parse(JSON.stringify(dto));
+    }
+    
+    searchDto.structure = this.key;    
+    return this.deviceManager.listSensorCores(searchDto);
+};
+
+/**
+ * List sensors under this farmhouse
+ * IMPORTANT: the implementation of this method is incomplete as it considers that the number of controllers
+ * and the number of sensor cores can be above 50 for this farmhouse. 
+ * @method listSensors
+ * @param {Object} [dto]: optional parameters
+ * @param {String} [dto.type]: sensor type
+ * @return {JSONArray<Sensor>} 
+ * @throws {Error}
+ */
+Farmhouse.prototype.listSensors = function(dto) {
+    
+    var controllers = this.listControllers();
+    var sensorCores = this.listSensorCores();
+    var sensors = [];
+    
+    var type = dto && dto.type ? dto.type : null;
+	var fromControllers = this._listSensors(controllers, type);   
+    var fromSensorCores = this._listSensors(sensorCores, type); 
+    sensors = sensors.concat(fromControllers);
+    sensors = sensors.contact(fromSensorCores);
+    return sensors;
+};
+
+/**
+ * Utility methods that factors out reusable logic to list sensors
+ * @method _listSensors
+ * @param {Array} sensorOwnerList: a list of entities that have associated sensors, e.g. controllers and sensor cores
+ * @param {String} sensor type: the type of sensor to filter with (optional)
+ * @return {Array<Sensor>}
+ */
+Farmhouse.prototype._listSensors = function(sensorOwnerList, sensorType) {
+    
+    // get all sensors related to the 'sensorOwnerList' in the farmhouse
+    var sensors = [];
+    for (var i = 0; sensorOwnerList && i < sensorOwnerList.length; i++) {
+        
+        var list = sensorOwnerList[i].listSensors();
+        
+        // if asked to filter by sensor type, do it
+        if (sensorType) {
+        	
+            for (var j = 0; j < list.length; j++) {
+                
+                if (list[i].sensor_type == dto.type){
+                    sensors.push(list[i]);
+                }
+            }
+        }else { // otherwise, just add all sensors
+            sensors.push(list);
+        }
+    }
+    
+    return sensors;
+};
