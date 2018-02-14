@@ -275,33 +275,12 @@ Farmhouse.prototype.stopCycle = function() {
 
         throw {
             error: "Invalid_Action",
-            errorDetail: "No cycle was started for this farmhouse: " + this.key
+            errorDetail: "Farmhouse.stopCycle: no cycle was started for this farmhouse: " + this.key
         };
     }
 
     return currentCycle.stop();
 };
-
-/**
- * Stop the current cycle if a cycle was started. Otherwise, throws an exception 
- * @method stopCycle
- * @return {Cycle} the current cycle object that was stopped
- * @throw {Error}
- */
-Farmhouse.prototype.getCurrentValueOf = function() {
- 
-    var currentCycle = this.getCurrentCycle();  
-    if (!currentCycle) {
-
-        throw {
-            error: "Invalid_Action",
-            errorDetail: "No cycle was started for this farmhouse: " + this.key
-        };
-    }
-
-    return currentCycle.stop();
-};
-
 
 /**
  * List all controllers under this farmhouse
