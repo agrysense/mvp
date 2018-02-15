@@ -12,7 +12,7 @@
 			"description": "",
 			"item": [
 				{
-					"name": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farm/0725D7D519102E30C7ACF9109842AA21",
+					"name": "Update farm",
 					"request": {
 						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farm/0725D7D519102E30C7ACF9109842AA21",
 						"method": "PUT",
@@ -37,7 +37,7 @@
 					"response": []
 				},
 				{
-					"name": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farm/0725D7D519102E30C7ACF9109842AA21",
+					"name": "Get farm by id",
 					"request": {
 						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farm/0725D7D519102E30C7ACF9109842AA21",
 						"method": "GET",
@@ -54,7 +54,7 @@
 					"response": []
 				},
 				{
-					"name": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farm",
+					"name": "List farms",
 					"request": {
 						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farm",
 						"method": "GET",
@@ -71,9 +71,9 @@
 					"response": []
 				},
 				{
-					"name": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farm",
+					"name": "Create new farm",
 					"request": {
-						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farm",
+						"url": "https://agrysense.scriptrapps.io/agApps/ppf/ppfServer/api/farm",
 						"method": "POST",
 						"header": [
 							{
@@ -96,7 +96,7 @@
 					"response": []
 				},
 				{
-					"name": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farm",
+					"name": "Delete a farm",
 					"request": {
 						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farm/A20EE35936B71A46D1A22E52658B1033",
 						"method": "DELETE",
@@ -124,7 +124,7 @@
 				{
 					"name": "Create farmhouse with invalid farm reference",
 					"request": {
-						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse",
+						"url": "https://agrysense.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse",
 						"method": "POST",
 						"header": [
 							{
@@ -149,7 +149,7 @@
 				{
 					"name": "Create farmhouse",
 					"request": {
-						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse",
+						"url": "https://agrysense.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse",
 						"method": "POST",
 						"header": [
 							{
@@ -165,7 +165,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"farm\": \"0725D7D519102E30C7ACF9109842AA21\",\n\t\"name\": \"TEST_ACME_HOUSE\",\n\t\"location\": \"44,001:77,002\",\n\t\"gps\": \"false\",\n\t\"description\": \"test\",\n\t\"category\": \"A\",\n\t\"length\": 100,\n\t\"width\": 20,\n\t\"capacity\":1000,\n\t\"layers\": 1,\n\t\"lines\": 2,\n\t\"height\": 5,\n\t\"hangarType\": \"H\"\n}"
+							"raw": "{\n\t\"farm\": \"388AD1BF2B482670FE84C41607D16C05\",\n\t\"name\": \"TEST_ACME_HOUSE\",\n\t\"location\": \"44,001:77,002\",\n\t\"gps\": \"false\",\n\t\"description\": \"test\",\n\t\"category\": \"A\",\n\t\"length\": 100,\n\t\"width\": 20,\n\t\"capacity\":1000,\n\t\"layers\": 1,\n\t\"lines\": 2,\n\t\"height\": 5,\n\t\"hangarType\": \"H\"\n}"
 						},
 						"description": "Create farmhouse with valid farm reference"
 					},
@@ -199,7 +199,7 @@
 				{
 					"name": "Get farmhouse by id",
 					"request": {
-						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse/BBD9FF9E99D85D7B06A78AE9DEAA97C3",
+						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/devices/camera/742D5FCB2AC158E590241B6D6D7C042B",
 						"method": "GET",
 						"header": [
 							{
@@ -239,7 +239,7 @@
 				{
 					"name": "Start a cycle",
 					"request": {
-						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse/B29235702D3B6810EE3324131642D3E6/cycle",
+						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse/742D5FCB2AC158E590241B6D6D7C042B/cycle",
 						"method": "PUT",
 						"header": [
 							{
@@ -284,7 +284,7 @@
 				{
 					"name": "Stop a cycle",
 					"request": {
-						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse/F0F975C11A8A2DD8AB0BCBDB00DFE38F/cycle",
+						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse/742D5FCB2AC158E590241B6D6D7C042B/cycle",
 						"method": "DELETE",
 						"header": [
 							{
@@ -305,7 +305,7 @@
 					"name": "List farmhouses by farm id",
 					"request": {
 						"url": {
-							"raw": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse?farm=7CC7AB46A3F8A5AE32778C1EECC79753",
+							"raw": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse?farm=234",
 							"protocol": "https",
 							"host": [
 								"api",
@@ -322,7 +322,7 @@
 							"query": [
 								{
 									"key": "farm",
-									"value": "7CC7AB46A3F8A5AE32778C1EECC79753",
+									"value": "234",
 									"equals": true,
 									"description": ""
 								}
@@ -342,6 +342,56 @@
 							"raw": "{\n\t\"farm\": \"0725D7D519102E30C7ACF9109842AA21\",\n\t\"name\": \"TEST_ACME_HOUSE\",\n\t\"location\": \"44,001:77,002\",\n\t\"gps\": \"false\",\n\t\"description\": \"test\",\n\t\"category\": \"A\",\n\t\"length\": 120,\n\t\"width\": 20,\n\t\"capacity\":1000,\n\t\"layers\": 1,\n\t\"lines\": 2,\n\t\"height\": 5,\n\t\"hangarType\": \"H\"\n}"
 						},
 						"description": "List farmhouses by farm id"
+					},
+					"response": []
+				},
+				{
+					"name": "List farmhouses by farm id, with overview",
+					"request": {
+						"url": {
+							"raw": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse?farm=388AD1BF2B482670FE84C41607D16C05&overview=true",
+							"protocol": "https",
+							"host": [
+								"api",
+								"scriptrapps",
+								"io"
+							],
+							"path": [
+								"agApps",
+								"ppf",
+								"ppfServer",
+								"api",
+								"farmhouse"
+							],
+							"query": [
+								{
+									"key": "farm",
+									"value": "388AD1BF2B482670FE84C41607D16C05",
+									"equals": true,
+									"description": ""
+								},
+								{
+									"key": "overview",
+									"value": "true",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"farm\": \"0725D7D519102E30C7ACF9109842AA21\",\n\t\"name\": \"TEST_ACME_HOUSE\",\n\t\"location\": \"44,001:77,002\",\n\t\"gps\": \"false\",\n\t\"description\": \"test\",\n\t\"category\": \"A\",\n\t\"length\": 120,\n\t\"width\": 20,\n\t\"capacity\":1000,\n\t\"layers\": 1,\n\t\"lines\": 2,\n\t\"height\": 5,\n\t\"hangarType\": \"H\"\n}"
+						},
+						"description": "List farmhouses by farm id, with overview"
 					},
 					"response": []
 				}
@@ -1327,7 +1377,7 @@
 				{
 					"name": "Delete cycle value",
 					"request": {
-						"url": "https://agrysense.scriptrapps.io/agServerCore/api/devices/camera/4BA2A6016BA86D3FEE7289D18FDFACDC",
+						"url": "https://agrysense.scriptrapps.io/agApps/ppf/ppfServer/api/cycle/B29235702D3B6810EE3324131642D3E6_Cycle/value/FF46DECA8BB11124F12B92ACE917DE6F",
 						"method": "DELETE",
 						"header": [
 							{
