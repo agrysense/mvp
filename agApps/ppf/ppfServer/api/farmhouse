@@ -22,7 +22,6 @@ var cycleReq = pathInfo.length > 1 && pathInfo[1] == "cycle" ? true : false;
 var cycleId = pathInfo.length > 2 ? pathInfo[2] : null; 
 
 var method = request.method;
-
 var farmhouseManager = new farmhouseManagerModule.FarmhouseManager();
 
 try {
@@ -109,12 +108,28 @@ function resolveDelete() {
  * @function listFarmhouses
  * @param {Object} [params]
  * @param {String} [params.farm]: the identifier of a farm (optional, when passed, only list the farmhouses of this farm)
+ * @param {Boolean} [params.overview]: if specified and true, will ask to return and overview of the farmhouses (includes cycle data)
  * @param {Number} [params.pageNumer]: number of the page to return when paginating (optional, defaults to 1)
  * @param {Number} [params.resultsPerPage]: max number of results in one page (optional, defaults to 50)
  * @return {Array}
  */
 function listFarmhouses(params) {
-    return farmhouseManager.listFarmhouses(params);
+    
+    var result = farmhouseManager.listFarmhouses(params);
+    var data = [];
+    if (params.overview) {
+        
+        for (var i = 0; i < result.length; i++) {
+            
+            var farmhouse = farmhouseManager.getFarmhouse(result[i].key);
+            var overview = farmhouse.overview();
+            data.push(overview);
+        }
+        
+        return data;
+    }
+    
+    return result;
 }
 
 /**

@@ -39,8 +39,6 @@ function Farmhouse(dto, farmhouseManager) {
         };
     }
 
-    this.cycleKey = this.key + "_Cycle";
-    this.startCycleKey = this.key + "Starting_Cycle";
     this.farmhouseManager = farmhouseManager;
     this.deviceManager = this.farmhouseManager.getDeviceManager();
 }
@@ -146,6 +144,25 @@ Farmhouse.prototype.addEquipment = function(dto) {
 };
 
 /**
+ * Returns an overview of the farm, including the total number of cycles, the number of chicken in the current cycle
+ * and the day of the cycle (if a cycle was started)
+ * @method overview
+ * @param {Object} [dto]: instance of Controller or Controller data
+ * @return {Object}
+ * @throw {Error}
+ */
+Farmhouse.prototype.overview = function() {
+
+    var cycle = this.getCurrentCycle();
+    var data = this.toJSONObject();
+    data.birdNbrIn = cycle ? cycle.birdNbrIn : 0;
+    data.cycleDay = cycle ? util.daysBetween(cycle.startDate) : 0;
+    data.endDate = cycle ? cycle.endDate : "";
+    data.nbrOfCycles = this.farmhouseManager.listCycles({farmhouse: this.key, count: true});
+    return data;
+};
+
+/**
  * Start a new cycle. There should be no other ongoing cycle.
  * @method startCycle
  * @param {Object} [dto]: cycle data
@@ -171,7 +188,7 @@ Farmhouse.prototype.startCycle = function(dto) {
     try {
 
         // this part is to deal with concurrent threads (checking if starting)
-        var resp = document.create({key: this.startCycleKey}); 
+        var resp = document.create({key: this._getCycleKeys().startCycleKey}); 
         if (resp.metadata.status == "failure" &&  resp.metadata.errorCode == "DUPLICATE_DOCUMENT_KEY")   {
 
             starting = false;
@@ -202,7 +219,7 @@ Farmhouse.prototype.startCycle = function(dto) {
         }   
 
         var data = JSON.parse(JSON.stringify(dto));
-        data.key = this.cycleKey;
+        data.key = this._getCycleKeys().cycleKey;
         data.farmhouse = this.key;
         data.startDate = dto && dto.startDate ? util.toShortDate(dto.startDate) : util.toShortDate();
         data.currentBirdCount = dto && dto.currentBirdCount ? dto.currentBirdCount : dto.birdNbrIn;
@@ -212,7 +229,7 @@ Farmhouse.prototype.startCycle = function(dto) {
 
         if (starting) {
 
-            deleteResp = document.delete(this.startCycleKey);
+            deleteResp = document.delete(this._getCycleKeys().startCycleKey);
             if (resp.metadata.status == "failure") {
                 log.error("Famrhouse.startCycle: could not remove startingCycle lock for this farmhouse " + this.key + "\n" + JSON.stringify(resp));   
             }
@@ -230,7 +247,7 @@ Farmhouse.prototype.getCurrentCycle = function() {
 
     try {
 
-        var cycle = this.farmhouseManager.getCycle(this.cycleKey); 
+        var cycle = this.farmhouseManager.getCycle(this._getCycleKeys().cycleKey); 
         return cycle;
     }catch(exception) {
         // if here, means not found
@@ -269,7 +286,7 @@ Farmhouse.prototype.updateCycle = function(dto) {
  * @throw {Error}
  */
 Farmhouse.prototype.stopCycle = function() {
- 
+
     var currentCycle = this.getCurrentCycle();  
     if (!currentCycle) {
 
@@ -292,12 +309,12 @@ Farmhouse.prototype.stopCycle = function() {
  * @throws {Error}
  */
 Farmhouse.prototype.listControllers = function(dto) {
-    
- 	var searchDto = {};
+
+    var searchDto = {};
     if (dto) {
         searchDto = JSON.parse(JSON.stringify(dto));
     }
-    
+
     searchDto.structure = this.key;    
     return this.deviceManager.listControllers(searchDto);
 };
@@ -312,12 +329,12 @@ Farmhouse.prototype.listControllers = function(dto) {
  * @throws {Error}
  */
 Farmhouse.prototype.listSensorCores = function() {
-    
+
     var searchDto = {};
     if (dto) {
         searchDto = JSON.parse(JSON.stringify(dto));
     }
-    
+
     searchDto.structure = this.key;    
     return this.deviceManager.listSensorCores(searchDto);
 };
@@ -333,13 +350,13 @@ Farmhouse.prototype.listSensorCores = function() {
  * @throws {Error}
  */
 Farmhouse.prototype.listSensors = function(dto) {
-    
+
     var controllers = this.listControllers();
     var sensorCores = this.listSensorCores();
     var sensors = [];
-    
+
     var type = dto && dto.type ? dto.type : null;
-	var fromControllers = this._listSensors(controllers, type);   
+    var fromControllers = this._listSensors(controllers, type);   
     var fromSensorCores = this._listSensors(sensorCores, type); 
     sensors = sensors.concat(fromControllers);
     sensors = sensors.concat(fromSensorCores);
@@ -354,18 +371,18 @@ Farmhouse.prototype.listSensors = function(dto) {
  * @return {Array<Sensor>}
  */
 Farmhouse.prototype._listSensors = function(sensorOwnerList, sensorType) {
-    
+
     // get all sensors related to the 'sensorOwnerList' in the farmhouse
     var sensors = [];
     for (var i = 0; sensorOwnerList && i < sensorOwnerList.length; i++) {
-        
+
         var list = sensorOwnerList[i].listSensors();
-        
+
         // if asked to filter by sensor type, do it
         if (sensorType) {
-        	
+
             for (var j = 0; j < list.length; j++) {
-                
+
                 if (list[i].sensor_type == dto.type){
                     sensors.push(list[i]);
                 }
@@ -374,6 +391,14 @@ Farmhouse.prototype._listSensors = function(sensorOwnerList, sensorType) {
             sensors.push(list);
         }
     }
-    
+
     return sensors;
+};
+
+Farmhouse.prototype._getCycleKeys = function() {
+
+    return {
+        cycleKey:  this.key + "_Cycle",
+        startCycleKey: this.key + "Starting_Cycle"
+    };
 };

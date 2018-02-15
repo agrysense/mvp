@@ -1,0 +1,109 @@
+<html ng-app="farm">
+    <head>
+        <title>Farm details</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+        <!-- replace with your icon -->
+        <link rel="shortcut icon" type="image/x-icon" href="">
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" crossorigin="anonymous">
+        <!-- font awesome.css -->
+        <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+        <link href="//fonts.googleapis.com/css?family=Josefin+Sans|Montserrat" rel="stylesheet">
+        <!-- Map styles -->
+        <link rel="stylesheet" href="/UIComponents/dashboard/frontend/components/map/map.css">
+        <!-- Adding Angular -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+        <script src="//cdn.rawgit.com/gdi2290/angular-websocket/v1.0.9/angular-websocket.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular-cookies.js"></script>
+
+
+        <script src="/UIComponents/wsProvider.js"></script>
+        <script src="/UIComponents/httpProvider.js"></script>
+
+        <script src="/UIComponents/config/scriptrTransport.js"></script>
+
+        <!-- custom styles -->
+        <link rel="stylesheet" href="./css/style.css">
+
+        <!-- custom lib -->
+        <script src="./lib/util.js"></script>
+
+    </head> 
+
+    <script>
+
+        var underscore = angular.module('underscore', []);
+        underscore.factory('_', ['$window', function($window) {		
+            return $window._; // assumes underscore has already been loaded on the page		
+        }]);
+
+        var farm = angular.module('farm', ["HttpClient", "WsClient"]);
+        angular.module('farm').config(wssConfig);
+        angular.module('farm').config(httpsConfig);
+
+
+        farm.controller('farmCtrl', function($scope, $controller, wsClient, httpClient, $sce) {
+
+            var vm = this;
+            vm.init = function() {
+
+                wsClient.onReady.then(function() {});               
+
+                // load farmhouses
+                vm.loadFarmHouses();
+            };
+
+            vm.loadFarmHouses = function() {
+
+                var params = getUrlParams();
+                params = params ? params : {};
+                params.overview = true;
+                httpClient.get("agApps/ppf/ppfServer/api/farmhouse", params)
+                    .then(
+                    function(data, response) {
+                        console.log(data);
+                        $scope.farmhouseList = data;
+                    },
+                    function(err) {
+                        console.log("reject published promise", err);
+                    });
+            }
+        });
+
+    </script>
+
+    <body>
+        <div ng-controller="farmCtrl as vm" ng-init="vm.init()"> 
+			
+            <div class="col-md-12"><div class="page-header">
+  <h1>Example page header <small>Subtext for header</small></h1>
+</div></div>
+            <div class="col-xs-12 col-sm-2">            
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Farm houses</h3>
+                    </div>
+                    <div class="panel-body">
+                        <ul class="list-group">
+                            <li class="list-group-item" ng-repeat="x in farmhouseList"">
+                                <div style="font-weight:bold">{{ x.name }}</div>
+                                <div>Category: {{ x.category }}</div>
+                                <div>Birds: {{ x.birdNbrIn }}</div>
+                                <div>Cycle day: {{ x.cycleDay }}</div>
+                                <div>Cycle ends: {{ x.endDate  || "N/A" }}</div>
+                                <div>Nbr of cycles: {{ x.nbrOfCycles }}</div>                                    
+                            </li>
+                        </ul>
+                    </div>
+                </div> 
+            </div>
+            
+            <div class="col-xs-12 col-sm-4 col-md-4">2</div>
+            <div class="col-xs-12 col-sm-6 col-md-6">3</div>
+            
+          
+    </body>  
+</html>

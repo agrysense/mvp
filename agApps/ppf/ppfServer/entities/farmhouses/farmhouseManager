@@ -141,11 +141,12 @@ FarmhouseManager.prototype.deleteFarmhouse = function(id) {
 /**
  * @method listCycles
  * @param {String} [dto.farmhouse]: optional, filter by farmhouse (key)
+ * @param {Boolean} [dto.count]: optional. If specified and true, will return the count of cycles only, not the cycle
  * @param {Number} [dto.resultsPerPage]: how many results to return per call (optional, defaults to 50)
  * @param {Number} [dto.pageNumber]: the page number in case there are more than one pages of results (optional, defaults to 1)
  * @param {String} [dto.filterExp]: optional, a filter expression, e.g. "fieldX<numeric> = 123"
  * @param {String} [dto.sortExp]: optional, sort expression, e.g "startDate<date> > '2018-01-01'"
- * @return {Array<Cycle>}
+ * @return {Array<Cycle>} or {Number} if count is true
  * @throw {Error}
  */
 FarmhouseManager.prototype.listCycles = function(dto) {
@@ -185,6 +186,10 @@ FarmhouseManager.prototype.listCycles = function(dto) {
         };
     }
 
+    if (dto && dto.count) {
+        return resp.result.count;
+    }
+    
     for (var i=0; i < resp.result.documents.length; i++) {
         result.push(new cycleModule.Cycle(resp.result.documents[i]));
     }

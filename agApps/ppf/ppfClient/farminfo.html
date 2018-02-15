@@ -1,0 +1,32 @@
+<div ng-non-bindable="">
+    <!-- begin farm summary -->
+    <section class="col-xs-12 bg-white-light pdt10 pdb10 index-summary">
+        
+        <div class="col-xs-12 col-sm-3 text-center pdl0 pdr0">
+            <div class="icon bg-yellow">
+                <i class="far fa-id-card fa-2x"></i>
+            </div>                 
+            <div class="nb bold"><span>{{marker.details.name.value || "N/A"}}</span></div>
+            <small>Name</small>
+        </div>
+        
+        <div class="col-xs-12 col-sm-3 text-center">
+            <div class="icon bg-orange">
+                <i class="fa fa-map-marker fa-2x" aria-hidden="true"></i>
+            </div>
+            <div class="nb bold"><span>{{marker.details.lat.value || "N/A"}}</span></div>
+            <div class="nb bold"><span>{{marker.details.long.value || "N/A"}}</span></div>
+            <small>Location</small>
+        </div>
+
+        <div class="col-xs-12 col-sm-3 text-center">
+            <div class="icon bg-green">
+                <i class="fa fa-mobile fa-2x" aria-hidden="true"></i>
+            </div>
+            <div class="nb bold">{{marker.details.phone.value || "N/A"}}</div>
+            <small>Phone</small>
+        </div>
+
+    </section>        
+    <a type="button" ng-click="vm.viewDashboard(marker.details.id.value)" class="btn btn-primary mt15" >View Dashboard</a>
+</div>

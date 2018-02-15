@@ -130,7 +130,8 @@ function _formatForMap(list) {
             long: {value: latlong[1].replace(/,/, ".")},
             name: {value: list[i].name},
             phone: {value: list[i].phone},
-            company: {value: list[i].company}
+            company: {value: list[i].company},
+            id: {value: list[i].key}
         };  
 
         out["0"]["1"].push(obj);

@@ -1,182 +1,128 @@
 
-<html ng-app="myApp">
+<html ng-app="myMap">
     <head>
+        <title>Farms Map</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
-        <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-        <script src="//use.fontawesome.com/3d61d6959e.js"></script>
+        <!-- replace with your icon -->
+        <link rel="shortcut icon" type="image/x-icon" href="">
 
-        <link rel="stylesheet" href="//www.scriptr.io/lib/UIComponents/build/ide/css//components.min.css">
-        <link rel="stylesheet" href="./style.css">
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" crossorigin="anonymous">
+        <!-- font awesome.css -->
+        <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+        <link href="//fonts.googleapis.com/css?family=Josefin+Sans|Montserrat" rel="stylesheet">
+        <!-- Map styles -->
+        <link rel="stylesheet" href="/UIComponents/dashboard/frontend/components/map/map.css">
+        <!-- Adding Angular -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+        <script src="//cdn.rawgit.com/gdi2290/angular-websocket/v1.0.9/angular-websocket.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular-cookies.js"></script>
 
+
+        <script src="/UIComponents/wsProvider.js"></script>
+        <script src="/UIComponents/httpProvider.js"></script>
+        <script src="/UIComponents/dashboard/frontend/components/map/map.js"></script>
+        <!--script src="/UIComponents/dashboard/frontend/components/map/mapService.js"></script-->
+
+        <!-- Map widget -->
         <script src="//maps.google.com/maps/api/js?key=AIzaSyBcPYghFh_BXz4dDz-TXTHbU2iV3Wbf57I&libraries=drawing,visualization"></script>
-        <script src="//www.scriptr.io/lib/UIComponents/build/ide/js/template_resources.min.js"></script>
+        <script src="//rawgit.com/allenhwkim/angularjs-google-maps/master/build/scripts/ng-map.js"></script>
+
+
+        <!-- Used by configuration controller -->
+        <script src="/UIComponents/dashboard/frontend/examples/map/simulatorConstants.js"></script>
+        <script src="/UIComponents/dashboard/frontend/components/map/markerClusterer.js"></script>
+        <script src="/UIComponents/dashboard/frontend/components/list/autocomplete.js"></script>
+
+        <link href="/UIComponents/dashboard/frontend/components/list/angucomplete.alt.css" rel="stylesheet">
+        <script src="/UIComponents/dashboard/frontend/components/list/angucomplete.alt.js"></script>
+        <script src="/UIComponents/dashboard/frontend/components/list/autocomplete.js"></script>
+
+        <link href="/UIComponents/dashboard/frontend/components/toggleSwitch/angular_toggle_switch.css" media="all" rel="stylesheet" type="text/css">
+        <script src="/UIComponents/dashboard/frontend/components/toggleSwitch/angular_toggle_switch.js"></script>
+        <script src="/UIComponents/dashboard/frontend/components/toggleSwitch/toggle_switch.js"></script>  
+
+        <script src="/UIComponents/config/scriptrTransport.js"></script>
+
+        <!-- custom styles -->
+        <link rel="stylesheet" href="./css/style.css">
 
     </head> 
 
     <script>
 
-        (function() {  
-            $.urlParam = function(name){
-                var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-                if (results==null){
-                    return null;
-                }else{
-                    return results[1] || 0;
-                }
+        const FARM_DETAILS_VIEW = "https://agrysense.scriptrapps.io/agApps/ppf/ppfClient/farmdetails.html";
+        
+        var underscore = angular.module('underscore', []);
+        underscore.factory('_', ['$window', function($window) {		
+            return $window._; // assumes underscore has already been loaded on the page		
+        }]);
+
+        var myMap = angular.module('myMap', ["HttpClient", "WsClient", "Map",  "List"]);
+        angular.module('myMap').config(wssConfig);
+        angular.module('myMap').config(httpsConfig);
+
+        myMap.controller('mapCtrl', function($scope, $controller, wsClient, mapConstants, $sce) {
+
+            var vm = this;
+            vm.init = function() {
+                wsClient.onReady.then(function() {});
+                vm.sources = mapConstants.sources;
+                vm.icons = mapConstants.infoWindows.icons;
+            };
+
+            vm.mapFormatData1 = function(data){
+                return data;
             }
 
-            $.getUrlVars = function() {
-                var vars = [], hash;
-                var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-                for(var i = 0; i < hashes.length; i++)
-                {
-                    hash = hashes[i].split('=');
-                    vars.push(hash[0]);
-                    vars[hash[0]] = hash[1];
-                }
-                return vars;
+            vm.viewDashboard = function(id) {
+                window.location.href = FARM_DETAILS_VIEW + "?id=" + id;
             }
-
-
-
-            var underscore = angular.module('underscore', []);
-            underscore.factory('_', ['$window', function($window) {		
-                return $window._; // assumes underscore has already been loaded on the page		
-            }]);
-
-
-            var wssConfig = ["wsClientProvider",function (wsClientProvider) {
-                wsClientProvider.setBaseUrl("wss://" + window.location.host + "/");   	 
-                wsClientProvider.setToken($.urlParam("auth_token"));
-                wsClientProvider.setPublishChannel("requestChannel");
-                wsClientProvider.setSubscribeChannel("responseChannel");
-            }];
-
-            var httpsConfig = ["httpClientProvider",function (httpClientProvider) {
-                httpClientProvider.setBaseUrl("https://" + window.location.host);
-                httpClientProvider.setToken($.urlParam("auth_token"));
-            }]
-
-            var myApp= angular.module("myApp", ["underscore" , "WsClient", "HttpClient", "Chart", 'gridster', 'ui.bootstrap', 'ngRoute', 'Gauge', 'Speedometer', 'Odometer', 'Message', 'Map', 'Grid', 'toggle-switch', 'Slider', 'Button', 'IFrame', 'Accelerometer'])
-
-            angular.module('myApp').run(cachedTemplates);  
-
-            angular.module('myApp').config(wssConfig);
-            angular.module('myApp').config(httpsConfig);
-
-            myApp.config(function($interpolateProvider, $locationProvider) {
-                $interpolateProvider.startSymbol('{[{');
-                $interpolateProvider.endSymbol('}]}');
-                $locationProvider.html5Mode({
-                    enabled: true,
-                    requireBase: false
-                });
-            });
-
-
-            myApp.controller('RootCtrl', function($scope, $interpolate, $location) {
-                var vm = this;
-                vm.gridsterOptions = {
-                    pushing: false,
-
-                    minRows: 1, // the minimum height of the grid, in rows
-                    maxRows: 100,
-                    columns: 5, // the width of the grid, in columns
-                    colWidth: 'auto', // can be an integer or 'auto'.  'auto' uses the pixel width of the element divided by 'columns'
-                    rowHeight: 'match', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
-                    margins: [10, 10], // the pixel distance between each widget
-                    defaultSizeX: 2, // the default width of a gridster item, if not specifed
-                    defaultSizeY: 1, // the default height of a gridster item, if not specified
-                    mobileBreakPoint: 1024, // if the screen is not wider that this, remove the grid layout and stack the items
-                    minColumns: 1,
-                    resizable: {
-                        enabled: false
-                    },
-                    draggable: {
-                        enabled: false
-                    }
-                };
-
-                vm.init = function() {
-                }
-                vm.mapFormatData1 = function(data){
-                    return data;
-                }
-            });
-
-        })();
+        });
 
     </script>
 
     <body>
-        <div ng-controller="RootCtrl as vm" ng-init="vm.init();"> 
+        <div ng-controller="mapCtrl as vm" ng-init="vm.init()"> 
 
-            <div style="width: 100%; display: table;">
-                <div style="display: table-row">
+            <div style="width: 100%; display: table;" class="table-class">                               
+                <div style="display: table-row" ng-include="'farmheader.html'"><!-- include header row -->
+                </div>  <!-- end header row -->             
+                <div style="display: table-row;"> <!-- start map row -->
+                    <div style="display: table-cell;">  <!-- start map cell -->
+                        <scriptr-map
+                                     transport='wss'
+                                     boxLabel='Farms location'
+                                     clustered-view='true'
+                                     cluster-zoom='8'
+                                     heatmap='true'
+                                     bounce='true'
+                                     resize='false'
+                                     msg-tag='everyone-main-live'
+                                     clustered-zoom-max='11'
+                                     detailed-zoom-min='0'
+                                     max-asset-points='100'
+                                     marker-info-window='true'
+                                     default-center='33.863594,35.612537'
+                                     path-stroke-opacity='0'
+                                     path-stroke-weight='1'
+                                     http-method='GET'
+                                     api='agApps/ppf/ppfServer/api/farm'
+                                     api-params='{"map":true}'
+                                     on-format-data='vm.mapFormatData1'
+                                     >
 
-                    <div style="display: table-cell; margin:5px;"> 
-                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAT/SURBVGhD7ZlnqB1FGIavxlhjw1gQK0ZUrMT+Q0H/KHaNRKygIaIR0YiiKCqKJURNRFTsDVGDBdsPFRWjmEAQNAkWLARixS727vNM7kc2x3vmnN3s3mwgLzzcM3Nm98zcnfnaDqxQMzoT5sOHcBmsBMuN1oEJcB/824F9h8Ca0GptBu9DcfLHwn7we6HvU9gVWquHwInOglvgDQg9Bm/DPHDMbGitPgEnuXFqLToTMgLWsgOtAr/C37CyHW3U6+BCboUp8AH8AX/Bx+AZsd8xC6C1OgiKZ0H+HKTYJxqE1mos/AxO9AHYEdw+I2FbOB++Bb+/Hlop9/5b4CRvsKMgz8lqiz4ObAcuxjOylR1t0yngIrRMPoHQuvAu/AZH2YGuBMeekVotU5jV8am1WPuD/XK/HegwsP0N7GtHW7QbODEdnVusKJ/ODHgTdrcD2fcweM1CWBWyGjX4t2l5cJ3UdamVl5P2bKwPc8HrYssNqXvhH3A/NimfwGfghHwyOW0PMdbD7tby8zXQVT+Cg2SSHQ3pcPA3tFg5uWC3l2O/gO8HP8ud0FVfQwyUy6GJkOAp8P5np1Z3uX0c55lYDwxbjoSXwMPfVTPBC18FTZ+fX4QtoS6NAb2299/Ajox0kP0s+H86C7zwHTgAvhxs/wJXQa8f7kePg/c0tuql18Cxe6ZWCa0BEY2eBxvBg6ABiAXdBXtBlcztNPA+7vVN7eihOeB4w5jSGgdebPyztx3I/8gzoNXwO9H+3wHHgZal0xcUZahxMRjR+k/Ro/ejJ8Dfyp6HnG4Gb/AVFB/rNqDdN5yOBQXmC3pqD6IT0JRrWZ6G78Axno0y+30aeN0FqVVBWge3lDdxO10IkeSEdgL7zeLMIYpPqxO/02jsAWV0NHi9u6GSdobbIM6GvAw5WRzYBYyT9BMnwqlgvrEJVJHGxTnoBEufyYlghhYLcF9/BJNhWeg9cB6G8qWkB/VCszYX1TM4a1jhS05OrRIyI4tQxcdqztx5PoZTFumci1avtMwPiufjeKhTGhMtUZj3nMJJa8FKK8zlD3Ap1F3l2we8/3OplZd+yrFusdLS/nuxNBHSHwPe+9HUysuz4dh7UquCrLfq5Nxifq5Thj9O7qbUyssz69ipqVVRemFvYhhtQaAu6e297wmplVektyelVkWZi0QlUO9aJVDslHnFT+A9ewWOxmg6Q3fFFnYsjcxFIpyvZDk6dAl4rxdSK6+Ill9JrRp0IERZ8wo7KsqkKqqGhjI5WWiw9uvYQ+2oS0dALMboWF9QRmtD1LE8Izl5b7eyY5+3o26ZL8f+fhbc7/3ISomv07zOSHlD6CZ91iPgWJ9I1YCzp8xPPgd/yLjMSqBRrv2jIWq2ni0jBMP8qKxbEdkauskELRbsFjQKb1RaG8N6f7AfjN2uBVPpoeR//UYw93G8T81FDYs0zUbHnSUkMcSxImjZ03caQxUtjKpNYX2isQATsNvB8zTscjv5RiniM3FilpRMi88Fwwwd2jkwHfyuWAx0AYYrO8Ayl/9FS/5amc43UEPh5D0zF8FSO7um5Htz62Kng8GeE9dA+DLHJ3Qw1BnyDIu0PC7EYttyrViIb6CMonM+pLWynBPFg8CzcTc05ujqVgSHood+EiySm+PYZ2nWN7itllbIyVpKMqcpllM3B6uRfu/rhVZLZ+m7lW4129XhatCyrdCSGhj4D5mihM8P+sJAAAAAAElFTkSuQmCC">
-
-                        Chicken
-
-                    </div>               
-                    <div style="display: table-cell; margin:5px;"> 
-                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAARvSURBVGhD5ZppqFZFGMdvVmqRGqKkLWrWhwKNNlvEkgxMvxj6KZSixSyJECyKzKysKLRIyYJIJFDUFjTFItOK9EP1oYiylMxso8VKoszKFvv9hjtwkfsu57xnznnBP/zAZ5wzyznzzjzPM7fjcNQRMAGWw274E/bBR7AYRkLb6zx4Dw424DkYBG2pmXAAHOjXcAecCUfBMXAxPAG/g3W+hzHQVrob4tt+Go6DWhoGW8C6Tmo8tIWmgYP6D+60oAn1hjXgc7/BGVCpHIADcUCzLMigI+F58NmP4VioRL3AnciBrLIgh/rADrCNZRZUodngAD4FB5RXZ8Ef4NK8wIIy1Q9+AicyyYIWtQBs6/VglagHwY63Bqt19Ye9YJul7WJHwx6w00stKEj3gG2uDVYJcinZ4SfBKk4nwT/wFwy0ILVeBCfS7JmRRa+AbWfdyjPLg0wn8F842YKCNRWcyGvBSqjRYEfbglW8dCRt30PWAzOZ4tnxTLDSyHPJPs4NViK9AHZybbDS6Fmwj5uClUjvgp2MClYazQP7uD9YibQT7GR4sNLoBrCPpcFKpJ/BTlrxrRppCtjHZjjeghTSsbOTImV4vBD0s74D2++KDqWxvxNzuenCtPwifwQb7xus/OoB14PewaED95zaBdvB/uLL64oh9UtwJegyZZaN29Bpwconv8A7EAfl234MLoPBcKic9Imga/QIGCbrysTnf4C7wLxA03oDfPjyYGWXb3A/2IYbx2TIIydmcuNDiBP6BtwonHhDRff9gWBl0zUQ3+Sj0BOK0ET4AOKENkJDp3MsWNmlkUXng16t6/0WCwqWX+FqiMGeX6duqsk4PVY+x4Im5A7zBfhMni+ZRUPgbbCvhqmme8GKzSYcYs7rTUjqCHbKXWwlxMnUTNEalv4KLhPXZz25TccQtszEgr+/l8F+dUINP7qVDp2VPMDqxSUxvng1WOXKPFk8pwyjayp6wh5eQy3oRqvBOjcHq3x5TNi/B2vNr2J+13VvRRPS3aWFvgL//9RgVaP3wTFcEawa8jRdB1aU9XAJKLfEv8Gzo6lDKpEeBsdWd3kpL3amwy8QJ/Q5rOj8t7+jKnUjOI4lwWpCJ4BB0bcQJySuzyp1OzgOs5mZ5MXOhXAbxEsdt+yqFDP++mG5tQlsJK+T2aoGgE6q6atTLMirGH8/Gazy9RTYv7FLSzodfBue7mVf5HiTZt8GYYXcJG8A38r8YJWjcaC3bb/6eoXobPCtGMJ6qZNafgnv9Z2Ed/0eD4XpIbBhr61T5IyVh7M3yvYjJvoK97b1RmOm3TvDIm9x3e5NZHwJtu+XnwHJ5I89xvwmqT1xHUReef1nG94Ix6/g5azRaHIZYT4OMcXzGTiYZi92zNabwNP9iUkMMQI1J1C6T+cf3USvVJyYtmvcJNytoOs/FxaB4YDhQqwfn3kLroOiEhm55G5ihOlh1dXhrIf1vASaA1WGBjXl7nIR+KM12eby8w9w7gO/zlUwAqoMB9pJHR3/AwpaQ9US7pAkAAAAAElFTkSuQmCC">
-                        Eggs
-
-                    </div>
-                    <div style="display: table-cell; margin:5px;">
-                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAVSSURBVGhD1Zp3qCw1GEevvfcCdrGhYi/YxYKivid2xPqHig27oogFFUFQ7J0nKKjwCggqKoqKqNh7RUWx94q9e87c+SB3nZXd2eTt+oPD3mTvJJlM8pXMjvWg0+AbOKwqTdSSsDnMVpUmar76c2TkTfwNf8BkKxJ9CH53PyxoRS1v+k94C9axItFccDTY1ixWzAwtAA70r/rzW1gd1DxgXfAcLA/qIYh6J2IbCJ0I8d1jsCYU1zJgh+/BLfXf78JyoOKJfFB/fgWXwtd1+Z7683c4G9aDV+u6H+rPn+AIKKp5wc58Ev79RF12yawBL9flzeC2+u/gPnDvXJzUBW/A4nA9xNO+Bpr2Wjb9AnbkjSwBz9Rl94CfP4NLUG0HzrwzPLcVtXaFe+FFuBFiCao94XuwralQ7GaeBDvZsiqNW6PLwSXxBRwAg8ol9znYz01WlNBlYAcnV6WJyjl764JL2L6OtCK39gIbd3+UVvTlctbQZJV7IyzM+lYUlvvEvly+2XUF2PitVams9Cv25eTNaUVOrQA/gqZyZysK6x3wZjaoSpl1Cti4G1K/UVIPgH1tW5Uyy7govLu+4wwI/5FKU3oRTAHDmDZ6G+xn1apUQJrbSyC8sTf0MHiDd0KELKLDdEk2yQCzm+n2KXj9d3AcHAzF4rFN4W74FWLgKS4/vXmTrgb/51Po3APzw/vQ2Z5o/vU1ReTMbgEXQDwlg8LVoEkulXRw0yDV0mC48hncDjpjYzijCP9f/7IfFNGB4BKzI5/SQtBNJmLpU7wKOqXfimU3K6wMx4JW02u83n2YTXZ2IcSgjHJ7CVn2gcdBn7SYFQ3aCoyMP4FoP0VjkkVGthG2O0OHQg4tBU9BDNis1KD1SjgBDoejwCh8YC0MkQGaQG0NubQ9xE1otYptbgM5cwo7+hjWgtzaDSLj1MMvC1llrm6aawdmeCtCKWkUYok9C7NDFm0EX4INPw051qgBoUvUWY/gUHPsknoe7oIw6VqtgbU2eKhgg3bcFJa0kWG6bb4OMeNaM+s6eQkG0ioQJvBRyHXo5t4yhNHipTnOmWBfhjuefcVhh7jcWknH9BrYiBv8vxxdv5oBtuvJSSodnfVvVqVxGeoMdFykQ7LRjyCn5TCsMdRw/XcaDB1qnKhk8RWLgI2JwZ0h+UmgQ5LTYUdoo93Bdt0PTXIJ+70xXBZ5ahLBWhOG7G3khHi9IU2TImffuypl0qJgtHkuXAcGhXEjbdfteeD151elf+sOyH4jnYoU9Iaq1E4GjbahIdGgpHLiwtR3SwUG1g5gB25G91Bb6TMizNG87gIO2qNTna31D0IxTQc7MRJNpX13ll0yJka9yIFrYm2vE+u7pchZZOhgR27WQ8AbegUijBDfbvUqI4RjIA7/POS23PbAoif5PiQG24n5uXmDf28I/cgMMLLL9I1XMfm6zDjL0N1ER7/i7BlerAQOxHcm/col5LVtTXlWeWTjYK6tSv1pJ/BareHQFSmvG75fnQpe62nJ0GUY7mDiJamaAzxd0Zy6bLqZa/MPrz2oKg1RDtgXnb+B+8g9o8dOD9m0ajq6JoUJ9n3kUGVo70C0WpFBBuGhTVWb5CGGN6mD1XoNXTFg8Z2iOYa/hvDJWOcpZJPMM/zeHxuMhDaG/UFvnf6SwcNtBzqpKo1/p0GIveT7eL8/pyqNqBx0ODpfRZsi31yXPYEx3nqhLnuWNbLyxNBBmgkeDzpLy4HJmftDQzFyP75JtQmkAxeXWrzqDsPwCIy0fCKGM864Ke2+YD5ufXoafxb8b5We4M+M193FpCHYA3L89KPW2Ng/m/2wPVy4qTkAAAAASUVORK5CYII=">
-
-                        Breeders
-
-                    </div>
-                    <div style="display: table-cell; margin:5px;">
-
-                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAASYSURBVGhD7ZlXqF1FFIaPvaKJDbsmNhQR64P1wY6oSSwYxAc1EMUKdlRExfKiWF7sYkFFDKIGRNQHsaCJFRUUfbAriNh7/76du2Tfc3eZc+8Z7w7cHz7OmX2mrT0za9bM6U0pTfvDR/AIrO2DpU3LwIXwJ/wzwgewMyw1WgMcATuvIZfD8yPpX+AE6Ly2h/fATn8FB4BaAW6EGJ1bYCXopObCD2BHX4ZNoV/Hwk9gnkWwCXRGvu3rId727bAy1GkHiFH7EvaDSdf68CzYKef/PEjRNHgMLOc6Oh90EJOiveAzsDO62F1hENnxiyE828Ogo/hfdQb8DnbgSVgHxquDQMdgXe/CdpBdq8F9YKN/w5WwHExUm8MrYL06jGMgm7aCN8HGvoVZMEzpIO4A65drYXkYqg6Hb8AG3gKNyqX58CvY1jOgQ5mwnDZXgNPIih+A1aFKbnCulWWL1FgZa6265GurdgMdiG1+CnvAuGXDT4CVubDPhH6tCKfA62A+cY67jrYF19TV4H7hb3/BixA7fpPWhach2j8NBtYu8CFYyRewN/TLhuxUGOCO7dv7YyTtvqIXit+/hvB0jvDx0CZnxFUQM+JeSB3V3olgJyz4HGwA/XI3fwnMY2cPhvBebnZnQ4Qi7uK7g3L6XQJ2zJHbEFI0B74D63sDtoRa2chtYGa5AexwlU6F6OR0H1TIee2a2qJIjdZdYPmzilSatoa3wXI6nkNhjAzwFkMYoXtt0qtgvsrKEqTrjrY+gXMgZT8y6IxyjuplMMq5hIeIzyZDXODm+RnG6+fXAqem6y865vxvUxii8bEWL4D/ZMR6Nzgy/thkiN7MPJ8XqYlrT9ARWOchPmhQGKJX1AEZsB4GY7QmtBniUDoaBnu+2SaZ1zOH60QnUCejX9v1hTapbEijUgxREYLbgSo5soYb1mM+cU6/BieD07Oso8A8DxWpeg3dkH3AjhlKeFNS1kngiIUBH8M78H3pmSfI8unQae3zS4tUvYZuiHKjMq9T7B6YDeeCBrqD677Lx10dg97qfbCcn4bwnt8t476zETQpiyHqPPgNLBNo2BFQJ9eK5/VyGUcwJZrOZojaGLzDCs/jSFXJYHObJV97m8GPYH6n1UxIUVZD1CrgWzWWqjotaoQXdNZ9kQ/QTWB61D7QouyGeINoOXf8Khkb+bss9AE6GkwbxqQquyEuWss9XqSqpSN4FLwOUgeCZVxjL8A1YHDYdJDKbkjsA/cXqTSdDpbp5ymou4DIboj3WZa7tUilqey5jJucYjtBk7Ib4inQcnqvFLngy0bsCCnKbkiELEcWqXrNAKPcMCJo7diIshriOcL8lmvamV3cEXp7OrwOvCWJG5PjoE1ZDQmP5Z1Xk+JoLE7FkGdw4zX3k6bLb5XVkNjY6iJh5XHYeMrwJdgXBlVWQzwYaUzTBbR/AFmvZ+5Y6A/CoMq+2Nu0Hjgi1hv/pSyAQTXphihHwLoDN9FB1QlDvG4y7L8TPLuMR50wZBiaMqRrGtgQz8+eF7qG9wBJhrjL6ibN3GU8HrfKc4I3G13lZkiNlqc0pYmp1/sX70nxymQpxdsAAAAASUVORK5CYII=">
-
-                        chicks
-                    </div>
-
-                </div> <!-- row -->
-            </div> <!-- table -->
-
-            <div gridster="vm.gridsterOptions">
-                <ul>
-                    <li class="myItem" gridster-item='{sizeX: 5, sizeY: 2, col: 0 , row: 1 }'>
-                        <div class="box">
-                            <div class="box-content">
-                                <div  style="height: 30px;" tooltip-placement="bottom" uib-tooltip="Map" class="box-label">Farms location</div>
-                                <div  style="height: 100%" > 
-                                    <scriptr-map
-                                                 transport='wss'
-                                                 boxLabel='Farms location'
-                                                 clustered-view='true'
-                                                 cluster-zoom='8'
-                                                 heatmap='true'
-                                                 bounce='true'
-                                                 resize='false'
-                                                 data=''
-                                                 sources-info=''
-                                                 msg-tag='everyone-main-live'
-                                                 clustered-zoom-max='11'
-                                                 detailed-zoom-min='0'
-                                                 max-asset-points='100'
-                                                 marker-info-window='true'
-                                                 default-center='33.863594,35.612537'
-                                                 path-stroke-opacity='0'
-                                                 path-stroke-weight='1'
-                                                 http-method='GET'
-                                                 api='agApps/ppf/ppfServer/api/farm'
-                                                 api-params='{"map":true}'
-                                                 on-format-data='vm.mapFormatData1'
-                                                 ></scriptr-map> </div>
+                            <div>
+                                <info-window id="infoWindowTemplate_ppf" template="farminfo.html" max-width="600">
+                                </info-window>
                             </div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
+
+                        </scriptr-map> 
+                    </div> <!-- end map cell -->
+                </div> <!-- end map row -->          
+            </div> <!-- end table -->
         </div>
     </body>  
 </html>
