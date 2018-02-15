@@ -342,7 +342,7 @@ Farmhouse.prototype.listSensors = function(dto) {
 	var fromControllers = this._listSensors(controllers, type);   
     var fromSensorCores = this._listSensors(sensorCores, type); 
     sensors = sensors.concat(fromControllers);
-    sensors = sensors.contact(fromSensorCores);
+    sensors = sensors.concat(fromSensorCores);
     return sensors;
 };
 
