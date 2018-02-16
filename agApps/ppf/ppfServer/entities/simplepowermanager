@@ -1,0 +1,130 @@
+var document = require("document");
+var log = require("log"); log.setLevel("info");
+var util = require("/agServerCore/lib/util");
+var powermanager = require("powermanager");
+
+const POWER_CONSUMPTION = "PowerConsumption"; // schema name
+const POWER_CONSUMPTION_FIELD =  "consumption"; // field that contains the power consumption measurement in the doc
+const POWER_CONSUMPTION_DATE_FIELD = "when"; // field that contains the date when the power consumption measurement was done
+
+/**
+ * Basic implementation of the PowerManager
+ * @class SimplePowerManager
+ * @constructor
+ */
+function SimplePowerManager() {
+
+}
+
+SimplePowerManager.prototype = new powermanager.PowerManager();
+SimplePowerManager.prototype.constructor = SimplePowerManager;
+
+/**
+ * @method savePowerConsumption
+ * @param {Object} [dto] 
+ * @param {String} [dto.structure]: the identifier of the related structure
+ * @param {String} [dto.when]: measurment date as ISO string, optional
+ * @param {Number} [dto.consumption]: measured value
+ * @return {Object} identifier of the created document
+ * @throw {Exception}
+ */
+SimplePowerManager.prototype.savePowerConsumption = function(dto) {
+
+    if (!dto || !dto.structure || !dto.when || !dto.consumption) {
+
+        throw {
+            
+            errorCode: "Missing_Parameter",
+            errorDetail: "SimplePowerManager.savePowerConsumption: dto.strucure, dto.when, dto.consumption cannot be null or empty"
+        };
+    }
+    
+    // check if structure exists
+    var resp = document.get(dto.structure);
+    if (resp.metadata.status == "failure") {
+        
+        throw {
+            
+            errorCode: "Entity_Not_Found",
+            errorDetail: "SimplePowerManager.savePowerConsumption: " + dto.strucure + " does not refer to an existing structure"
+        };
+    }
+    
+    var data = JSON.parse(JSON.stringify(dto));
+    data["meta.schema"] = POWER_CONSUMPTION;
+    resp = document.save(data);
+    if (resp.metadata.status == "failure") {
+        
+        log.error("SimplePowerManager.savePowerConsumption: could not save data\n" + JSON.stringify(resp));
+        throw resp.metadata;
+    }
+    
+    return resp.result;
+};
+
+/**
+ * @method listPowerConsumptionDailyAggregates
+ * @param {Object} [dto] 
+ * @param {String} [dto.structure]: the identifier of the related structure
+ * @param {String} [dto.from]: start date as ISO string, optional
+ * @param {String} [dto.to]: end date as ISO string, optional, defaults to current date
+ * @return {Array}
+ * @throw {Exception}
+ */
+SimplePowerManager.prototype.listPowerConsumptionDailyAggregates = function(dto) {
+
+    if (!dto || !dto.structure) {
+
+        throw {
+            
+            errorCode: "Missing_Parameter",
+            errorDetail: "SimplePowerManager.listPowerConsumptionDailyAggregates: dto.strucure cannot be null or empty"
+        };
+    }
+
+    var queryParams = {
+
+        query: POWER_CONSUMPTION_DATE_FIELD + "<date> is not null",
+        aggregateExpression: "SUM${"+ POWER_CONSUMPTION_FIELD + "}",
+        aggregateGroupBy: POWER_CONSUMPTION_DATE_FIELD + "<date>",
+        aggregateGlobal: true,
+        aggregatePage: false
+    };
+
+    if (dto && dto.from) {
+        queryParams.query += " and " + POWER_CONSUMPTION_DATE_FIELD + "<date> >= " + toShortDate(dto.from); 
+    }
+
+    if (dto && dto.to) {
+        queryParams.query += " and " + POWER_CONSUMPTION_DATE_FIELD + "<date> <= " + toShortDate(dto.to); 
+    }
+
+    var resp = document.query(queryParams);
+    if (resp.metadata.status == "failure") {
+
+        log.error("PowerManager.prototype.listPowerConsumptionDailyAggregates: faile while executing aggregation\n" + JSON.stringify(resp));
+        throw resp.metadata;
+    }
+
+    var data = [];
+    var results = resp.result.aggregate.globalScope.groupby;
+    for (var i = 0; i < results.length; i++) {
+
+        var obj = {
+            when: results[i].fields[0].value,
+            value: results[i].value
+        };
+
+        data.push(obj);
+    }
+
+    return data;
+};
+
+SimplePowerManager.prototype.listPowerConsumptionWeeklyAggregates = function(dto) {
+    throw "Not_Impemented";
+};
+
+SimplePowerManager.prototype.listPowerConsumptionMonthlyAggregates = function(dto) {
+    throw "Not_Impemented";
+};

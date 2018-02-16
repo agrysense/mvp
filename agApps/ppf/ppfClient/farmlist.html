@@ -54,7 +54,7 @@
     <script>
 
         const FARM_DETAILS_VIEW = "https://agrysense.scriptrapps.io/agApps/ppf/ppfClient/farmdetails.html";
-        
+
         var underscore = angular.module('underscore', []);
         underscore.factory('_', ['$window', function($window) {		
             return $window._; // assumes underscore has already been loaded on the page		
@@ -87,11 +87,16 @@
     <body>
         <div ng-controller="mapCtrl as vm" ng-init="vm.init()"> 
 
-            <div style="width: 100%; display: table;" class="table-class">                               
-                <div style="display: table-row" ng-include="'farmheader.html'"><!-- include header row -->
-                </div>  <!-- end header row -->             
-                <div style="display: table-row;"> <!-- start map row -->
-                    <div style="display: table-cell;">  <!-- start map cell -->
+            <div class="col-md-12">
+
+                <!-- include header row -->            		
+                <div ng-include="'farmlistheader.html'"></div>
+                <!-- end header row -->             
+
+
+                <div class="panel panel-default">
+                    <div class="panel-body">
+
                         <scriptr-map
                                      transport='wss'
                                      boxLabel='Farms location'
@@ -113,16 +118,14 @@
                                      api-params='{"map":true}'
                                      on-format-data='vm.mapFormatData1'
                                      >
-
                             <div>
                                 <info-window id="infoWindowTemplate_ppf" template="farminfo.html" max-width="600">
                                 </info-window>
                             </div>
-
-                        </scriptr-map> 
-                    </div> <!-- end map cell -->
-                </div> <!-- end map row -->          
-            </div> <!-- end table -->
+                        </scriptr-map>                          
+                    </div>
+                </div>
+            </div>
         </div>
     </body>  
 </html>

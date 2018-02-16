@@ -194,10 +194,10 @@ Farmhouse.prototype.startCycle = function(dto) {
             starting = false;
             log.error("Famrhouse.startCycle: could not start cycle for farmhouse: " + this.key + "\n" + JSON.stringify(resp));
             throw {
+                
                 errorCode: "Invalid_Action",
                 errorDetail: "Farmhouse.startCycle: a cycle for (" + this.key + ") is already starting"
             };
-
         }
 
         if (!dto || !dto.birdNbrIn) {

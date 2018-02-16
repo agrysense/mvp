@@ -11,3 +11,11 @@ const happinessIndexCalculator = {
     path: "/agApps/ppf/ppfServer/entities/farms/dummycalculator",
     clazz: "DummyCalculator"
 };
+
+/**
+ * Name of the class to use to obtain power consumption for a given structure
+ */
+const powermanagerImpl = {
+    path: "/agApps/ppf/ppfServer/entities/dummypowermanager",
+    class: "DummyPowerManager"
+};

@@ -1,0 +1,75 @@
+/**
+ * This API provides operation to read the power consumption of structures, i.e. farms and farmhouses
+ * For now this API generates fake data. 
+ * Use [GET] ../api/power?structure=structure_id&[from=iso_date]&[to=iso_date]&[type=daily|weekly|monthly] 
+ * to obtain the aggregate values. Query string parameters in [] are optional. type defaults to daily for the past 50 days.
+ * User [POST] ../api/power and passe {"when":"iso_date","consumption":some_value, "structure": id_of_structure} in the request body to save new values
+ */
+
+var util = require("/agServerCore/lib/util");
+var config = require("./config");
+
+var powerManager = getPowerManager();
+
+try {
+
+    switch(method.toLowerCase()) {
+
+        case "get": {
+
+            var dto = {
+
+                method: request.method,
+                structure: request.parameters.structure,
+                from: request.parameters.from,
+                to: request.parameters.to,
+                type: request.parameters.type
+            };
+
+            return listAggregates(dto);
+        };break;
+        case "post": { 
+
+            var body =  util.parse(request.body ? request.body : request.rawBody);
+            var result = savePowerConsumptionData(body); 
+            return result;
+        };break;
+        default: throw {
+
+            errorCode: "Invalid_Method",
+            errorDetail: method + " is not supported by the API"
+        }
+    };
+}catch(exception){
+    return exception;
+}
+
+/**
+ * @function listAggregates
+ * @return {Array}
+ */
+function listAggregates(dto) {
+
+    switch(dto.type) {
+            
+        case "weekly": return powerManager.listPowerConsumptionWeeklyAggregates(dto);break;
+        case "monthly": return powerManager.listPowerConsumptionMonthlyAggregates(dto);break;
+        default: return powerManager.listPowerConsumptionDailyAggregates(dto);
+    }
+}
+
+/**
+ * @function savePowerConsumptionData
+ * @param {Object} [data]: power consumption data
+ * @return {Object} {key: the identifier of the saved document, version: document version}
+ */
+function savePowerConsumptionData(data) {
+    return powerManager.savePowerConsumption(data);
+}
+
+function getPowerManager() {
+
+    var powermanagerImplModule = require(config.powermanagerImpl.path);
+    var powermanagerImpl = new powermanagerImplModule[config.powermanagerImpl.clazz]();
+    return powermanagerImpl;
+}

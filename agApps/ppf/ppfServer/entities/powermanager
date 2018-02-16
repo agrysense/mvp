@@ -1,0 +1,60 @@
+/**
+ * Abstract specfication of a PowerManager
+ * @class PowerManager
+ * @constructor
+ */
+function PowerManager() {
+    
+}
+
+/**
+ * @method savePowerConsumption
+ * @param {Object} [dto] 
+ * @param {String} [dto.structure]: the identifier of the related structure
+ * @param {String} [dto.when]: measurment date as ISO string, optional
+ * @param {Number} [dto.consumption]: measured value
+ * @return {Object} identifier of the created document
+ * @throw {Exception}
+ */
+PowerManager.prototype.savePowerConsumption = function(dto) {
+    throw "Not_Impemented";    
+}
+
+/**
+ * @method listPowerConsumptionDailyAggregates
+ * @param {Object} [dto] 
+ * @param {String} [dto.structure]: the identifier of the related structure
+ * @param {String} [dto.from]: start date as ISO string, optional
+ * @param {String} [dto.to]: end date as ISO string, optional, defaults to current date
+ * @return {Array}
+ * @throw {Exception}
+ */
+PowerManager.prototype.listPowerConsumptionDailyAggregates = function(dto) {
+    throw "Not_Impemented";    
+};
+
+/**
+ * @method listPowerConsumptionWeeklyAggregates
+ * @param {Object} [dto] 
+ * @param {String} [dto.structure]: the identifier of the related structure
+ * @param {String} [dto.from]: start date as ISO string, optional
+ * @param {String} [dto.to]: end date as ISO string, optional, defaults to current date
+ * @return {Array}
+ * @throw {Exception}
+ */
+PowerManager.prototype.listPowerConsumptionWeeklyAggregates = function(dto) {
+    throw "Not_Impemented";
+};
+
+/**
+ * @method listPowerConsumptionMonthlyAggregates
+ * @param {Object} [dto] 
+ * @param {String} [dto.structure]: the identifier of the related structure
+ * @param {String} [dto.from]: start date as ISO string, optional
+ * @param {String} [dto.to]: end date as ISO string, optional, defaults to current date
+ * @return {Array}
+ * @throw {Exception}
+ */
+PowerManager.prototype.listPowerConsumptionMonthlyAggregates = function(dto) {
+    throw "Not_Impemented";
+};

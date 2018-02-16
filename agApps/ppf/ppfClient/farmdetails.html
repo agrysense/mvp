@@ -71,24 +71,31 @@
                         console.log("reject published promise", err);
                     });
             }
+            
+            $scope.loadFarmData = function(event){
+                console.log(event);
+            };
         });
 
     </script>
 
     <body>
         <div ng-controller="farmCtrl as vm" ng-init="vm.init()"> 
-			
-            <div class="col-md-12"><div class="page-header">
-  <h1>Example page header <small>Subtext for header</small></h1>
-</div></div>
-            <div class="col-xs-12 col-sm-2">            
+
+            <div class="col-md-12">
+ 			<!-- include header row -->            		
+                <div ng-include="'farmlistheader.html'"></div>
+                <!-- end header row -->             
+
+                
+            <div class="col-xs-12 col-sm-3">            
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h3 class="panel-title">Farm houses</h3>
                     </div>
                     <div class="panel-body">
                         <ul class="list-group">
-                            <li class="list-group-item" ng-repeat="x in farmhouseList"">
+                            <li class="list-group-item" ng-repeat="x in farmhouseList" ng-click="gotToFarmhouse($event)" id="{{x.key}}">
                                 <div style="font-weight:bold">{{ x.name }}</div>
                                 <div>Category: {{ x.category }}</div>
                                 <div>Birds: {{ x.birdNbrIn }}</div>
@@ -100,10 +107,10 @@
                     </div>
                 </div> 
             </div>
-            
-            <div class="col-xs-12 col-sm-4 col-md-4">2</div>
+
+            <div class="col-xs-12 col-sm-3 col-md-3">2</div>
             <div class="col-xs-12 col-sm-6 col-md-6">3</div>
-            
-          
-    </body>  
-</html>
+
+
+            </body>  
+        </html>
