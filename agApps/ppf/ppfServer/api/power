@@ -7,9 +7,10 @@
  */
 
 var util = require("/agServerCore/lib/util");
-var config = require("./config");
+var config = require("/agApps/ppf/config");
 
-var powerManager = getPowerManager();
+var powerManager = getPowerManager(); 
+var method = request.method;
 
 try {
 

@@ -17,5 +17,5 @@ const happinessIndexCalculator = {
  */
 const powermanagerImpl = {
     path: "/agApps/ppf/ppfServer/entities/dummypowermanager",
-    class: "DummyPowerManager"
+    clazz: "DummyPowerManager"
 };

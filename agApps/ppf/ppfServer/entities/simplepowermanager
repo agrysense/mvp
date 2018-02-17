@@ -1,7 +1,7 @@
 var document = require("document");
 var log = require("log"); log.setLevel("info");
 var util = require("/agServerCore/lib/util");
-var powermanager = require("powermanager");
+var powermanager = require("./powermanager");
 
 const POWER_CONSUMPTION = "PowerConsumption"; // schema name
 const POWER_CONSUMPTION_FIELD =  "consumption"; // field that contains the power consumption measurement in the doc

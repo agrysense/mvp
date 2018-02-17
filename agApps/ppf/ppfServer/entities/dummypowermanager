@@ -1,4 +1,4 @@
-var powermanager = require("powermanager");
+var powermanager = require("./powermanager");
 
 /**
  * Stub
