@@ -1446,7 +1446,31 @@
 				{
 					"name": "list power consumption default",
 					"request": {
-						"url": "https://agrysense.scriptrapps.io/agApps/ppf/ppfServer/api/power",
+						"url": {
+							"raw": "https://agrysense.scriptrapps.io/agApps/ppf/ppfServer/api/power?structure=2A7729844A6BEB3AD5245F221598E36E",
+							"protocol": "https",
+							"host": [
+								"agrysense",
+								"scriptrapps",
+								"io"
+							],
+							"path": [
+								"agApps",
+								"ppf",
+								"ppfServer",
+								"api",
+								"power"
+							],
+							"query": [
+								{
+									"key": "structure",
+									"value": "2A7729844A6BEB3AD5245F221598E36E",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -1464,7 +1488,7 @@
 					"name": "list power consumption weekly",
 					"request": {
 						"url": {
-							"raw": "https://agrysense.scriptrapps.io/agApps/ppf/ppfServer/api/power?type=weekly",
+							"raw": "https://agrysense.scriptrapps.io/agApps/ppf/ppfServer/api/power?type=weekly&structure=2A7729844A6BEB3AD5245F221598E36E",
 							"protocol": "https",
 							"host": [
 								"agrysense",
@@ -1482,6 +1506,12 @@
 								{
 									"key": "type",
 									"value": "weekly",
+									"equals": true,
+									"description": ""
+								},
+								{
+									"key": "structure",
+									"value": "2A7729844A6BEB3AD5245F221598E36E",
 									"equals": true,
 									"description": ""
 								}
@@ -1505,7 +1535,7 @@
 					"name": "list power consumption monthly",
 					"request": {
 						"url": {
-							"raw": "https://agrysense.scriptrapps.io/agApps/ppf/ppfServer/api/power?type=monthly",
+							"raw": "https://agrysense.scriptrapps.io/agApps/ppf/ppfServer/api/power?type=monthly&structure=2A7729844A6BEB3AD5245F221598E36E",
 							"protocol": "https",
 							"host": [
 								"agrysense",
@@ -1523,6 +1553,12 @@
 								{
 									"key": "type",
 									"value": "monthly",
+									"equals": true,
+									"description": ""
+								},
+								{
+									"key": "structure",
+									"value": "2A7729844A6BEB3AD5245F221598E36E",
 									"equals": true,
 									"description": ""
 								}
@@ -1546,7 +1582,7 @@
 					"name": "list power consumption daily",
 					"request": {
 						"url": {
-							"raw": "https://agrysense.scriptrapps.io/agApps/ppf/ppfServer/api/power?type=daily",
+							"raw": "https://agrysense.scriptrapps.io/agApps/ppf/ppfServer/api/power?type=daily&structure=2A7729844A6BEB3AD5245F221598E36E",
 							"protocol": "https",
 							"host": [
 								"agrysense",
@@ -1564,6 +1600,12 @@
 								{
 									"key": "type",
 									"value": "daily",
+									"equals": true,
+									"description": ""
+								},
+								{
+									"key": "structure",
+									"value": "2A7729844A6BEB3AD5245F221598E36E",
 									"equals": true,
 									"description": ""
 								}
