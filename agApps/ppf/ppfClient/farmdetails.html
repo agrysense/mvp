@@ -51,9 +51,9 @@
             vm.init = function() {
 
                 wsClient.onReady.then(function() {});               
-
-                // load farmhouses
+                
                 vm.loadFarmHouses();
+                vm.loadPowerConsumption();                
             };
 
             vm.loadFarmHouses = function() {
@@ -63,18 +63,40 @@
                 params.overview = true;
                 httpClient.get("agApps/ppf/ppfServer/api/farmhouse", params)
                     .then(
-                    function(data, response) {
-                        console.log(data);
+                    function(data, response) {                       
                         $scope.farmhouseList = data;
                     },
                     function(err) {
                         console.log("reject published promise", err);
                     });
             }
-            
-            $scope.loadFarmData = function(event){
-                console.log(event);
+
+            vm.loadPowerConsumption = function() {
+
+                var params = getUrlParams();
+                params = params ? params : {};
+                params.type="monthly";
+                httpClient.get("agApps/ppf/ppfServer/api/power", params)
+                    .then(
+                    function(data, response) {                        
+                        $scope.powerconsumption = data;
+                    },
+                    function(err) {
+                        console.log("reject published promise", err);
+                    });
+            }
+
+            $scope.loadFarmHouseData = function(event){
+
+                var farmhouseid = event.target.parentElement.id;
+                window.open("agApps/ppf/ppfClient/farmhousedetails.html?id=" + farmhouseid);
             };
+            
+            $scope.toMonth = function(value) {
+                
+                var months = {1:"JAN", 2:"FEB", 3:"MAR", 4: "APR", 5:"MAY", 6: "JUN", 7: "JUL", 8: "AUG", 9: "SEP", 10: "OCT", 11: "NOV", 12: "DEC"};
+            	return months[value];
+            }
         });
 
     </script>
@@ -83,34 +105,52 @@
         <div ng-controller="farmCtrl as vm" ng-init="vm.init()"> 
 
             <div class="col-md-12">
- 			<!-- include header row -->            		
+                <!-- include header row -->            		
                 <div ng-include="'farmlistheader.html'"></div>
                 <!-- end header row -->             
 
-                
-            <div class="col-xs-12 col-sm-3">            
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Farm houses</h3>
+
+                <div class="col-xs-12 col-sm-3">            
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Farm houses</h3>
+                        </div>
+                        <div class="panel-body">
+                            <ul class="list-group">
+                                <li class="list-group-item" ng-repeat="x in farmhouseList" ng-click="loadFarmHouseData($event)" id="{{x.key}}">
+                                    <div style="font-weight:bold">{{ x.name }}</div>
+                                    <div>Category: {{ x.category }}</div>
+                                    <div>Birds: {{ x.birdNbrIn }}</div>
+                                    <div>Cycle day: {{ x.cycleDay }}</div>
+                                    <div>Cycle ends: {{ x.endDate  || "N/A" }}</div>
+                                    <div>Nbr of cycles: {{ x.nbrOfCycles }}</div>                                    
+                                </li>
+                            </ul>
+                        </div>
+                    </div> 
+                </div>
+
+                <div class="col-xs-12 col-sm-3 col-md-3">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Electricity consumption</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="media" ng-repeat="x in powerconsumption">
+                                <div class="media-left media-middle">
+                                    {{toMonth(x.when)}}
+                                </div>
+                                <div class="media-body">
+                                    {{x.value}} 
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="panel-body">
-                        <ul class="list-group">
-                            <li class="list-group-item" ng-repeat="x in farmhouseList" ng-click="gotToFarmhouse($event)" id="{{x.key}}">
-                                <div style="font-weight:bold">{{ x.name }}</div>
-                                <div>Category: {{ x.category }}</div>
-                                <div>Birds: {{ x.birdNbrIn }}</div>
-                                <div>Cycle day: {{ x.cycleDay }}</div>
-                                <div>Cycle ends: {{ x.endDate  || "N/A" }}</div>
-                                <div>Nbr of cycles: {{ x.nbrOfCycles }}</div>                                    
-                            </li>
-                        </ul>
-                    </div>
-                </div> 
-            </div>
+                </div>
 
-            <div class="col-xs-12 col-sm-3 col-md-3">2</div>
-            <div class="col-xs-12 col-sm-6 col-md-6">3</div>
+                <div class="col-xs-12 col-sm-6 col-md-6">3</div>
 
 
-            </body>  
-        </html>
+                </body>  
+            </html>
