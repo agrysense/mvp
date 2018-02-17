@@ -1438,6 +1438,152 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "power",
+			"description": "",
+			"item": [
+				{
+					"name": "list power consumption default",
+					"request": {
+						"url": "https://agrysense.scriptrapps.io/agApps/ppf/ppfServer/api/power",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "list power consumption default"
+					},
+					"response": []
+				},
+				{
+					"name": "list power consumption weekly",
+					"request": {
+						"url": {
+							"raw": "https://agrysense.scriptrapps.io/agApps/ppf/ppfServer/api/power?type=weekly",
+							"protocol": "https",
+							"host": [
+								"agrysense",
+								"scriptrapps",
+								"io"
+							],
+							"path": [
+								"agApps",
+								"ppf",
+								"ppfServer",
+								"api",
+								"power"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "weekly",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "list power consumption weekly"
+					},
+					"response": []
+				},
+				{
+					"name": "list power consumption monthly",
+					"request": {
+						"url": {
+							"raw": "https://agrysense.scriptrapps.io/agApps/ppf/ppfServer/api/power?type=monthly",
+							"protocol": "https",
+							"host": [
+								"agrysense",
+								"scriptrapps",
+								"io"
+							],
+							"path": [
+								"agApps",
+								"ppf",
+								"ppfServer",
+								"api",
+								"power"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "monthly",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "list power consumption monthly"
+					},
+					"response": []
+				},
+				{
+					"name": "list power consumption daily",
+					"request": {
+						"url": {
+							"raw": "https://agrysense.scriptrapps.io/agApps/ppf/ppfServer/api/power?type=daily",
+							"protocol": "https",
+							"host": [
+								"agrysense",
+								"scriptrapps",
+								"io"
+							],
+							"path": [
+								"agApps",
+								"ppf",
+								"ppfServer",
+								"api",
+								"power"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "daily",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": "list power consumption daily"
+					},
+					"response": []
+				}
+			]
 		}
 	]
 }
