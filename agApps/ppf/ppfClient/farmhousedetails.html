@@ -76,11 +76,24 @@
                 wsClient.onReady.then(function() {});                   
             };
 
-            vm.loadFarmHouse = function() {
+            vm.temperatureCallback = function(data) {
 
+                if (data && data.length > 0) {
+                    return data[0].temperature
+                }
+                
+                return data;
+            };
+            
+            vm.humidityCallback = function(data) {
 
-            }
-
+                if (data && data.length > 0) {
+                    return data[0].humidity
+                }
+                
+                return data;
+            };
+            
             vm.dateFormat = function(x) {
                 // return new Date(x).toTimeString()
                 return x;
@@ -143,7 +156,7 @@
                             <div ng-show="temperature" ng-hide="!temperature">
                                 <scriptr-gauge 
                                                transport='wss' 
-                                               msg-tag="temperature-gauge" 
+                                               msg-tag="gauge" 
                                                title="Title"
                                                title-font-color="#aaa"
                                                api='UIComponents/dashboard/frontend/examples/gauge/getGaugeVal'
@@ -157,13 +170,13 @@
                                                start-animation-type="bounce"
                                                refresh-animation-type="bounce"
                                                relative-gauge-size="true"
-                                               on-format-data="vm.callback">
+                                               on-format-data="vm.temperatureCallback">
                                 </scriptr-gauge>
                             </div>
                             <div ng-show="humidity" ng-hide="!humidity">
                                 <scriptr-gauge 
                                                transport='wss' 
-                                               msg-tag="humidity-gauge" 
+                                               msg-tag="gauge" 
                                                title="Title"
                                                title-font-color="#aaa"
                                                api='UIComponents/dashboard/frontend/examples/gauge/getGaugeVal'
@@ -177,7 +190,7 @@
                                                start-animation-type="bounce"
                                                refresh-animation-type="bounce"
                                                relative-gauge-size="true"
-                                               on-format-data="vm.callback">
+                                               on-format-data="vm.humidityCallback">
                                 </scriptr-gauge>
                             </div>
                         </div>

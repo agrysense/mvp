@@ -237,5 +237,7 @@ function stopCycle(id) {
 function getEnvironment(id, parameters) {
     
     var farmhouse = getFarmhouse(id);
-    return farmhouse.listEnvironmentalValues(parameters);
+    var data = farmhouse.listEnvironmentalValues(parameters);
+    var resp = publish("responseChannel", {"id": "gauge", "result": data});
+    return data;
 }

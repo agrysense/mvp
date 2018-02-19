@@ -13,7 +13,7 @@ try {
     }
 
     var list = farmManager.listGlobalHappiness();
-    resp = publish("responseChannel", {"id": "global_happiness_list", "result": list});
+    var resp = publish("responseChannel", {"id": "global_happiness_list", "result": list});
     if (option && option == "current") {
         return happiness;    
     }else {
