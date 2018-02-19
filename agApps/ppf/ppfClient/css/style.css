@@ -30,6 +30,7 @@ body {
 .side-bar {
     background-color: #FFFFFF;
     margin-top:25px;
+    height: auto;
 }
 
 .side-bar .nav>li>a {color: #000000; border-radius: 0;}
@@ -45,18 +46,5 @@ header {
  height:100%;
 }
 
-/* farms map */
+.fixed-height {height: calc(100vh - 300px); overflow-y: auto; position: relative;}
 
-.table-class {
-    margin-left:1em;
-    margin-top:1em;
-    margin-bottom:1em;
-    margin-right:1em;
-}
-
-/* farm details */
-
-
-/*
-* End additional styling for index.html
-*/

@@ -11,146 +11,212 @@
         <!-- font awesome.css -->
         <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
         <link href="//fonts.googleapis.com/css?family=Josefin+Sans|Montserrat" rel="stylesheet">
-        <!-- Map styles -->
-        <link rel="stylesheet" href="/UIComponents/dashboard/frontend/components/map/map.css">
+
         <!-- Adding Angular -->
         <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
         <script src="//cdn.rawgit.com/gdi2290/angular-websocket/v1.0.9/angular-websocket.min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular-cookies.js"></script>
 
+        <!-- Adding JQuery, required for charts -->
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 
-        <script src="/UIComponents/wsProvider.js"></script>
-        <script src="/UIComponents/httpProvider.js"></script>
+        <!-- Charts used in historical angular.morris -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.4/raphael-min.js"></script>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+        <link rel="stylesheet" href="/UIComponents/dashboard/frontend/components/chart/chart.css">
 
-        <script src="/UIComponents/config/scriptrTransport.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+        <script src="/UIComponents/dashboard/frontend/components/chart/angular.morris.js"></script>
 
-        <!-- custom styles -->
-        <link rel="stylesheet" href="./css/style.css">
+        <!-- Chart UIComponent -->
+        <script src="/UIComponents/dashboard/frontend/components/chart/chart.js"></script>
+        <link re="/UIComponents/dashboard/frontend/components/chart/chart.css"></link>
 
-        <!-- custom lib -->
-        <script src="./lib/util.js"></script>
+    <!-- Communication providers --> 
+    <script src="/UIComponents/wsProvider.js"></script>
+    <script src="/UIComponents/httpProvider.js"></script>
+    <script src="/UIComponents/config/scriptrTransport.js"></script>
+
+    <!-- custom styles -->
+    <link rel="stylesheet" href="./css/style.css">
+
+    <!-- custom lib -->
+    <script src="./lib/util.js"></script>
 
     </head> 
 
-    <script>
+<script>
 
-        var underscore = angular.module('underscore', []);
-        underscore.factory('_', ['$window', function($window) {		
-            return $window._; // assumes underscore has already been loaded on the page		
-        }]);
+    var underscore = angular.module('underscore', []);
+    underscore.factory('_', ['$window', function($window) {		
+        return $window._; // assumes underscore has already been loaded on the page		
+    }]);
 
-        var farm = angular.module('farm', ["HttpClient", "WsClient"]);
-        angular.module('farm').config(wssConfig);
-        angular.module('farm').config(httpsConfig);
+    var farm = angular.module('farm', ["HttpClient", "WsClient", "Chart"]);
+    angular.module('farm').config(wssConfig);
+    angular.module('farm').config(httpsConfig);
 
 
-        farm.controller('farmCtrl', function($scope, $controller, wsClient, httpClient, $sce) {
+    farm.controller('farmCtrl', function($scope, $controller, wsClient, httpClient, $sce) {
 
-            var vm = this;
-            vm.init = function() {
+        var vm = this;
+        vm.init = function() {
 
-                wsClient.onReady.then(function() {});               
-                
-                vm.loadFarmHouses();
-                vm.loadPowerConsumption();                
-            };
+            var params = getUrlParams();
+            $scope.queryStringParams = params;
+            wsClient.onReady.then(function() {});               
+            vm.loadFarmHouses();
+            vm.loadPowerConsumption();                
+        };
 
-            vm.loadFarmHouses = function() {
+        vm.loadFarmHouses = function() {
 
-                var params = getUrlParams();
-                params = params ? params : {};
-                params.overview = true;
-                httpClient.get("agApps/ppf/ppfServer/api/farmhouse", params)
-                    .then(
-                    function(data, response) {                       
-                        $scope.farmhouseList = data;
-                    },
-                    function(err) {
-                        console.log("reject published promise", err);
-                    });
-            }
+            var params = $scope.queryStringParams;
+            params = params ? params : {};
+            params.overview = true;
+            httpClient.get("agApps/ppf/ppfServer/api/farmhouse", params)
+                .then(
+                function(data, response) {                       
+                    $scope.farmhouseList = data;
+                },
+                function(err) {
+                    console.log("reject published promise", err);
+                });
+        }
 
-            vm.loadPowerConsumption = function() {
+        vm.loadPowerConsumption = function() {
 
-                var params = getUrlParams();
-                params = params ? params : {};
-                params.type="monthly";
-                httpClient.get("agApps/ppf/ppfServer/api/power", params)
-                    .then(
-                    function(data, response) {                        
-                        $scope.powerconsumption = data;
-                    },
-                    function(err) {
-                        console.log("reject published promise", err);
-                    });
-            }
+            var params = getUrlParams();
+            params = params ? params : {};
+            params.type="monthly";
+            httpClient.get("agApps/ppf/ppfServer/api/power", params)
+                .then(
+                function(data, response) {                        
+                    $scope.powerconsumption = data;
+                },
+                function(err) {
+                    console.log("reject published promise", err);
+                });
+        }
 
-            $scope.loadFarmHouseData = function(event){
+        vm.dateFormat = function(x) {
+           // return new Date(x).toTimeString()
+            return x;
+        }
 
-                var farmhouseid = event.target.parentElement.id;
-                window.open("agApps/ppf/ppfClient/farmhousedetails.html?id=" + farmhouseid);
-            };
+        $scope.loadFarmHouseData = function(event){
+
+            var farmhouseid = event.target.parentElement.id;
+            window.location.href = "https://agrysense.scriptrapps.io/agApps/ppf/ppfClient/farmhousedetails.html?id=" + farmhouseid;
+        };
+
+        $scope.toMonth = function(value) {
+
+            var months = {1:"JAN", 2:"FEB", 3:"MAR", 4: "APR", 5:"MAY", 6: "JUN", 7: "JUL", 8: "AUG", 9: "SEP", 10: "OCT", 11: "NOV", 12: "DEC"};
+            return months[value];
+        }
+        
+        $scope.getChartParams = function() {            
+            return "agApps/ppf/ppfServer/api/power?type=weekly&structure=" + $scope.queryStringParams.id;           
+        }
+        
+        $scope.checkPowerConsumptionIncreased = function(index) {
             
-            $scope.toMonth = function(value) {
+            if (index > 0) {
                 
-                var months = {1:"JAN", 2:"FEB", 3:"MAR", 4: "APR", 5:"MAY", 6: "JUN", 7: "JUL", 8: "AUG", 9: "SEP", 10: "OCT", 11: "NOV", 12: "DEC"};
-            	return months[value];
+                var former = $scope.powerconsumption[index - 1];
+                var current = $scope.powerconsumption[index];
+                var diff = Number(current.value) - Number(former.value); 
+                return diff;
             }
-        });
+            
+            return 0;
+        }
+    });
 
-    </script>
+</script>
 
-    <body>
-        <div ng-controller="farmCtrl as vm" ng-init="vm.init()"> 
+<body>
+    <div ng-controller="farmCtrl as vm" ng-init="vm.init()"> 
 
-            <div class="col-md-12">
-                <!-- include header row -->            		
-                <div ng-include="'farmlistheader.html'"></div>
-                <!-- end header row -->             
+        <div class="col-md-12">
+            <!-- include header row -->            		
+            <div ng-include="'farmlistheader.html'"></div>
+            <!-- end header row -->             
 
+			<!-- farmhouse list -->
+            <div class="col-xs-12 col-sm-3">            
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Farm houses</h3>
+                    </div>
+                    <div class="panel-body fixed-height">
+                        <ul class="list-group">
+                            <li class="list-group-item" ng-repeat="x in farmhouseList" ng-click="loadFarmHouseData($event)" id="{{x.key}}">
+                                <div style="font-weight:bold">{{ x.name }}</div>
+                                <div>Category: {{ x.category }}</div>
+                                <div>Birds: {{ x.birdNbrIn }}</div>
+                                <div>Cycle day: {{ x.cycleDay }}</div>
+                                <div>Cycle ends: {{ x.endDate  || "N/A" }}</div>
+                                <div>Nbr of cycles: {{ x.nbrOfCycles }}</div>                                    
+                            </li>
+                        </ul>
+                    </div>
+                </div> 
+            </div>
 
-                <div class="col-xs-12 col-sm-3">            
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Farm houses</h3>
-                        </div>
-                        <div class="panel-body">
-                            <ul class="list-group">
-                                <li class="list-group-item" ng-repeat="x in farmhouseList" ng-click="loadFarmHouseData($event)" id="{{x.key}}">
-                                    <div style="font-weight:bold">{{ x.name }}</div>
-                                    <div>Category: {{ x.category }}</div>
-                                    <div>Birds: {{ x.birdNbrIn }}</div>
-                                    <div>Cycle day: {{ x.cycleDay }}</div>
-                                    <div>Cycle ends: {{ x.endDate  || "N/A" }}</div>
-                                    <div>Nbr of cycles: {{ x.nbrOfCycles }}</div>                                    
-                                </li>
-                            </ul>
-                        </div>
-                    </div> 
-                </div>
+            <!-- Monthly power consumption -->
+            <div class="col-xs-12 col-sm-3 col-md-3">
 
-                <div class="col-xs-12 col-sm-3 col-md-3">
-
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Electricity consumption</h3>
-                        </div>
-                        <div class="panel-body">
-                            <div class="media" ng-repeat="x in powerconsumption">
-                                <div class="media-left media-middle">
-                                    {{toMonth(x.when)}}
-                                </div>
-                                <div class="media-body">
-                                    {{x.value}} 
-                                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Electricity consumption</h3>
+                    </div>
+                    <div class="panel-body fixed-height">
+                        <div class="media" ng-repeat="x in powerconsumption">
+                            <div class="media-left media-middle">
+                                {{toMonth(x.when)}}
                             </div>
+                            <div class="media-body">
+                                {{x.value}}
+                                <span ng-if="checkPowerConsumptionIncreased($index) > 0">
+                                    <i class="far fa-arrow-alt-circle-up"></i>
+                                </span>
+                                <span ng-if="checkPowerConsumptionIncreased($index) < 0">
+                                    <i class="far fa-arrow-alt-circle-down"></i>
+                                </span>
+                            </div>                           
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="col-xs-12 col-sm-6 col-md-6">3</div>
-
-
-                </body>  
-            </html>
+            <!-- Weekly power consumption -->
+            <div class="col-xs-12 col-sm-6 col-md-6">  
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Weekly Electricity consumption</h3>
+                    </div>
+                    <div class="panel-body fixed-height">
+                        <scriptr-chart                                             
+                                       type='line'
+                                       transport="https"
+                                       msg-tag="power-weekly"
+                                       ykeys='["value"]'
+                                       xkey='when'
+                                       parse-time='false'
+                                       labels='["Value"]'   
+                                       date-format="vm.dateFormat"
+                                       line-width="2"
+                                       colors='["#FCC717", "#E90088"]'
+                                       api = '{{getChartParams()}}'
+                                       >                                       
+                        </scriptr-chart>                    
+                    </div>                  
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

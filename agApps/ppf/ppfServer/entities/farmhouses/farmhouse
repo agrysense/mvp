@@ -3,6 +3,7 @@ var log = require("log"); log.setLevel("info");
 var componentModule = require("/agServerCore/entities/component");
 var cycleModule = require("./cycle");
 var util = require("/agServerCore/lib/util");
+var config = require("/agApps/ppf/config");
 
 var farmhouseid = null;
 var farm = null;
@@ -45,6 +46,19 @@ function Farmhouse(dto, farmhouseManager) {
 
 Farmhouse.prototype = new componentModule.Component({inheritance: true});
 Farmhouse.prototype.constructor = Farmhouse;
+
+/**
+ * lists environmetal data in this farmhouse
+ * @method listEnvironmentalValues
+ * @param {Object} [dto] optional filtering and pagination parameters
+ * @return {JSONArray<Object>}
+ * @throws {Error}
+ */
+Farmhouse.prototype.listEnvironmentalValues = function(dto) {
+
+    var visitor = this._getVisitor();
+    return visitor.listEnvironmentalValues(dto);
+};
 
 
 /**
@@ -401,4 +415,11 @@ Farmhouse.prototype._getCycleKeys = function() {
         cycleKey:  this.key + "_Cycle",
         startCycleKey: this.key + "Starting_Cycle"
     };
+};
+
+Farmhouse.prototype._getVisitor = function() {
+  
+    var visitorModule = require(config.farmhousevisitorImpl.path);
+    var visitorImpl = new visitorModule[config.farmhousevisitorImpl.clazz](this);
+    return visitorImpl;
 };

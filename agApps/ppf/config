@@ -19,3 +19,11 @@ const powermanagerImpl = {
     path: "/agApps/ppf/ppfServer/entities/dummypowermanager",
     clazz: "DummyPowerManager"
 };
+
+/**
+ * Name of the class to use to obtain an instance of FarmhouseVisitor, used to handle complex Farmhouse logic
+ */
+const farmhousevisitorImpl = {
+    path: "/agApps/ppf/ppfServer/entities/farmhouses/dummyfarmhousevisitor",
+    clazz: "DummyFarmhouseVisitor"
+};

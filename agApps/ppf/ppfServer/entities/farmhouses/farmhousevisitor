@@ -1,0 +1,33 @@
+/**
+ * Abstract class that factors out complex logic that needs to be dealt with by farmhouses
+ * @class FarmhouseVisitor
+ * @constructor
+ * @param {Object} obj: should be an instance of Farmhouse (when not calling the constructor for inheritance)
+ */
+function FarmhouseVisitor(obj) {
+    
+    if (obj && obj.inheritance) {
+        return;
+    }
+    
+    if (!obj) {
+        
+        throw {
+            errorCode: "Missing_Parameter",
+            errorDetail: this.constructor.name + ": you need to pass the corresponding Farmhouse instance"
+        };
+    }
+    
+    this.farmhouse = obj;
+}
+
+/**
+ * This method knows how to load environmental measurements in a given farmhouse
+ * @method listEnvironmentalValues
+ * @param {Object} [dto]
+ * @return {Array} should be similar to [ {date:xxx, sensor_type1:yyy, sensor_type2:zzz, sensor_type_n:tttt, etc.}, etc.]
+ * @throws {Error}
+ */
+FarmhouseVisitor.prototype.listEnvironmentalValues = function(dto) {
+    throw "Not_Implemented";
+};

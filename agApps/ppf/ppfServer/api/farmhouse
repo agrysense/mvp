@@ -10,6 +10,7 @@
  * To start a cycle, send a PUT request to "../api/farmhouse/farmhouse_id/cycle"
  * To update a cycle, send a PUT request to "../id/farmhouse/farmhouse_id/cycle/cycleid"  + cycle data in JSON body
  * To stop the current cycle, send a DELETE request to "../api/farmhouse/farmhouse_id/cycle"
+ * To get environmental values, send a GET request to "../api/farmhouse/farmhouse_id/environment"
  * @module farmhouse
  */
 
@@ -19,6 +20,7 @@ var farmhouseManagerModule = require("/agApps/ppf/ppfServer/entities/farmhouses/
 var pathInfo = request.pathInfo ? request.pathInfo.split("/") : "";
 var id = pathInfo.length > 0 ? pathInfo[0] : null;
 var cycleReq = pathInfo.length > 1 && pathInfo[1] == "cycle" ? true : false;
+var environmentReq = pathInfo.length > 1 && pathInfo[1] == "environment" ? true : false;
 var cycleId = pathInfo.length > 2 ? pathInfo[2] : null; 
 
 var method = request.method;
@@ -61,8 +63,12 @@ function resolveGet() {
         return listFarmhouses(request.parameters);
     }
 
-    if (id && !cycleReq) {
+    if (id && !cycleReq && !environmentReq) {
         return getFarmhouse(id);
+    }
+    
+    if (id && environmentReq) {
+        return getEnvironment(id, request.parameters);
     }
 
     if (cycleReq && !cycleId) {
@@ -221,4 +227,15 @@ function stopCycle(id) {
 
     var farmhouse = getFarmhouse(id);
     return farmhouse.stopCycle();
+}
+
+/**
+ * @function getEnvironment
+ * @param {String} id: farmhouse id
+ * @param {Object} params: parameters optional
+ */
+function getEnvironment(id, parameters) {
+    
+    var farmhouse = getFarmhouse(id);
+    return farmhouse.listEnvironmentalValues(parameters);
 }

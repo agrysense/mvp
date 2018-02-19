@@ -1,0 +1,193 @@
+<html ng-app="farmhouse">
+    <head>
+        <title>Farmhouse details</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+        <!-- replace with your icon -->
+        <link rel="shortcut icon" type="image/x-icon" href="">
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" crossorigin="anonymous">
+        <!-- font awesome.css -->
+        <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+        <link href="//fonts.googleapis.com/css?family=Josefin+Sans|Montserrat" rel="stylesheet">
+
+        <!-- Adding Angular -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+        <script src="//cdn.rawgit.com/gdi2290/angular-websocket/v1.0.9/angular-websocket.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular-cookies.js"></script>
+
+        <!-- Adding JQuery, required for charts -->
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+        <!-- Charts used in historical angular.morris -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.4/raphael-min.js"></script>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+        <link rel="stylesheet" href="/UIComponents/dashboard/frontend/components/chart/chart.css">
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+        <script src="/UIComponents/dashboard/frontend/components/chart/angular.morris.js"></script>
+
+        <!-- Chart UIComponent -->
+        <script src="/UIComponents/dashboard/frontend/components/chart/chart.js"></script>
+        <link rel="/UIComponents/dashboard/frontend/components/chart/chart.css">
+
+        <!-- Gauge UIComponent -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.4/raphael-min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/justgage/1.2.2/justgage.min.js"></script>
+        <script src="/UIComponents/dashboard/frontend/components/gauge/angular.gauge.min.js"></script>
+        <script src="/UIComponents/dashboard/frontend/components/gauge/gauge.js"></script>
+
+        <!-- Communication providers --> 
+        <script src="/UIComponents/wsProvider.js"></script>
+        <script src="/UIComponents/httpProvider.js"></script>
+        <script src="/UIComponents/config/scriptrTransport.js"></script>
+
+        <!-- custom styles -->
+        <link rel="stylesheet" href="./css/style.css">
+
+        <!-- custom lib -->
+        <script src="./lib/util.js"></script>
+
+    </head> 
+
+    <script>
+
+        var underscore = angular.module('underscore', []);
+        underscore.factory('_', ['$window', function($window) {		
+            return $window._; // assumes underscore has already been loaded on the page		
+        }]);
+
+        var farmhouse = angular.module('farmhouse', ["HttpClient", "WsClient", "Chart", "Gauge"]);
+        angular.module('farmhouse').config(wssConfig);
+        angular.module('farmhouse').config(httpsConfig);
+
+
+        farmhouse.controller('farmhouseCtrl', function($scope, $controller, wsClient, httpClient, $sce) {
+
+            var vm = this;
+            vm.init = function() {
+
+                var params = getUrlParams();
+                $scope.queryStringParams = params;
+                $scope.temperature = true;
+                $scope.humidity = false;
+                wsClient.onReady.then(function() {});                   
+            };
+
+            vm.loadFarmHouse = function() {
+
+
+            }
+
+            vm.dateFormat = function(x) {
+                // return new Date(x).toTimeString()
+                return x;
+            }
+
+            $scope.getChartParams = function() {            
+                return "agApps/ppf/ppfServer/api/farmhouse/" + $scope.queryStringParams.id + "/environment";           
+            }
+
+        });
+
+    </script>
+
+    <body>
+        <div ng-controller="farmhouseCtrl as vm" ng-init="vm.init()"> 
+
+            <div class="col-md-12">
+                <!-- include header row -->            		
+                <div ng-include="'farmhouseheader.html'"></div>
+                <!-- end header row -->             
+
+
+                <!-- Farmhouse monitor -->
+                <div class="col-xs-12 col-sm-8 col-md-8">  
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Farmhouse monitor</h3>
+                        </div>
+                        <div class="panel-body fixed-height">
+                            <scriptr-chart                                             
+                                           type='line'
+                                           transport="https"
+                                           msg-tag="farmhouse-env"
+                                           ykeys='["temperature", "humidity", "weight"]'
+                                           xkey='date'
+                                           parse-time='false'
+                                           labels='["Temperature", "Humidity", "Weight"]'   
+                                           date-format="vm.dateFormat"
+                                           line-width="2"
+                                           colors='["#FCC717", "#E90088", "156194"]'
+                                           api = '{{getChartParams()}}'
+                                           >                                       
+                            </scriptr-chart>                    
+                        </div>                  
+                    </div>
+                </div>
+
+                <!-- farmhouse list -->
+                <div class="col-xs-12 col-sm-4">            
+                    <div class="panel panel-default">                    
+                        <div class="panel-body fixed-height">
+                            <ul class="nav nav-tabs">                            
+                                <li role="presentation" class="active">
+                                    <a href="#" ng-click="temperature = !temperature; humidity=!humidity">Temperature</a>                                   
+                                </li>
+                                <li role="presentation">
+                                    <a href="#" ng-click="humidity = !humidity; temperature = !temperature">Humidity</a>                                    
+                                </li>
+                            </ul>
+                            <div ng-show="temperature" ng-hide="!temperature">
+                                <scriptr-gauge 
+                                               transport='wss' 
+                                               msg-tag="temperature-gauge" 
+                                               title="Title"
+                                               title-font-color="#aaa"
+                                               api='UIComponents/dashboard/frontend/examples/gauge/getGaugeVal'
+                                               title-position="above"
+                                               hide-inner-shadow="false"
+                                               shadow-vertical-offset="3"
+                                               shadow-opacity="0.2"
+                                               pointer="true"
+                                               value-font-color="#aff542"
+                                               hide-inner-shadow="false"
+                                               start-animation-type="bounce"
+                                               refresh-animation-type="bounce"
+                                               relative-gauge-size="true"
+                                               on-format-data="vm.callback">
+                                </scriptr-gauge>
+                            </div>
+                            <div ng-show="humidity" ng-hide="!humidity">
+                                <scriptr-gauge 
+                                               transport='wss' 
+                                               msg-tag="humidity-gauge" 
+                                               title="Title"
+                                               title-font-color="#aaa"
+                                               api='UIComponents/dashboard/frontend/examples/gauge/getGaugeVal'
+                                               title-position="above"
+                                               hide-inner-shadow="false"
+                                               shadow-vertical-offset="3"
+                                               shadow-opacity="0.2"
+                                               pointer="true"
+                                               value-font-color="#aff542"
+                                               hide-inner-shadow="false"
+                                               start-animation-type="bounce"
+                                               refresh-animation-type="bounce"
+                                               relative-gauge-size="true"
+                                               on-format-data="vm.callback">
+                                </scriptr-gauge>
+                            </div>
+                        </div>
+                    </div> 
+                </div>
+
+
+
+
+            </div>
+        </div>
+    </body>
+</html>

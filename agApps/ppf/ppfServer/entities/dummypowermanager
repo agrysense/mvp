@@ -91,6 +91,10 @@ DummyPowerManager.prototype.listPowerConsumptionMonthlyAggregates = function(dto
         {
             "when": "2",
             "value": "40000.0"
+        },
+        {
+            "when": "3",
+            "value": "39500.0"
         }
     ];
 };

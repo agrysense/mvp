@@ -1,9 +1,9 @@
-body {background: #f2f2f2;}
+body {background: #ffffff;}
 
 /*** header ***/
 header {
   padding: 8px 0;
-  background: #313131; 
+  background: #ffffff; 
 }
 
 /*** Page title ***/
@@ -47,13 +47,13 @@ header {
 
 /*** Override boostrap button styles ***/
 .btn-default {
-  background: #ff8c00;
+  background: #81F7BE;
   border: none;
   color: #fff;
 }
 
 .btn-default:hover, .btn-default:active, .btn-default:focus, .btn-default:active.focus, .btn-default:active:focus, .btn-default:active:hover  {
-  background: #e4710d;
+  background: #45ef9d;
   color: #fff;
   border: none;
   outline: 0;
