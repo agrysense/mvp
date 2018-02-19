@@ -199,7 +199,7 @@
 				{
 					"name": "Get farmhouse by id",
 					"request": {
-						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/devices/camera/742D5FCB2AC158E590241B6D6D7C042B",
+						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse/BBD9FF9E99D85D7B06A78AE9DEAA97C3",
 						"method": "GET",
 						"header": [
 							{
@@ -392,6 +392,26 @@
 							"raw": "{\n\t\"farm\": \"0725D7D519102E30C7ACF9109842AA21\",\n\t\"name\": \"TEST_ACME_HOUSE\",\n\t\"location\": \"44,001:77,002\",\n\t\"gps\": \"false\",\n\t\"description\": \"test\",\n\t\"category\": \"A\",\n\t\"length\": 120,\n\t\"width\": 20,\n\t\"capacity\":1000,\n\t\"layers\": 1,\n\t\"lines\": 2,\n\t\"height\": 5,\n\t\"hangarType\": \"H\"\n}"
 						},
 						"description": "List farmhouses by farm id, with overview"
+					},
+					"response": []
+				},
+				{
+					"name": "List environmental values for a given farmhouse",
+					"request": {
+						"url": "https://api.scriptrapps.io/agApps/ppf/ppfServer/api/farmhouse/2A7729844A6BEB3AD5245F221598E36E/environment",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SkZFMEVBMzJBMTpzY3JpcHRyOjRDQzE0QkU2N0U2NUFDNUI2NTQzRENGMjQ3NjJGNEI5",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"farm\": \"0725D7D519102E30C7ACF9109842AA21\",\n\t\"name\": \"TEST_ACME_HOUSE\",\n\t\"location\": \"44,001:77,002\",\n\t\"gps\": \"false\",\n\t\"description\": \"test\",\n\t\"category\": \"A\",\n\t\"length\": 120,\n\t\"width\": 20,\n\t\"capacity\":1000,\n\t\"layers\": 1,\n\t\"lines\": 2,\n\t\"height\": 5,\n\t\"hangarType\": \"H\"\n}"
+						},
+						"description": "List environmental values for a given farmhouse"
 					},
 					"response": []
 				}
