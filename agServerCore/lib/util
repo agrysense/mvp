@@ -27,6 +27,36 @@ function removeMetaData(doc) {
 }
 
 /**
+ * Returns the rounded number of days between two dates
+ * @function daysBetween
+ * @param {Date} start (can be a string date)
+ * @param {Date} end (can be a string date), optional, defaults to current date
+ */
+function daysBetween(start, end) {
+ 
+    if (!start) {
+
+        throw {
+            error: "Missing_Parameter",
+            errorDetail: "You should provide a start date at least"
+        };
+    }
+
+    var startDate = (start instanceof Date) ? start : new Date(start);
+    var endDate = end;
+    if (endDate) {
+       endDate = (endDate instanceof Date) ? endDate : new Date(endDate);
+    }else {
+        endDate = new Date();
+    }
+    
+    startDate = startDate.getTime(); 
+    endDate = endDate.getTime(); 
+    var lap = Math.abs(endDate - startDate) / (1000 * 60 * 60 * 24);
+    return Math.round(lap);
+}
+
+/**
  * @function toShortDate
  * @param {Date} date. If not provided, uses current date
  * @return {String} YYYY-MM-DD
@@ -45,6 +75,32 @@ function toShortDate(date) {
     return dateStr;
 }
 
+/**
+ * @function toLongDate
+ * @param {Date} date, if not provided defaults to current date
+ * @return {String} YYYY-MM-DDTHH:mm:ss
+ */
+function toLongDate(date) {
+
+    var useDate = null;
+    if (date) {
+        useDate = (date instanceof Date) ? date : new Date(date); 
+    }else {
+        useDate = new Date();
+    }
+
+    var dateStr = useDate.toISOString();
+    dateStr = dateStr.substring(0, dateStr.indexOf("."));
+    return dateStr + "+0000";
+}
+
+/**
+ * Checks if the body of a request needs to be parsed into JSON. Used by API operations.
+ * @function parse
+ * @param {Object} data: the request's body, could be a string, if so it will be parsed
+ * @return {Object}
+ * @throw {Error}
+ */
 function parse(data) {
 
     var obj = data;
@@ -69,23 +125,4 @@ function parse(data) {
     }
 
     return obj;
-}
-
-/**
- * @function toLongDate
- * @param {Date} date, if not provided defaults to current date
- * @return {String} YYYY-MM-DDTHH:mm:ss
- */
-function toLongDate(date) {
-    
-    var useDate = null;
-    if (date) {
-        useDate = (date instanceof Date) ? date : new Date(date); 
-    }else {
-        useDate = new Date();
-    }
-
-    var dateStr = useDate.toISOString();
-    dateStr = dateStr.substring(0, dateStr.indexOf("."));
-    return dateStr + "+0000";
 }
